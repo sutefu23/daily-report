@@ -98,6 +98,14 @@
 - バックアップ：日次
 - 稼働時間：平日8:00-20:00（メンテナンス時間を除く）
 
+## 8. 使用技術
+**言語:** TypeScript
+**フレームワーク** Next.js(Aop Router)
+**UI** shadcn/ui
+**APIスキーマ定義** OpenAPI(Zodによる検証)
+**DBスキーマ定義** Prisma.js
+**テスト** Vitest
+**デプロイ** Google Cloud Cloud Run
 
 ## 7. 画面設計
 
