@@ -1,34 +1,33 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import { env } from './env';
 
 describe('EnvConfig', () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
     // 環境変数をリセット
     vi.resetModules();
-    process.env = { ...originalEnv };
+    vi.unstubAllEnvs();
     // envのキャッシュをクリア
     env.clearCache();
   });
 
   afterAll(() => {
-    process.env = originalEnv;
+    vi.unstubAllEnvs();
   });
 
   describe('validate', () => {
     it('validates successfully when all required env vars are set', () => {
-      process.env.DATABASE_URL = 'postgresql://test';
-      process.env.NEXTAUTH_URL = 'http://localhost:3000';
-      process.env.NEXTAUTH_SECRET = 'test-secret';
-      process.env.JWT_SECRET = 'jwt-secret';
+      vi.stubEnv('DATABASE_URL', 'postgresql://test');
+      vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+      vi.stubEnv('NEXTAUTH_SECRET', 'test-secret');
+      vi.stubEnv('JWT_SECRET', 'jwt-secret');
 
       expect(() => env.validate()).not.toThrow();
     });
 
     it('warns in development when required env vars are missing', () => {
-      process.env.NODE_ENV = 'development';
-      delete process.env.DATABASE_URL;
+      vi.stubEnv('NODE_ENV', 'development');
+      // 環境変数を削除するには、undefinedを設定
+      vi.stubEnv('DATABASE_URL', undefined);
 
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -42,8 +41,8 @@ describe('EnvConfig', () => {
     });
 
     it('throws error in production when required env vars are missing', () => {
-      process.env.NODE_ENV = 'production';
-      delete process.env.DATABASE_URL;
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('DATABASE_URL', undefined);
 
       expect(() => env.validate()).toThrow(
         'Missing required environment variables'
@@ -53,10 +52,10 @@ describe('EnvConfig', () => {
 
   describe('get', () => {
     beforeEach(() => {
-      process.env.DATABASE_URL = 'postgresql://test';
-      process.env.NEXTAUTH_URL = 'http://localhost:3000';
-      process.env.NEXTAUTH_SECRET = 'test-secret';
-      process.env.JWT_SECRET = 'jwt-secret';
+      vi.stubEnv('DATABASE_URL', 'postgresql://test');
+      vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+      vi.stubEnv('NEXTAUTH_SECRET', 'test-secret');
+      vi.stubEnv('JWT_SECRET', 'jwt-secret');
     });
 
     it('returns value for required env var', () => {
@@ -65,19 +64,19 @@ describe('EnvConfig', () => {
     });
 
     it('returns default value for optional env var when not set', () => {
-      delete process.env.JWT_EXPIRES_IN;
+      vi.stubEnv('JWT_EXPIRES_IN', undefined);
       const value = env.get('JWT_EXPIRES_IN');
       expect(value).toBe('1h');
     });
 
     it('returns custom value for optional env var when set', () => {
-      process.env.JWT_EXPIRES_IN = '2h';
+      vi.stubEnv('JWT_EXPIRES_IN', '2h');
       const value = env.get('JWT_EXPIRES_IN');
       expect(value).toBe('2h');
     });
 
     it('throws error for missing required env var', () => {
-      delete process.env.DATABASE_URL;
+      vi.stubEnv('DATABASE_URL', undefined);
       expect(() => env.get('DATABASE_URL')).toThrow(
         'Environment variable DATABASE_URL is not set'
       );
@@ -86,11 +85,11 @@ describe('EnvConfig', () => {
 
   describe('getAll', () => {
     it('returns all env vars with values', () => {
-      process.env.DATABASE_URL = 'postgresql://test';
-      process.env.NEXTAUTH_URL = 'http://localhost:3000';
-      process.env.NEXTAUTH_SECRET = 'test-secret';
-      process.env.JWT_SECRET = 'jwt-secret';
-      process.env.NODE_ENV = 'test';
+      vi.stubEnv('DATABASE_URL', 'postgresql://test');
+      vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+      vi.stubEnv('NEXTAUTH_SECRET', 'test-secret');
+      vi.stubEnv('JWT_SECRET', 'jwt-secret');
+      vi.stubEnv('NODE_ENV', 'test');
 
       const config = env.getAll();
 
@@ -106,39 +105,39 @@ describe('EnvConfig', () => {
   describe('environment checks', () => {
     beforeEach(() => {
       // 必須環境変数を設定
-      process.env.DATABASE_URL = 'postgresql://test';
-      process.env.NEXTAUTH_URL = 'http://localhost:3000';
-      process.env.NEXTAUTH_SECRET = 'test-secret';
-      process.env.JWT_SECRET = 'jwt-secret';
+      vi.stubEnv('DATABASE_URL', 'postgresql://test');
+      vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
+      vi.stubEnv('NEXTAUTH_SECRET', 'test-secret');
+      vi.stubEnv('JWT_SECRET', 'jwt-secret');
     });
 
     it('isProduction returns true when NODE_ENV is production', () => {
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
       expect(env.isProduction()).toBe(true);
     });
 
     it('isProduction returns false when NODE_ENV is not production', () => {
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       expect(env.isProduction()).toBe(false);
     });
 
     it('isDevelopment returns true when NODE_ENV is development', () => {
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       expect(env.isDevelopment()).toBe(true);
     });
 
     it('isDevelopment returns false when NODE_ENV is not development', () => {
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
       expect(env.isDevelopment()).toBe(false);
     });
 
     it('isTest returns true when NODE_ENV is test', () => {
-      process.env.NODE_ENV = 'test';
+      vi.stubEnv('NODE_ENV', 'test');
       expect(env.isTest()).toBe(true);
     });
 
     it('isTest returns false when NODE_ENV is not test', () => {
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       expect(env.isTest()).toBe(false);
     });
   });
