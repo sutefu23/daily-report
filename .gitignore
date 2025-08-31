@@ -5,3 +5,6 @@ tsconfig.tsbuildinfo
 .env.production
 .DS_Store
 next-env.d.ts
+
+# git subtree work directories
+issue-*
