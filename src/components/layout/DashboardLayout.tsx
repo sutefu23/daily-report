@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React from 'react';
 import { Header } from './Header';
@@ -23,9 +23,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <div className="flex h-[calc(100vh-4rem)]">
         <Sidebar isManager={isManager} />
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-6 py-8">
-            {children}
-          </div>
+          <div className="container mx-auto px-6 py-8">{children}</div>
         </main>
       </div>
     </div>
