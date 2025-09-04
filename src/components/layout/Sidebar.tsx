@@ -1,16 +1,10 @@
-"use client"
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import {
-  FileText,
-  Users,
-  Building,
-  Home,
-  PlusCircle,
-} from 'lucide-react';
+import { FileText, Users, Building, Home, PlusCircle } from 'lucide-react';
 
 interface SidebarProps {
   isManager?: boolean;
@@ -57,7 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isManager = false }) => {
   const pathname = usePathname();
 
   const filteredNavItems = navItems.filter(
-    item => !item.requiresManager || isManager
+    (item) => !item.requiresManager || isManager
   );
 
   return (
@@ -68,10 +62,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isManager = false }) => {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
               pathname === item.href
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-accent hover:text-accent-foreground"
+                ? 'bg-primary text-primary-foreground'
+                : 'hover:bg-accent hover:text-accent-foreground'
             )}
           >
             {item.icon}

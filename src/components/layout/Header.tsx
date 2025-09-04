@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({ userName, onLogout }) => {
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold">営業日報システム</h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             {userName && (
               <>
