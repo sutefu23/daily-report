@@ -33,7 +33,7 @@ export const LoginResponseSchema = z.object({
 // ユーザー情報
 export const UserSchema = z.object({
   id: z.number().int().positive(),
-  name: z.string(),
+  name: z.string().min(1, '名前は必須です'),
   email: z.string().email(),
   department: z.string(),
   is_manager: z.boolean(),

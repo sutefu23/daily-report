@@ -72,12 +72,16 @@ export const PaginationQuerySchema = z.object({
 // 日付形式バリデーション
 export const DateStringSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format');
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+  .refine((date) => {
+    const parsed = new Date(date + 'T00:00:00Z');
+    return parsed.toISOString().slice(0, 10) === date;
+  }, 'Invalid date');
 
 // 時刻形式バリデーション（HH:MM）
 export const TimeStringSchema = z
   .string()
-  .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be in HH:MM format');
+  .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be in HH:MM format');
 
 // ID パラメータ
 export const IdParamSchema = z.object({
