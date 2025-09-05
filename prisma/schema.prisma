@@ -15,8 +15,10 @@ model SalesPerson {
   salesPersonId Int      @id @default(autoincrement()) @map("sales_person_id")
   name          String
   email         String   @unique
+  password      String
   department    String
   isManager     Boolean  @default(false) @map("is_manager")
+  isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
