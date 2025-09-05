@@ -74,6 +74,20 @@ export const resetPasswordSchema = z
   });
 
 /**
+ * パスワードリセット用APIスキーマ（フロントエンド確認なし）
+ */
+export const resetPasswordApiSchema = z.object({
+  password: z
+    .string()
+    .min(8, 'パスワードは8文字以上で入力してください')
+    .max(100, 'パスワードは100文字以内で入力してください')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
+      'パスワードは大文字・小文字・数字を含む必要があります'
+    ),
+});
+
+/**
  * 検索用スキーマ
  */
 export const searchSalesPersonSchema = z.object({
@@ -89,4 +103,5 @@ export const searchSalesPersonSchema = z.object({
 export type CreateSalesPersonInput = z.infer<typeof createSalesPersonSchema>;
 export type UpdateSalesPersonInput = z.infer<typeof updateSalesPersonSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordApiInput = z.infer<typeof resetPasswordApiSchema>;
 export type SearchSalesPersonInput = z.infer<typeof searchSalesPersonSchema>;

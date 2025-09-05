@@ -54,42 +54,52 @@ export async function GET(request: NextRequest) {
     }
 
     if (validatedParams.is_manager !== undefined) {
-      where.is_manager = validatedParams.is_manager;
+      where.isManager = validatedParams.is_manager;
     }
 
     if (validatedParams.is_active !== undefined) {
-      where.is_active = validatedParams.is_active;
+      where.isActive = validatedParams.is_active;
     }
 
     // 総件数取得
     const total = await prisma.salesPerson.count({ where });
 
     // ページネーション計算
-    const offset = (validatedParams.page - 1) * validatedParams.per_page;
     const totalPages = Math.ceil(total / validatedParams.per_page);
+    const skip = (validatedParams.page - 1) * validatedParams.per_page;
 
-    // データ取得（パスワードは除外）
-    const salesPersons = await prisma.salesPerson.findMany({
+    // データ取得
+    const salesPersonsRaw = await prisma.salesPerson.findMany({
       where,
-      skip: offset,
+      skip,
       take: validatedParams.per_page,
       select: {
-        id: true,
+        salesPersonId: true,
         name: true,
         email: true,
         department: true,
-        is_manager: true,
-        is_active: true,
-        created_at: true,
-        updated_at: true,
+        isManager: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
-      orderBy: {
-        created_at: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
+    // APIレスポンス形式に変換
+    const salesPersons: SalesPerson[] = salesPersonsRaw.map((person) => ({
+      id: person.salesPersonId,
+      name: person.name,
+      email: person.email,
+      department: person.department,
+      is_manager: person.isManager,
+      is_active: person.isActive,
+      created_at: person.createdAt,
+      updated_at: person.updatedAt,
+    }));
+
     const response: PaginatedResponse<SalesPerson> = {
-      data: salesPersons as SalesPerson[],
+      data: salesPersons,
       pagination: {
         total,
         page: validatedParams.page,
@@ -107,7 +117,7 @@ export async function GET(request: NextRequest) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
@@ -148,12 +158,6 @@ export async function POST(request: NextRequest) {
         error: {
           code: 'DUPLICATE_EMAIL',
           message: 'このメールアドレスは既に使用されています',
-          details: [
-            {
-              field: 'email',
-              message: 'このメールアドレスは既に使用されています',
-            },
-          ],
         },
       };
       return NextResponse.json(apiError, { status: 409 });
@@ -163,26 +167,38 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(validatedData.password, 12);
 
     // 営業担当者の作成
-    const salesPerson = await prisma.salesPerson.create({
+    const salesPersonRaw = await prisma.salesPerson.create({
       data: {
         name: validatedData.name,
         email: validatedData.email,
         password: hashedPassword,
         department: validatedData.department,
-        is_manager: validatedData.is_manager,
-        is_active: validatedData.is_active,
+        isManager: validatedData.is_manager,
+        isActive: validatedData.is_active,
       },
       select: {
-        id: true,
+        salesPersonId: true,
         name: true,
         email: true,
         department: true,
-        is_manager: true,
-        is_active: true,
-        created_at: true,
-        updated_at: true,
+        isManager: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
+
+    // APIレスポンス形式に変換
+    const salesPerson: SalesPerson = {
+      id: salesPersonRaw.salesPersonId,
+      name: salesPersonRaw.name,
+      email: salesPersonRaw.email,
+      department: salesPersonRaw.department,
+      is_manager: salesPersonRaw.isManager,
+      is_active: salesPersonRaw.isActive,
+      created_at: salesPersonRaw.createdAt,
+      updated_at: salesPersonRaw.updatedAt,
+    };
 
     return NextResponse.json(salesPerson, { status: 201 });
   } catch (error) {
@@ -193,7 +209,7 @@ export async function POST(request: NextRequest) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),

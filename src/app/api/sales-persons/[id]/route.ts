@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { updateSalesPersonSchema } from '@/lib/validations/sales-person';
 import type { ApiError, SalesPerson } from '@/types/api';
@@ -15,9 +14,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const salesPersonId = parseInt(params.id);
 
-    if (isNaN(id)) {
+    if (isNaN(salesPersonId)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -28,16 +27,16 @@ export async function GET(
     }
 
     const salesPerson = await prisma.salesPerson.findUnique({
-      where: { id },
+      where: { salesPersonId },
       select: {
-        id: true,
+        salesPersonId: true,
         name: true,
         email: true,
         department: true,
-        is_manager: true,
-        is_active: true,
-        created_at: true,
-        updated_at: true,
+        isManager: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -51,7 +50,17 @@ export async function GET(
       return NextResponse.json(apiError, { status: 404 });
     }
 
-    return NextResponse.json(salesPerson as SalesPerson);
+    const responseData: SalesPerson = {
+      id: salesPerson.salesPersonId,
+      name: salesPerson.name,
+      email: salesPerson.email,
+      department: salesPerson.department,
+      is_manager: salesPerson.isManager,
+      is_active: salesPerson.isActive,
+      created_at: salesPerson.createdAt,
+      updated_at: salesPerson.updatedAt,
+    };
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Error fetching sales person:', error);
 
@@ -75,9 +84,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const salesPersonId = parseInt(params.id);
 
-    if (isNaN(id)) {
+    if (isNaN(salesPersonId)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -94,7 +103,7 @@ export async function PUT(
 
     // 存在チェック
     const existingSalesPerson = await prisma.salesPerson.findUnique({
-      where: { id },
+      where: { salesPersonId },
     });
 
     if (!existingSalesPerson) {
@@ -121,12 +130,6 @@ export async function PUT(
           error: {
             code: 'DUPLICATE_EMAIL',
             message: 'このメールアドレスは既に使用されています',
-            details: [
-              {
-                field: 'email',
-                message: 'このメールアドレスは既に使用されています',
-              },
-            ],
           },
         };
         return NextResponse.json(apiError, { status: 409 });
@@ -141,27 +144,37 @@ export async function PUT(
     if (validatedData.department !== undefined)
       updateData.department = validatedData.department;
     if (validatedData.is_manager !== undefined)
-      updateData.is_manager = validatedData.is_manager;
+      updateData.isManager = validatedData.is_manager;
     if (validatedData.is_active !== undefined)
-      updateData.is_active = validatedData.is_active;
+      updateData.isActive = validatedData.is_active;
 
     // 営業担当者の更新
     const updatedSalesPerson = await prisma.salesPerson.update({
-      where: { id },
+      where: { salesPersonId },
       data: updateData,
       select: {
-        id: true,
+        salesPersonId: true,
         name: true,
         email: true,
         department: true,
-        is_manager: true,
-        is_active: true,
-        created_at: true,
-        updated_at: true,
+        isManager: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return NextResponse.json(updatedSalesPerson as SalesPerson);
+    const responseData: SalesPerson = {
+      id: updatedSalesPerson.salesPersonId,
+      name: updatedSalesPerson.name,
+      email: updatedSalesPerson.email,
+      department: updatedSalesPerson.department,
+      is_manager: updatedSalesPerson.isManager,
+      is_active: updatedSalesPerson.isActive,
+      created_at: updatedSalesPerson.createdAt,
+      updated_at: updatedSalesPerson.updatedAt,
+    };
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Error updating sales person:', error);
 
@@ -170,7 +183,7 @@ export async function PUT(
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
@@ -199,9 +212,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const salesPersonId = parseInt(params.id);
 
-    if (isNaN(id)) {
+    if (isNaN(salesPersonId)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -213,7 +226,7 @@ export async function DELETE(
 
     // 存在チェック
     const existingSalesPerson = await prisma.salesPerson.findUnique({
-      where: { id },
+      where: { salesPersonId },
     });
 
     if (!existingSalesPerson) {
@@ -226,25 +239,25 @@ export async function DELETE(
       return NextResponse.json(apiError, { status: 404 });
     }
 
-    // 関連データの存在チェック（日報やコメントがある場合は論理削除）
-    const hasReports = await prisma.dailyReport.findFirst({
-      where: { sales_person_id: id },
+    // 参照データの確認
+    const referencedReports = await prisma.dailyReport.findMany({
+      where: { salesPersonId },
     });
 
-    const hasComments = await prisma.managerComment.findFirst({
-      where: { manager_id: id },
+    const referencedComments = await prisma.managerComment.findMany({
+      where: { managerId: salesPersonId },
     });
 
-    if (hasReports || hasComments) {
-      // 関連データがある場合は論理削除（is_activeをfalseに設定）
+    if (referencedReports.length > 0 || referencedComments.length > 0) {
+      // 論理削除（is_activeをfalseに設定）
       await prisma.salesPerson.update({
-        where: { id },
-        data: { is_active: false },
+        where: { salesPersonId },
+        data: { isActive: false },
       });
     } else {
-      // 関連データがない場合は物理削除
+      // 物理削除の実行
       await prisma.salesPerson.delete({
-        where: { id },
+        where: { salesPersonId },
       });
     }
 

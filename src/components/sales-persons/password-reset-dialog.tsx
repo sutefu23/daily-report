@@ -47,7 +47,7 @@ export function PasswordResetDialog({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<ResetPasswordInput>({
+  const form = useForm({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: '',

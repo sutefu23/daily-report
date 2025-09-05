@@ -44,7 +44,7 @@ export function NewSalesPersonDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<CreateSalesPersonInput>({
+  const form = useForm({
     resolver: zodResolver(createSalesPersonSchema),
     defaultValues: {
       name: '',

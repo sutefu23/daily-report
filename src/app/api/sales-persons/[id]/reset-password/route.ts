@@ -26,9 +26,9 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const salesPersonId = parseInt(params.id);
 
-    if (isNaN(id)) {
+    if (isNaN(salesPersonId)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -45,12 +45,12 @@ export async function POST(
 
     // 存在チェック
     const existingSalesPerson = await prisma.salesPerson.findUnique({
-      where: { id },
+      where: { salesPersonId },
       select: {
-        id: true,
+        salesPersonId: true,
         name: true,
         email: true,
-        is_active: true,
+        isActive: true,
       },
     });
 
@@ -65,7 +65,7 @@ export async function POST(
     }
 
     // アクティブなアカウントかチェック
-    if (!existingSalesPerson.is_active) {
+    if (!existingSalesPerson.isActive) {
       const apiError: ApiError = {
         error: {
           code: 'ACCOUNT_INACTIVE',
@@ -80,10 +80,10 @@ export async function POST(
 
     // パスワードの更新
     await prisma.salesPerson.update({
-      where: { id },
+      where: { salesPersonId },
       data: {
         password: hashedPassword,
-        updated_at: new Date(),
+        updatedAt: new Date(),
       },
     });
 
@@ -91,7 +91,7 @@ export async function POST(
     return NextResponse.json({
       message: 'パスワードをリセットしました',
       user: {
-        id: existingSalesPerson.id,
+        id: existingSalesPerson.salesPersonId,
         name: existingSalesPerson.name,
         email: existingSalesPerson.email,
       },
@@ -104,7 +104,7 @@ export async function POST(
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),

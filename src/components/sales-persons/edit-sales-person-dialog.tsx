@@ -48,14 +48,14 @@ export function EditSalesPersonDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<UpdateSalesPersonInput>({
+  const form = useForm({
     resolver: zodResolver(updateSalesPersonSchema),
     defaultValues: {
       name: salesPerson.name,
       email: salesPerson.email,
       department: salesPerson.department,
       is_manager: salesPerson.is_manager,
-      is_active: true, // TODO: API側でis_activeフィールド実装後に対応
+      is_active: salesPerson.is_active,
     },
   });
 
@@ -67,7 +67,7 @@ export function EditSalesPersonDialog({
         email: salesPerson.email,
         department: salesPerson.department,
         is_manager: salesPerson.is_manager,
-        is_active: true, // TODO: API側でis_activeフィールド実装後に対応
+        is_active: salesPerson.is_active,
       });
     }
   }, [salesPerson, form]);
@@ -113,8 +113,8 @@ export function EditSalesPersonDialog({
   };
 
   // 作成日時のフォーマット
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ja-JP', {
+  const formatDate = (date: Date | string) => {
+    return new Date(date).toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
