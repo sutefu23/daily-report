@@ -31,6 +31,10 @@ vi.mock('bcryptjs', () => ({
 // Import after mocking
 import { GET, POST } from './route';
 
+vi.mock('@/lib/auth/verify', () => ({
+  verifyToken: vi.fn(),
+}));
+
 describe('/api/sales-persons', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -41,8 +45,25 @@ describe('/api/sales-persons', () => {
   });
 
   describe('GET /api/sales-persons', () => {
+    it('認証されていない場合は401を返す', async () => {
+      vi.mocked(verifyToken).mockResolvedValue(null);
+
+      const request = new NextRequest('http://localhost:3000/api/sales-persons');
+      const response = await GET(request);
+
+      expect(response.status).toBe(401);
+      const data = await response.json();
+      expect(data.error.code).toBe('AUTH_UNAUTHORIZED');
+    });
+
     it('営業担当者一覧を正常に取得できる', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+        is_manager: false,
+      });
+
       const mockSalesPersons = [
         {
           salesPersonId: 1,
@@ -86,6 +107,12 @@ describe('/api/sales-persons', () => {
 
     it('検索パラメータで絞り込みができる', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+        is_manager: false,
+      });
+
       mockPrismaClient.salesPerson.count.mockResolvedValue(0);
       mockPrismaClient.salesPerson.findMany.mockResolvedValue([]);
 
@@ -115,6 +142,12 @@ describe('/api/sales-persons', () => {
 
     it('ページネーションが正しく動作する', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+        is_manager: false,
+      });
+
       mockPrismaClient.salesPerson.count.mockResolvedValue(100);
       mockPrismaClient.salesPerson.findMany.mockResolvedValue([]);
 
@@ -143,8 +176,46 @@ describe('/api/sales-persons', () => {
   });
 
   describe('POST /api/sales-persons', () => {
-    it('営業担当者を正常に作成できる', async () => {
+    it('認証されていない場合は401を返す', async () => {
+      vi.mocked(verifyToken).mockResolvedValue(null);
+
+      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      const response = await POST(request);
+
+      expect(response.status).toBe(401);
+      const data = await response.json();
+      expect(data.error.code).toBe('AUTH_UNAUTHORIZED');
+    });
+
+    it('管理者でない場合は403を返す', async () => {
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+        is_manager: false,
+      });
+
+      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      const response = await POST(request);
+
+      expect(response.status).toBe(403);
+      const data = await response.json();
+      expect(data.error.code).toBe('FORBIDDEN');
+    });
+
+    it('管理者の場合、営業担当者を正常に作成できる', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'admin@example.com',
+        is_manager: true,
+      });
+
       const requestData = {
         name: '新規太郎',
         email: 'shinki@example.com',
@@ -193,6 +264,12 @@ describe('/api/sales-persons', () => {
 
     it('重複するメールアドレスで409エラーが返る', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'admin@example.com',
+        is_manager: true,
+      });
+
       const requestData = {
         name: '重複太郎',
         email: 'existing@example.com',
@@ -223,6 +300,12 @@ describe('/api/sales-persons', () => {
 
     it('バリデーションエラーで400エラーが返る', async () => {
       // Arrange
+      vi.mocked(verifyToken).mockResolvedValue({
+        id: 1,
+        email: 'admin@example.com',
+        is_manager: true,
+      });
+
       const requestData = {
         name: '', // 必須項目が空
         email: 'invalid-email', // 不正なメールアドレス
