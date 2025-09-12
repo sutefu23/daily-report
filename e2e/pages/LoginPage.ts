@@ -20,7 +20,7 @@ export class LoginPage {
 
   async goto(): Promise<void> {
     await this.page.goto('/login');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async fillEmail(email: string): Promise<void> {

@@ -5,8 +5,8 @@ import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/auth/verify';
 
 // モック設定
-vi.mock('@prisma/client', () => {
-  const mockPrismaClient = vi.fn(() => ({
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn().mockImplementation(() => ({
     customer: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -16,9 +16,8 @@ vi.mock('@prisma/client', () => {
       count: vi.fn(),
     },
     $disconnect: vi.fn(),
-  }));
-  return { PrismaClient: mockPrismaClient };
-});
+  })),
+}));
 
 vi.mock('@/lib/auth/verify', () => ({
   verifyToken: vi.fn(),

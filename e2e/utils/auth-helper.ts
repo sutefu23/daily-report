@@ -12,7 +12,7 @@ export async function login(
   const user = TEST_USERS[userType];
   
   await page.goto('/login');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   
   // ログインフォームの要素を取得
   const emailField = page.locator('input[name="email"], input[type="email"]');
