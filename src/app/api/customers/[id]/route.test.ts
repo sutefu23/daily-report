@@ -1,12 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET, PUT, DELETE } from './route';
-import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/auth/verify';
 
 // モック設定
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn().mockImplementation(() => ({
+vi.mock('@/lib/prisma', () => ({
+  default: {
     customer: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -16,19 +15,20 @@ vi.mock('@prisma/client', () => ({
       count: vi.fn(),
     },
     $disconnect: vi.fn(),
-  })),
+  },
 }));
 
 vi.mock('@/lib/auth/verify', () => ({
   verifyToken: vi.fn(),
 }));
 
+import mockPrisma from '@/lib/prisma';
+
 describe('/api/customers/[id]', () => {
-  let prismaClient: any;
+  const prismaClient = mockPrisma as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    prismaClient = new PrismaClient();
   });
 
   describe('GET /api/customers/[id]', () => {

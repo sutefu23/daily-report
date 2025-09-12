@@ -3,6 +3,34 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import SalesPersonsPage from './page';
 import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+
+// Mock useAuth hook
+const mockAuthValue = {
+  user: {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    department: '営業部',
+    is_manager: true,
+  },
+  isLoading: false,
+  error: null,
+  isAuthenticated: true,
+  isManager: true,
+  login: vi.fn(),
+  logout: vi.fn(),
+  clearError: vi.fn(),
+};
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => mockAuthValue,
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => mockAuthValue,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 // Mock components
 vi.mock('@/components/layout/DashboardLayout', () => ({
@@ -170,7 +198,7 @@ describe('SalesPersonsPage', () => {
 
     // Assert
     expect(screen.getByTestId('new-dialog')).toHaveAttribute('data-open', 'true');
-  });
+  }, 10000);
 
   it('編集ダイアログが開く', async () => {
     // Arrange
@@ -320,6 +348,13 @@ describe('SalesPersonsPage', () => {
   it('ダイアログの成功コールバックが正しく動作する', async () => {
     // Arrange
     const user = userEvent.setup();
+    
+    // 最初のデータフェッチをモック
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: mockSalesPersons }),
+    });
+    
     render(<SalesPersonsPage />);
 
     await waitFor(() => {
@@ -329,6 +364,12 @@ describe('SalesPersonsPage', () => {
     // 新規登録ダイアログを開く
     const newButton = screen.getByText('新規登録');
     await user.click(newButton);
+
+    // 成功後のデータフェッチをモック
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: mockSalesPersons }),
+    });
 
     // Act - 成功コールバックを実行
     const successButton = screen.getByText('Success');

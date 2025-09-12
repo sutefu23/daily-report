@@ -827,7 +827,8 @@ describe('Daily Report Workflow Integration Tests', () => {
       expect(statistics.totalReports).toBe(15);
       expect(statistics.totalVisits).toBeGreaterThan(15); // 各日報に1-3件の訪問
       expect(statistics.uniqueCustomers).toBeLessThanOrEqual(5);
-      expect(statistics.mostVisitedCustomers).toHaveLength(5);
+      expect(statistics.mostVisitedCustomers.length).toBeLessThanOrEqual(5);
+      expect(statistics.mostVisitedCustomers.length).toBeGreaterThan(0);
       expect(statistics.commonIssues.length).toBeGreaterThan(0);
 
       const summary = result.data.summary;

@@ -115,20 +115,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
-    return items.filter((item) => {
-      // Check role-based access
-      if (item.requiredRole === 'manager' && !user?.isManager) {
-        return false;
-      }
-      if (item.requiredRole === 'admin' && !user?.isManager) {
-        return false;
-      }
-      // Filter children recursively
-      if (item.children) {
-        item.children = filterMenuItems(item.children);
-      }
-      return true;
-    });
+    return items
+      .filter((item) => {
+        // Check role-based access
+        if (item.requiredRole === 'manager' && !user?.isManager) {
+          return false;
+        }
+        if (item.requiredRole === 'admin' && !user?.isManager) {
+          return false;
+        }
+        return true;
+      })
+      .map((item) => {
+        // Filter children recursively without mutating the original
+        if (item.children) {
+          return {
+            ...item,
+            children: filterMenuItems(item.children),
+          };
+        }
+        return item;
+      });
   };
 
   const renderMenuItem = (item: MenuItem, depth = 0) => {

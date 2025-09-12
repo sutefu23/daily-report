@@ -95,7 +95,7 @@ describe('LoginForm', () => {
 
       // バリデーションによりフォーム送信が阻止されることを確認
       expect(mockOnSubmit).not.toHaveBeenCalled();
-    });
+    }, 10000);
 
     it('パスワードが8文字未満の場合にエラーメッセージが表示される', async () => {
       const user = userEvent.setup();

@@ -27,6 +27,18 @@ vi.mock('next-themes', () => ({
   }),
 }));
 
+// Mock dropdown menu components
+vi.mock('@/components/ui/dropdown-menu', () => ({
+  DropdownMenu: ({ children }: any) => <div>{children}</div>,
+  DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
+  DropdownMenuContent: ({ children }: any) => <div data-testid="dropdown-content">{children}</div>,
+  DropdownMenuLabel: ({ children }: any) => <div>{children}</div>,
+  DropdownMenuItem: ({ children, onClick }: any) => (
+    <div onClick={onClick} role="menuitem">{children}</div>
+  ),
+  DropdownMenuSeparator: () => <hr />,
+}));
+
 describe('MainLayout', () => {
   const mockUser: User = {
     id: 1,
@@ -119,7 +131,7 @@ describe('MainLayout', () => {
       .toBeInTheDocument();
   });
 
-  it('calls onLogout when logout is triggered', () => {
+  it('calls onLogout when logout is triggered', async () => {
     render(
       <MainLayout user={mockUser} onLogout={mockOnLogout}>
         <div>Test Content</div>
@@ -135,7 +147,7 @@ describe('MainLayout', () => {
     fireEvent.click(logoutButton);
     
     expect(mockOnLogout).toHaveBeenCalledTimes(1);
-  });
+  }, 10000);
 
   it('renders children content correctly', () => {
     const TestComponent = () => (

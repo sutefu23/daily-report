@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth/middleware';
-
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   return requireAuth(request, async (req) => {
@@ -53,7 +51,7 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect(); // Not needed with singleton
     }
   });
 }

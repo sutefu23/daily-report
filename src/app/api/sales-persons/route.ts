@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import {
   createSalesPersonSchema,
   searchSalesPersonSchema,
@@ -9,7 +9,6 @@ import {
 import type { ApiError, PaginatedResponse, SalesPerson } from '@/types/api';
 import { verifyToken } from '@/lib/auth/verify';
 
-const prisma = new PrismaClient();
 
 /**
  * 営業担当者一覧取得
@@ -149,7 +148,7 @@ export async function GET(request: NextRequest) {
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -270,6 +269,6 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }

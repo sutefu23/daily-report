@@ -1,39 +1,40 @@
 import { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock setup
-const mockPrismaClient = {
-  salesPerson: {
-    count: vi.fn(),
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    create: vi.fn(),
-  },
-  $disconnect: vi.fn(),
-};
-
-const mockBcryptHash = vi.fn();
-
-// Mock modules
-vi.mock('@prisma/client', () => ({
-  PrismaClient: class {
-    salesPerson = mockPrismaClient.salesPerson;
-    $disconnect = mockPrismaClient.$disconnect;
+// Mock modules first
+vi.mock('@/lib/prisma', () => ({
+  default: {
+    salesPerson: {
+      count: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
+    $disconnect: vi.fn(),
   },
 }));
 
 vi.mock('bcryptjs', () => ({
   default: {
-    hash: mockBcryptHash,
+    hash: vi.fn(),
   },
 }));
-
-// Import after mocking
-import { GET, POST } from './route';
 
 vi.mock('@/lib/auth/verify', () => ({
   verifyToken: vi.fn(),
 }));
+
+// Import after mocking
+import { GET, POST } from './route';
+import { verifyToken } from '@/lib/auth/verify';
+import bcrypt from 'bcryptjs';
+
+// Import after mocking to get the mocked version
+import prisma from '@/lib/prisma';
+
+// Get references to mocked functions
+const mockPrismaClient = prisma as any;
+const mockBcryptHash = bcrypt.hash as any;
 
 describe('/api/sales-persons', () => {
   beforeEach(() => {

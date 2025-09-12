@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { requireAuth, AuthenticatedRequest } from '@/lib/auth/middleware';
 import { UpdateReportRequestSchema } from '@/lib/schemas/report';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // GET /api/reports/[id] - 日報詳細取得
 export async function GET(
@@ -142,7 +140,7 @@ export async function GET(
         { status: 500 }
       );
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect(); // Not needed with singleton
     }
   });
 }
@@ -150,11 +148,12 @@ export async function GET(
 // PUT /api/reports/[id] - 日報更新
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return requireAuth(request, async (req: AuthenticatedRequest) => {
     try {
-      const reportId = parseInt(params.id, 10);
+      const { id } = await params;
+      const reportId = parseInt(id, 10);
 
       if (isNaN(reportId) || reportId <= 0) {
         return NextResponse.json(
@@ -314,7 +313,7 @@ export async function PUT(
         { status: 500 }
       );
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect(); // Not needed with singleton
     }
   });
 }
@@ -322,11 +321,12 @@ export async function PUT(
 // DELETE /api/reports/[id] - 日報削除
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return requireAuth(request, async (req: AuthenticatedRequest) => {
     try {
-      const reportId = parseInt(params.id, 10);
+      const { id } = await params;
+      const reportId = parseInt(id, 10);
 
       if (isNaN(reportId) || reportId <= 0) {
         return NextResponse.json(
@@ -394,7 +394,7 @@ export async function DELETE(
         { status: 500 }
       );
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect(); // Not needed with singleton
     }
   });
 }

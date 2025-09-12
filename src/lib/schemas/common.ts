@@ -75,6 +75,10 @@ export const DateStringSchema = z
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
   .refine((date) => {
     const parsed = new Date(date + 'T00:00:00Z');
+    // Check if date is valid before calling toISOString
+    if (isNaN(parsed.getTime())) {
+      return false;
+    }
     return parsed.toISOString().slice(0, 10) === date;
   }, 'Invalid date');
 

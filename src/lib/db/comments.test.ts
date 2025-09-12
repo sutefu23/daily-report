@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import {
   getCommentsByReportId,
   checkReportExists,
@@ -9,8 +8,8 @@ import {
 } from './comments';
 
 // Prismaクライアントのモック
-vi.mock('@prisma/client', () => {
-  const mockPrismaClient = {
+vi.mock('@/lib/prisma', () => ({
+  default: {
     managerComment: {
       findMany: vi.fn(),
       create: vi.fn(),
@@ -22,19 +21,16 @@ vi.mock('@prisma/client', () => {
       findUnique: vi.fn(),
     },
     $disconnect: vi.fn(),
-  };
+  },
+}));
 
-  return {
-    PrismaClient: vi.fn(() => mockPrismaClient),
-  };
-});
+import mockPrismaImported from '@/lib/prisma';
 
 describe('Comments Database Operations', () => {
-  let prisma: any;
+  const prisma = mockPrismaImported as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    prisma = new PrismaClient();
   });
 
   afterEach(() => {

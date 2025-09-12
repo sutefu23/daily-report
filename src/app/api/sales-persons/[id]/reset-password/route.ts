@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import type { ApiError } from '@/types/api';
-
-const prisma = new PrismaClient();
 
 // パスワードリセット用のスキーマ
 const resetPasswordApiSchema = z.object({
@@ -122,6 +120,6 @@ export async function POST(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }

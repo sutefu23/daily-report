@@ -23,6 +23,7 @@ export const createSalesPersonSchema = z.object({
     ),
   department: z
     .string()
+    .min(1, '部署は必須です')
     .max(50, '部署は50文字以内で入力してください')
     .optional()
     .default(''),
@@ -47,6 +48,7 @@ export const updateSalesPersonSchema = z.object({
     .optional(),
   department: z
     .string()
+    .min(1, '部署は必須です')
     .max(50, '部署は50文字以内で入力してください')
     .optional(),
   is_manager: z.boolean().optional(),

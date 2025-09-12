@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { LoginRequestSchema } from '@/lib/schemas/auth';
 import { JWTUtil, CookieUtil, PasswordUtil } from '@/lib/auth';
 import { RateLimitUtil } from '@/lib/auth/rate-limit';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -136,6 +134,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }

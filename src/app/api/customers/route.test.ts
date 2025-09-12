@@ -3,8 +3,8 @@ import { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth/verify';
 
 // Prismaのモック
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn().mockImplementation(() => ({
+vi.mock('@/lib/prisma', () => ({
+  default: {
     customer: {
       count: vi.fn(),
       findMany: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock('@prisma/client', () => ({
       findUnique: vi.fn(),
     },
     $disconnect: vi.fn(),
-  })),
+  },
 }));
 
 vi.mock('@/lib/auth/verify', () => ({
@@ -21,14 +21,13 @@ vi.mock('@/lib/auth/verify', () => ({
 
 // テスト対象のインポート（モック設定後）
 import { GET, POST } from './route';
-import { PrismaClient } from '@prisma/client';
+import mockPrisma from '@/lib/prisma';
 
 describe('/api/customers', () => {
-  let prisma: any;
+  const prisma = mockPrisma as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    prisma = new PrismaClient();
   });
 
   describe('GET /api/customers', () => {

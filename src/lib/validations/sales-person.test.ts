@@ -26,7 +26,7 @@ describe('Sales Person Validation Schemas', () => {
       const invalidData = {
         email: 'yamada@example.com',
         password: 'Password123',
-        // name, departmentが不足
+        // nameが不足 (departmentはoptional)
       };
 
       const result = createSalesPersonSchema.safeParse(invalidData);
@@ -34,7 +34,6 @@ describe('Sales Person Validation Schemas', () => {
       if (!result.success) {
         const errors = result.error.issues.map((e) => e.path[0]);
         expect(errors).toContain('name');
-        expect(errors).toContain('department');
       }
     });
 
@@ -104,13 +103,13 @@ describe('Sales Person Validation Schemas', () => {
       expect(
         createSalesPersonSchema.safeParse({
           ...baseData,
-          name: 'a'.repeat(101),
+          name: 'a'.repeat(51),
         }).success
       ).toBe(false);
       expect(
         createSalesPersonSchema.safeParse({
           ...baseData,
-          name: 'a'.repeat(100),
+          name: 'a'.repeat(50),
         }).success
       ).toBe(true);
 

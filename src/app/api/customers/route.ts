@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import {
   createCustomerSchema,
   searchCustomerSchema,
 } from '@/lib/validations/customer';
 import type { ApiError, PaginatedResponse, Customer } from '@/types/api';
 import { verifyToken } from '@/lib/auth/verify';
-
-const prisma = new PrismaClient();
 
 /**
  * 顧客一覧取得
@@ -110,7 +108,7 @@ export async function GET(request: NextRequest) {
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -195,6 +193,6 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }

@@ -98,12 +98,12 @@ export default function SalesPersonsPage() {
   }, []);
 
   // 検索フィルタリング
-  const filteredSalesPersons = salesPersons.filter(
+  const filteredSalesPersons = salesPersons?.filter(
     (person) =>
       person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
 
   // アカウントの有効/無効を切り替え
   const toggleAccountStatus = async (

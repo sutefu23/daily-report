@@ -114,12 +114,13 @@ export function mockPrismaClient() {
 export function setupGlobalPrismaMock() {
   const mockPrisma = createMockPrismaClient();
   
-  vi.mock('@prisma/client', () => ({
-    PrismaClient: vi.fn(() => mockPrisma),
-  }));
-
+  // vi.mock()はファイルのトップレベルで実行される必要があるため、
+  // この関数は使用しないことを推奨
   return mockPrisma;
 }
+
+// グローバルなmockPrismaインスタンス
+export const mockPrisma = createMockPrismaClient();
 
 // データベースのモックファクトリー関数
 export const createMockData = {

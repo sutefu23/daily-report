@@ -56,14 +56,26 @@ vi.mock('next/navigation', () => ({
 
 // Prismaのグローバルモック
 const mockPrisma = createMockPrismaClient();
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => mockPrisma),
+
+// src/lib/prisma.tsのモック
+vi.mock('../src/lib/prisma', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma,
+}));
+
+// エイリアスパスのモック
+vi.mock('@/lib/prisma', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma,
 }));
 
 // console.error のモック（テストでエラーログを抑制）
 const originalError = console.error;
 beforeEach(() => {
-  console.error = vi.fn();
+  // エラーログを出力しつつ、モック関数として記録する
+  console.error = vi.fn((...args) => {
+    originalError(...args); // 実際のエラーを出力
+  });
 });
 
 afterEach(() => {

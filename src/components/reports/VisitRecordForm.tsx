@@ -153,7 +153,7 @@ export function VisitRecordForm({
                         </SelectContent>
                       </Select>
                       {errors[`visits.${index}.customer_id`] && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-sm text-red-500" role="alert">
                           {errors[`visits.${index}.customer_id`][0]}
                         </p>
                       )}
@@ -174,7 +174,7 @@ export function VisitRecordForm({
                         placeholder="HH:MM"
                       />
                       {errors[`visits.${index}.visit_time`] && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-sm text-red-500" role="alert">
                           {errors[`visits.${index}.visit_time`][0]}
                         </p>
                       )}
@@ -199,7 +199,7 @@ export function VisitRecordForm({
                     <div className="flex items-center justify-between">
                       <div>
                         {errors[`visits.${index}.visit_content`] && (
-                          <p className="text-sm text-red-500">
+                          <p className="text-sm text-red-500" role="alert">
                             {errors[`visits.${index}.visit_content`][0]}
                           </p>
                         )}

@@ -1,30 +1,37 @@
 import { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { POST } from './route';
 
-// Mock PrismaClient
-const mockPrismaClient = {
-  salesPerson: {
-    findUnique: vi.fn(),
-    update: vi.fn(),
+// Mock modules first
+vi.mock('@/lib/prisma', () => ({
+  default: {
+    salesPerson: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    $disconnect: vi.fn(),
   },
-  $disconnect: vi.fn(),
-};
-
-// Mock bcryptjs
-const mockBcrypt = {
-  hash: vi.fn(),
-};
-
-// Mock modules
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => mockPrismaClient),
 }));
 
-vi.mock('bcryptjs', () => mockBcrypt);
+vi.mock('bcryptjs', () => ({
+  default: {
+    hash: vi.fn(),
+  },
+}));
+
+// Import after mocking
+import { POST } from './route';
+import bcrypt from 'bcryptjs';
+import prisma from '@/lib/prisma';
+
+// Get references to mocked functions
+const mockPrismaClient = prisma as any;
+
+const mockBcrypt = {
+  hash: bcrypt.hash as any,
+};
 
 describe('/api/sales-persons/[id]/reset-password', () => {
-  const mockParams = { id: '1' };
+  const mockParams = Promise.resolve({ id: '1' });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -244,7 +251,7 @@ describe('/api/sales-persons/[id]/reset-password', () => {
       // Arrange
       const validPasswords = [
         'Aa123456', // 最小8文字
-        'A'.repeat(99) + 'a1', // 最大100文字
+        'A'.repeat(97) + 'a1', // 最大100文字
       ];
 
       const existingSalesPerson = {
@@ -259,7 +266,10 @@ describe('/api/sales-persons/[id]/reset-password', () => {
       mockPrismaClient.salesPerson.update.mockResolvedValue(existingSalesPerson);
 
       for (const password of validPasswords) {
-        const requestData = { password };
+        const requestData = { 
+          password,
+          confirmPassword: password 
+        };
 
         const request = new NextRequest(
           'http://localhost:3000/api/sales-persons/1/reset-password',

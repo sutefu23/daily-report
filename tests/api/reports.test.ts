@@ -8,6 +8,21 @@ import {
   vi,
 } from 'vitest';
 import { NextRequest } from 'next/server';
+import { JWTUtil } from '@/lib/auth';
+import {
+  createMockPrismaClient,
+  testUsers,
+  createMockData,
+  mockPrisma,
+} from '../utils/prisma-mock';
+
+// Centralized Prisma clientをモック
+vi.mock('@/lib/prisma', () => ({
+  default: mockPrisma,
+  prisma: mockPrisma,
+}));
+
+// Import after mocking
 import {
   GET as getReports,
   POST as createReport,
@@ -21,20 +36,6 @@ import {
   GET as getComments,
   POST as createComment,
 } from '@/app/api/reports/[id]/comments/route';
-import { JWTUtil } from '@/lib/auth';
-import {
-  createMockPrismaClient,
-  testUsers,
-  createMockData,
-} from '../utils/prisma-mock';
-
-// Prismaクライアントをグローバルにモック
-vi.mock('@/lib/db', () => {
-  const mockPrisma = createMockPrismaClient();
-  return {
-    prisma: mockPrisma,
-  };
-});
 
 describe('Reports API', () => {
   let prisma: any;
@@ -45,7 +46,7 @@ describe('Reports API', () => {
 
   beforeAll(() => {
     // Prismaモックのセットアップ
-    prisma = createMockPrismaClient();
+    prisma = mockPrisma;
 
     // テストユーザー設定
     mockUser = testUsers.regularUser;
@@ -173,7 +174,13 @@ describe('Reports API', () => {
         report_date: '2025-01-01',
         problem: 'テスト課題',
         plan: 'テスト計画',
-        visits: [],
+        visits: [
+          {
+            customer_id: 1,
+            visit_content: 'テスト訪問内容',
+            visit_time: '10:00',
+          },
+        ],
       };
 
       prisma.dailyReport.findUnique.mockResolvedValue({
@@ -202,7 +209,7 @@ describe('Reports API', () => {
         report_date: 'invalid-date',
         problem: '', // 空文字
         plan: 'テスト計画',
-        visits: [],
+        visits: [], // 空配列もバリデーションエラーになる
       };
 
       const request = new NextRequest('http://localhost:3000/api/reports', {
@@ -269,7 +276,7 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: { id: '1' } });
+      const response = await getReport(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -288,7 +295,7 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: { id: '999' } });
+      const response = await getReport(request, { params: Promise.resolve({ id: '999' }) });
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -307,7 +314,7 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: { id: '1' } });
+      const response = await getReport(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -354,7 +361,7 @@ describe('Reports API', () => {
         body: JSON.stringify(updateData),
       });
 
-      const response = await updateReport(request, { params: { id: '1' } });
+      const response = await updateReport(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -378,7 +385,7 @@ describe('Reports API', () => {
         body: JSON.stringify({ problem: 'test' }),
       });
 
-      const response = await updateReport(request, { params: { id: '1' } });
+      const response = await updateReport(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -400,7 +407,7 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await deleteReport(request, { params: { id: '1' } });
+      const response = await deleteReport(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(204);
       expect(prisma.dailyReport.delete).toHaveBeenCalledWith({
@@ -421,7 +428,7 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await deleteReport(request, { params: { id: '1' } });
+      const response = await deleteReport(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -446,6 +453,10 @@ describe('Reports API', () => {
         managerId: 2,
         comment: commentData.comment,
         createdAt: new Date(),
+        manager: {
+          salesPersonId: 2,
+          name: 'テスト管理者',
+        },
       });
 
       const request = new NextRequest(
@@ -460,7 +471,7 @@ describe('Reports API', () => {
         }
       );
 
-      const response = await createComment(request, { params: { id: '1' } });
+      const response = await createComment(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(201);
@@ -484,7 +495,7 @@ describe('Reports API', () => {
         }
       );
 
-      const response = await createComment(request, { params: { id: '1' } });
+      const response = await createComment(request, { params: Promise.resolve({ id: '1' }) });
       const data = await response.json();
 
       expect(response.status).toBe(403);

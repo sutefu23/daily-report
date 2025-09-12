@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { requireAuth, AuthenticatedRequest } from '@/lib/auth/middleware';
-import { ReportQuerySchema } from '@/lib/schemas/report';
+import { ReportQuerySchema, CreateReportRequestSchema } from '@/lib/schemas/report';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // GET /api/reports - 日報一覧取得
 export async function GET(request: NextRequest) {
@@ -146,17 +144,17 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect(); // Not needed with singleton
     }
   });
 }
 
 // POST /api/reports - 日報作成
 export async function POST(request: NextRequest) {
-  return requireAuth(request, async (req: AuthenticatedRequest) => {
-    try {
+  try {
+    return await requireAuth(request, async (req: AuthenticatedRequest) => {
+      try {
       const body = await req.json();
-      const { CreateReportRequestSchema } = await import('@/lib/schemas/report');
       
       // バリデーション
       const validatedData = CreateReportRequestSchema.parse(body);
@@ -227,7 +225,7 @@ export async function POST(request: NextRequest) {
         },
         { status: 201 }
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('日報作成エラー:', error);
 
       if (error instanceof z.ZodError) {
@@ -252,8 +250,35 @@ export async function POST(request: NextRequest) {
         },
         { status: 500 }
       );
-    } finally {
-      await prisma.$disconnect();
+      } finally {
+        // await prisma.$disconnect(); // Not needed with singleton
+      }
+    });
+  } catch (outerError: any) {
+    console.error('Outer error in POST /api/reports:', outerError);
+    
+    // Handle ZodError at the outer level
+    if (outerError instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: '入力値が不正です',
+            details: outerError.issues,
+          },
+        },
+        { status: 400 }
+      );
     }
-  });
+    
+    return NextResponse.json(
+      {
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'サーバーエラーが発生しました',
+        },
+      },
+      { status: 500 }
+    );
+  }
 }

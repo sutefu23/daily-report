@@ -1,12 +1,10 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { updateSalesPersonSchema } from '@/lib/validations/sales-person';
 import type { ApiError, SalesPerson } from '@/types/api';
 import { verifyToken } from '@/lib/auth/verify';
-
-const prisma = new PrismaClient();
 
 /**
  * 営業担当者詳細取得
@@ -89,7 +87,7 @@ export async function GET(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -255,7 +253,7 @@ export async function PUT(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -340,7 +338,7 @@ export async function DELETE(
       });
     }
 
-    return NextResponse.json(null, { status: 204 });
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error('Error deleting sales person:', error);
 
@@ -352,6 +350,6 @@ export async function DELETE(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }

@@ -1,6 +1,5 @@
-import { PrismaClient, ManagerComment, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { ManagerComment, Prisma } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
 export interface CommentWithManager extends ManagerComment {
   manager: {

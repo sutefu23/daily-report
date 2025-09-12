@@ -73,8 +73,8 @@ export function validateVisitTime(timeString: string): { isValid: boolean; error
     return { isValid: true, errors }; // 任意項目のため、空文字は有効
   }
 
-  // 時刻フォーマットチェック
-  if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeString)) {
+  // 時刻フォーマットチェック（HH:MM形式のみ許可）
+  if (!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(timeString)) {
     errors.push('時刻はHH:MM形式で入力してください（例: 09:30）');
     return { isValid: false, errors };
   }
@@ -82,7 +82,7 @@ export function validateVisitTime(timeString: string): { isValid: boolean; error
   const [hours, minutes] = timeString.split(':').map(Number);
   
   // 営業時間チェック（8:00-20:00）
-  if (hours < 8 || hours > 20) {
+  if (hours < 8 || (hours === 20 && minutes > 0) || hours > 20) {
     errors.push('訪問時刻は営業時間内（08:00-20:00）で入力してください');
   }
 

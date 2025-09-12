@@ -24,74 +24,49 @@ export async function requireAuth(
   request: NextRequest,
   handler: (req: AuthenticatedRequest) => Promise<NextResponse>
 ): Promise<NextResponse> {
-  try {
-    // トークンを取得（Cookieまたは Authorization ヘッダーから）
-    let token = CookieUtil.getAccessToken(request);
+  // トークンを取得（Cookieまたは Authorization ヘッダーから）
+  let token = CookieUtil.getAccessToken(request);
 
-    // Cookieにない場合は Authorization ヘッダーをチェック
-    if (!token) {
-      const authHeader = request.headers.get('authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
+  // Cookieにない場合は Authorization ヘッダーをチェック
+  if (!token) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
     }
+  }
 
-    if (!token) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'AUTH_TOKEN_MISSING',
-            message: '認証トークンが見つかりません',
-          },
-        },
-        { status: 401 }
-      );
-    }
-
-    const payload = JWTUtil.verifyAccessToken(token);
-
-    if (!payload) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'AUTH_TOKEN_INVALID',
-            message: '無効な認証トークンです',
-          },
-        },
-        { status: 401 }
-      );
-    }
-
-    // リクエストにユーザー情報を追加
-    const authenticatedRequest = request as AuthenticatedRequest;
-    authenticatedRequest.user = payload;
-
-    return await handler(authenticatedRequest);
-  } catch (error) {
-    console.error('認証エラー:', error);
-
-    if (error instanceof AuthError) {
-      return NextResponse.json(
-        {
-          error: {
-            code: error.code,
-            message: error.message,
-          },
-        },
-        { status: error.statusCode }
-      );
-    }
-
+  if (!token) {
     return NextResponse.json(
       {
         error: {
-          code: 'INTERNAL_ERROR',
-          message: 'サーバーエラーが発生しました',
+          code: 'AUTH_TOKEN_MISSING',
+          message: '認証トークンが見つかりません',
         },
       },
-      { status: 500 }
+      { status: 401 }
     );
   }
+
+  const payload = JWTUtil.verifyAccessToken(token);
+
+  if (!payload) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'AUTH_TOKEN_INVALID',
+          message: '無効な認証トークンです',
+        },
+      },
+      { status: 401 }
+    );
+  }
+
+  // リクエストにユーザー情報を追加
+  const authenticatedRequest = request as AuthenticatedRequest;
+  authenticatedRequest.user = payload;
+
+  // ハンドラーのエラーはハンドラー内で処理される
+  return await handler(authenticatedRequest);
 }
 
 /**
@@ -125,30 +100,30 @@ export async function optionalAuth(
   request: NextRequest,
   handler: (req: NextRequest & { user?: JWTPayload }) => Promise<NextResponse>
 ): Promise<NextResponse> {
-  try {
-    // トークンを取得（Cookieまたは Authorization ヘッダーから）
-    let token = CookieUtil.getAccessToken(request);
+  // トークンを取得（Cookieまたは Authorization ヘッダーから）
+  let token = CookieUtil.getAccessToken(request);
 
-    // Cookieにない場合は Authorization ヘッダーをチェック
-    if (!token) {
-      const authHeader = request.headers.get('authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
+  // Cookieにない場合は Authorization ヘッダーをチェック
+  if (!token) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
     }
+  }
 
-    if (token) {
+  if (token) {
+    try {
       const payload = JWTUtil.verifyAccessToken(token);
       if (payload) {
         (request as any).user = payload;
       }
+    } catch (error) {
+      // オプショナル認証なので、トークン検証エラーは無視して続行
+      console.error('オプショナル認証でトークン検証エラー:', error);
     }
-
-    return await handler(request as NextRequest & { user?: JWTPayload });
-  } catch (error) {
-    console.error('オプショナル認証エラー:', error);
-    return await handler(request as NextRequest & { user?: JWTPayload });
   }
+
+  return await handler(request as NextRequest & { user?: JWTPayload });
 }
 
 /**

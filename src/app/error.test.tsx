@@ -1,55 +1,64 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ErrorBoundary from './error';
 
 describe('Error Component', () => {
-  // console.errorをモック
-  const consoleErrorSpy = vi
-    .spyOn(console, 'error')
-    .mockImplementation(() => {});
   const mockReset = vi.fn();
   const mockError = new Error('Test error message') as Error & {
     digest?: string;
   };
+  
+  // console.errorをモック - 各テストの前に設定
+  let consoleErrorSpy: any;
+  
+  beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   afterEach(() => {
     vi.clearAllMocks();
+    consoleErrorSpy.mockRestore();
   });
 
   it('renders error heading', () => {
     render(<ErrorBoundary error={mockError} reset={mockReset} />);
-    const heading = screen.getByRole('heading', {
+    // h1は"500"、h2が"エラーが発生しました"
+    const statusHeading = screen.getByRole('heading', {
       level: 1,
+      name: /500/i,
+    });
+    expect(statusHeading).toBeInTheDocument();
+    
+    const errorHeading = screen.getByRole('heading', {
+      level: 2,
       name: /エラーが発生しました/i,
     });
-    expect(heading).toBeInTheDocument();
+    expect(errorHeading).toBeInTheDocument();
   });
 
   it('renders error message', () => {
     render(<ErrorBoundary error={mockError} reset={mockReset} />);
+    // メッセージは一つのp要素内に含まれている
     const message = screen.getByText(
       /申し訳ございません。予期しないエラーが発生しました。/i
     );
     expect(message).toBeInTheDocument();
+    expect(message.textContent).toContain('問題が解決しない場合はシステム管理者にお問い合わせください');
   });
 
-  it('renders contact message', () => {
+  it('logs error to console', async () => {
     render(<ErrorBoundary error={mockError} reset={mockReset} />);
-    const contactMessage = screen.getByText(
-      /問題が解決しない場合は、システム管理者にお問い合わせください。/i
-    );
-    expect(contactMessage).toBeInTheDocument();
-  });
-
-  it('logs error to console', () => {
-    render(<ErrorBoundary error={mockError} reset={mockReset} />);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Application error:',
-      mockError
-    );
+    
+    // Wait for useEffect to run
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Application error:',
+        mockError
+      );
+    });
   });
 
   it('calls reset function when retry button is clicked', () => {
@@ -67,26 +76,29 @@ describe('Error Component', () => {
     expect(homeLink).toHaveAttribute('href', '/');
   });
 
-  it('has proper styling classes', () => {
+  it('has proper button elements', () => {
     render(<ErrorBoundary error={mockError} reset={mockReset} />);
 
     const retryButton = screen.getByRole('button', { name: /もう一度試す/i });
-    expect(retryButton).toHaveClass('bg-primary');
+    expect(retryButton).toBeInTheDocument();
 
     const homeLink = screen.getByRole('link', { name: /ホームへ戻る/i });
-    expect(homeLink).toHaveClass('border');
+    expect(homeLink).toBeInTheDocument();
   });
 
-  it('handles error with digest property', () => {
+  it('handles error with digest property', async () => {
     const errorWithDigest = {
       ...mockError,
       digest: 'test-digest-123',
     } as Error & { digest?: string };
 
     render(<ErrorBoundary error={errorWithDigest} reset={mockReset} />);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Application error:',
-      errorWithDigest
-    );
+    
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Application error:',
+        errorWithDigest
+      );
+    });
   });
 });

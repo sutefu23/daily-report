@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { updateCustomerSchema } from '@/lib/validations/customer';
 import type { ApiError } from '@/types/api';
 import { verifyToken } from '@/lib/auth/verify';
-
-const prisma = new PrismaClient();
 
 /**
  * 顧客詳細取得
@@ -78,7 +76,7 @@ export async function GET(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -207,7 +205,7 @@ export async function PUT(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
 
@@ -307,6 +305,6 @@ export async function DELETE(
     };
     return NextResponse.json(apiError, { status: 500 });
   } finally {
-    await prisma.$disconnect();
+    // await prisma.$disconnect(); // Not needed with singleton
   }
 }
