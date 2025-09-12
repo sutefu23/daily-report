@@ -135,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
     const isActive = pathname === item.href || 
-      (hasChildren && item.children.some(child => pathname === child.href));
+      (hasChildren && item.children?.some(child => pathname === child.href));
 
     if (hasChildren && !isCollapsed) {
       return (
@@ -164,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </Button>
           {isExpanded && (
             <div className="mt-1 space-y-1">
-              {item.children.map((child) => renderMenuItem(child, depth + 1))}
+              {item.children?.map((child) => renderMenuItem(child, depth + 1))}
             </div>
           )}
         </div>

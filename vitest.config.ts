@@ -18,7 +18,6 @@ export default defineConfig({
         '**/*.config.ts',
         '**/*.config.js',
         '**/types/**',
-        'issue-*/**',
       ],
     },
   },

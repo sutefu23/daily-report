@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),

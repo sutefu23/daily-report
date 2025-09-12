@@ -140,7 +140,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
     const isActive = pathname === item.href || 
-      (hasChildren && item.children.some(child => pathname === child.href));
+      (hasChildren && item.children?.some(child => pathname === child.href));
 
     if (hasChildren) {
       return (
@@ -171,7 +171,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           </Button>
           {isExpanded && (
             <div className="space-y-1">
-              {item.children.map((child) => renderMenuItem(child, depth + 1))}
+              {item.children?.map((child) => renderMenuItem(child, depth + 1))}
             </div>
           )}
         </div>

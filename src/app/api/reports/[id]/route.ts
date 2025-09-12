@@ -9,11 +9,12 @@ const prisma = new PrismaClient();
 // GET /api/reports/[id] - 日報詳細取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return requireAuth(request, async (req: AuthenticatedRequest) => {
     try {
-      const reportId = parseInt(params.id, 10);
+      const { id } = await params;
+      const reportId = parseInt(id, 10);
 
       if (isNaN(reportId) || reportId <= 0) {
         return NextResponse.json(
@@ -82,7 +83,7 @@ export async function GET(
       }
 
       // 権限チェック（管理者以外は自分の日報のみ閲覧可能）
-      if (!req.user.isManager && report.salesPersonId !== req.user.id) {
+      if (!req.user.isManager && report.salesPersonId !== req.user.userId) {
         return NextResponse.json(
           {
             error: {
@@ -190,7 +191,7 @@ export async function PUT(
       }
 
       // 権限チェック（自分の日報のみ編集可能）
-      if (existingReport.salesPersonId !== req.user.id) {
+      if (existingReport.salesPersonId !== req.user.userId) {
         return NextResponse.json(
           {
             error: {
@@ -359,7 +360,7 @@ export async function DELETE(
       }
 
       // 権限チェック（自分の日報のみ削除可能）
-      if (existingReport.salesPersonId !== req.user.id) {
+      if (existingReport.salesPersonId !== req.user.userId) {
         return NextResponse.json(
           {
             error: {

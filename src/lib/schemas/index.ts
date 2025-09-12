@@ -1,5 +1,6 @@
 // 共通スキーマ
-export * from './common';
+export { ErrorResponseSchema, PaginationSchema, IdParamSchema } from './common';
+export type { ErrorResponse, Pagination, IdParam } from './common';
 
 // 認証関連
 export * from './auth';
@@ -11,4 +12,19 @@ export * from './sales-person';
 export * from './customer';
 
 // 日報関連
-export * from './report';
+export {
+  VisitRecordSchema,
+  CreateReportRequestSchema,
+  UpdateReportRequestSchema,
+  CreateCommentRequestSchema,
+  CreateReportResponseSchema,
+  CreateCommentResponseSchema,
+} from './report';
+export type {
+  VisitRecord,
+  CreateReportRequest,
+  UpdateReportRequest,
+  CreateCommentRequest,
+  CreateReportResponse,
+  CreateCommentResponse,
+} from './report';

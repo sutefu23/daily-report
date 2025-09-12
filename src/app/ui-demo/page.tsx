@@ -22,7 +22,7 @@ import { useNotification, usePromiseToast } from '@/components/common/notificati
 import { ConfirmationDialog, useConfirmation, usePresetDialogs } from '@/components/common/dialog/confirmation-dialog';
 
 // Component that throws an error for testing
-function ErrorComponent() {
+function ErrorComponent(): never {
   throw new Error('This is a test error!');
 }
 

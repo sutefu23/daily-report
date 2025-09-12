@@ -68,7 +68,7 @@ export function middleware(request: NextRequest) {
   }
   
   // Rate limiting
-  const clientIdentifier = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const clientIdentifier = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const rateLimitConfig = securityConfig.rateLimiting.endpoints[pathname as keyof typeof securityConfig.rateLimiting.endpoints] || securityConfig.rateLimiting.endpoints.default;
   const rateLimitResult = checkRateLimit(`${clientIdentifier}:${pathname}`, rateLimitConfig);
   

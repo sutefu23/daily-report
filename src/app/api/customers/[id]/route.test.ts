@@ -37,7 +37,7 @@ describe('/api/customers/[id]', () => {
       vi.mocked(verifyToken).mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost/api/customers/1');
-      const response = await GET(request, { params: { id: '1' } });
+      const response = await GET(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(401);
       const data = await response.json();
@@ -52,7 +52,7 @@ describe('/api/customers/[id]', () => {
       });
 
       const request = new NextRequest('http://localhost/api/customers/invalid');
-      const response = await GET(request, { params: { id: 'invalid' } });
+      const response = await GET(request, { params: Promise.resolve({ id: 'invalid' }) });
 
       expect(response.status).toBe(400);
       const data = await response.json();
@@ -69,7 +69,7 @@ describe('/api/customers/[id]', () => {
       prismaClient.customer.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost/api/customers/999');
-      const response = await GET(request, { params: { id: '999' } });
+      const response = await GET(request, { params: Promise.resolve({ id: '999' }) });
 
       expect(response.status).toBe(404);
       const data = await response.json();
@@ -97,7 +97,7 @@ describe('/api/customers/[id]', () => {
       prismaClient.customer.findUnique.mockResolvedValue(mockCustomer);
 
       const request = new NextRequest('http://localhost/api/customers/1');
-      const response = await GET(request, { params: { id: '1' } });
+      const response = await GET(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(200);
       const data = await response.json();
@@ -116,7 +116,7 @@ describe('/api/customers/[id]', () => {
         method: 'PUT',
         body: JSON.stringify({}),
       });
-      const response = await PUT(request, { params: { id: '1' } });
+      const response = await PUT(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(401);
       const data = await response.json();
@@ -134,7 +134,7 @@ describe('/api/customers/[id]', () => {
         method: 'PUT',
         body: JSON.stringify({}),
       });
-      const response = await PUT(request, { params: { id: '1' } });
+      const response = await PUT(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(403);
       const data = await response.json();
@@ -178,7 +178,7 @@ describe('/api/customers/[id]', () => {
         method: 'PUT',
         body: JSON.stringify(requestBody),
       });
-      const response = await PUT(request, { params: { id: '1' } });
+      const response = await PUT(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(200);
       const data = await response.json();
@@ -199,7 +199,7 @@ describe('/api/customers/[id]', () => {
         method: 'PUT',
         body: JSON.stringify({ company_name: 'Test' }),
       });
-      const response = await PUT(request, { params: { id: '999' } });
+      const response = await PUT(request, { params: Promise.resolve({ id: '999' }) });
 
       expect(response.status).toBe(404);
       const data = await response.json();
@@ -214,7 +214,7 @@ describe('/api/customers/[id]', () => {
       const request = new NextRequest('http://localhost/api/customers/1', {
         method: 'DELETE',
       });
-      const response = await DELETE(request, { params: { id: '1' } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(401);
       const data = await response.json();
@@ -231,7 +231,7 @@ describe('/api/customers/[id]', () => {
       const request = new NextRequest('http://localhost/api/customers/1', {
         method: 'DELETE',
       });
-      const response = await DELETE(request, { params: { id: '1' } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(403);
       const data = await response.json();
@@ -263,7 +263,7 @@ describe('/api/customers/[id]', () => {
       const request = new NextRequest('http://localhost/api/customers/1', {
         method: 'DELETE',
       });
-      const response = await DELETE(request, { params: { id: '1' } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(204);
     });
@@ -292,7 +292,7 @@ describe('/api/customers/[id]', () => {
       const request = new NextRequest('http://localhost/api/customers/1', {
         method: 'DELETE',
       });
-      const response = await DELETE(request, { params: { id: '1' } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: '1' }) });
 
       expect(response.status).toBe(409);
       const data = await response.json();
@@ -312,7 +312,7 @@ describe('/api/customers/[id]', () => {
       const request = new NextRequest('http://localhost/api/customers/999', {
         method: 'DELETE',
       });
-      const response = await DELETE(request, { params: { id: '999' } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: '999' }) });
 
       expect(response.status).toBe(404);
       const data = await response.json();

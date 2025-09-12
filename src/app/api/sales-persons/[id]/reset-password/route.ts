@@ -23,10 +23,11 @@ const resetPasswordApiSchema = z.object({
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const salesPersonId = parseInt(params.id);
+    const { id } = await params;
+    const salesPersonId = parseInt(id);
 
     if (isNaN(salesPersonId)) {
       const apiError: ApiError = {
@@ -104,7 +105,7 @@ export async function POST(
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),

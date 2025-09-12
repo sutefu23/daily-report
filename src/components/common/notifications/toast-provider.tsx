@@ -2,6 +2,7 @@
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import { CheckCircle2, XCircle, AlertCircle, Info } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -56,16 +57,16 @@ export function useNotification() {
           {icons[type]}
           <span>{title}</span>
         </div>
-      ),
+      ) as any,
       description,
       duration,
       className: classNames[type],
       action: action
-        ? {
-            altText: action.label,
-            onClick: action.onClick,
-            children: action.label,
-          }
+        ? (
+            <ToastAction altText={action.label} onClick={action.onClick}>
+              {action.label}
+            </ToastAction>
+          )
         : undefined,
     });
   };
@@ -136,7 +137,7 @@ export const notify = {
             <CheckCircle2 className="h-5 w-5 text-green-600" />
             <span>{title}</span>
           </div>
-        ),
+        ) as any,
         description,
         className: 'border-green-200 bg-green-50',
       });
@@ -150,7 +151,7 @@ export const notify = {
             <XCircle className="h-5 w-5 text-red-600" />
             <span>{title}</span>
           </div>
-        ),
+        ) as any,
         description,
         className: 'border-red-200 bg-red-50',
       });
@@ -164,7 +165,7 @@ export const notify = {
             <AlertCircle className="h-5 w-5 text-yellow-600" />
             <span>{title}</span>
           </div>
-        ),
+        ) as any,
         description,
         className: 'border-yellow-200 bg-yellow-50',
       });
@@ -178,7 +179,7 @@ export const notify = {
             <Info className="h-5 w-5 text-blue-600" />
             <span>{title}</span>
           </div>
-        ),
+        ) as any,
         description,
         className: 'border-blue-200 bg-blue-50',
       });

@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -27,7 +27,8 @@ export async function GET(
       return NextResponse.json(apiError, { status: 401 });
     }
 
-    const customerId = parseInt(params.id);
+    const { id } = await params;
+    const customerId = parseInt(id);
     if (isNaN(customerId)) {
       const apiError: ApiError = {
         error: {
@@ -86,7 +87,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -112,7 +113,8 @@ export async function PUT(
       return NextResponse.json(apiError, { status: 403 });
     }
 
-    const customerId = parseInt(params.id);
+    const { id } = await params;
+    const customerId = parseInt(id);
     if (isNaN(customerId)) {
       const apiError: ApiError = {
         error: {
@@ -214,7 +216,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -240,7 +242,8 @@ export async function DELETE(
       return NextResponse.json(apiError, { status: 403 });
     }
 
-    const customerId = parseInt(params.id);
+    const { id } = await params;
+    const customerId = parseInt(id);
     if (isNaN(customerId)) {
       const apiError: ApiError = {
         error: {

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { updateSalesPersonSchema } from '@/lib/validations/sales-person';
 import type { ApiError, SalesPerson } from '@/types/api';
@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -28,9 +28,10 @@ export async function GET(
       return NextResponse.json(apiError, { status: 401 });
     }
 
-    const id = parseInt(params.id);
+    const { id: paramId } = await params;
+    const id = Number.parseInt(paramId, 10);
 
-    if (isNaN(id)) {
+    if (Number.isNaN(id)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -97,7 +98,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -123,9 +124,10 @@ export async function PUT(
       return NextResponse.json(apiError, { status: 403 });
     }
 
-    const id = parseInt(params.id);
+    const { id: paramId } = await params;
+    const id = Number.parseInt(paramId, 10);
 
-    if (isNaN(id)) {
+    if (Number.isNaN(id)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',
@@ -182,7 +184,13 @@ export async function PUT(
     }
 
     // 更新データの準備
-    const updateData: any = {};
+    const updateData: {
+      name?: string;
+      email?: string;
+      department?: string;
+      isManager?: boolean;
+      isActive?: boolean;
+    } = {};
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
     if (validatedData.email !== undefined)
       updateData.email = validatedData.email;
@@ -192,10 +200,6 @@ export async function PUT(
       updateData.isManager = validatedData.is_manager;
     if (validatedData.is_active !== undefined)
       updateData.isActive = validatedData.is_active;
-    // パスワードが指定されている場合はハッシュ化
-    if (validatedData.password !== undefined) {
-      updateData.password = await bcrypt.hash(validatedData.password, 12);
-    }
 
     // 営業担当者の更新
     const updatedSalesPerson = await prisma.salesPerson.update({
@@ -234,7 +238,7 @@ export async function PUT(
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
@@ -260,7 +264,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -286,9 +290,10 @@ export async function DELETE(
       return NextResponse.json(apiError, { status: 403 });
     }
 
-    const id = parseInt(params.id);
+    const { id: paramId } = await params;
+    const id = Number.parseInt(paramId, 10);
 
-    if (isNaN(id)) {
+    if (Number.isNaN(id)) {
       const apiError: ApiError = {
         error: {
           code: 'VALIDATION_ERROR',

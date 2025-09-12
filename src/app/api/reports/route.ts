@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
       // 営業担当者フィルタ（管理者のみ他者の日報を検索可能）
       if (query.sales_person_id) {
-        if (!req.user.isManager && query.sales_person_id !== req.user.id) {
+        if (!req.user.isManager && query.sales_person_id !== req.user.userId) {
           return NextResponse.json(
             {
               error: {
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         where.salesPersonId = query.sales_person_id;
       } else if (!req.user.isManager) {
         // 一般ユーザーは自分の日報のみ取得
-        where.salesPersonId = req.user.id;
+        where.salesPersonId = req.user.userId;
       }
 
       // ページネーション計算
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
       const existingReport = await prisma.dailyReport.findUnique({
         where: {
           salesPersonId_reportDate: {
-            salesPersonId: req.user.id,
+            salesPersonId: req.user.userId,
             reportDate: reportDate,
           },
         },
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
         // 日報作成
         const newReport = await tx.dailyReport.create({
           data: {
-            salesPersonId: req.user.id,
+            salesPersonId: req.user.userId,
             reportDate: reportDate,
             problem: validatedData.problem,
             plan: validatedData.plan,
