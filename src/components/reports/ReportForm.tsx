@@ -143,11 +143,19 @@ export function ReportForm({
         plan,
       };
 
+      // Get CSRF token from cookie
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+
       const response = await fetch('/api/reports', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(csrfToken && { 'x-csrf-token': csrfToken }),
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 

@@ -37,11 +37,11 @@ describe('Home Page', () => {
     const customerCard = screen.getByRole('heading', { name: /👥 顧客管理/i });
     expect(customerCard).toBeInTheDocument();
 
-    // システム設定カード
-    const settingsCard = screen.getByRole('heading', {
-      name: /⚙️ システム設定/i,
+    // 営業担当者管理カード  
+    const salesPersonsCard = screen.getByRole('heading', {
+      name: /👥 営業担当者管理/i,
     });
-    expect(settingsCard).toBeInTheDocument();
+    expect(salesPersonsCard).toBeInTheDocument();
   });
 
   it('renders all navigation links', () => {
@@ -59,9 +59,9 @@ describe('Home Page', () => {
     const customersLink = screen.getByRole('link', { name: /顧客管理へ/i });
     expect(customersLink).toHaveAttribute('href', '/customers');
 
-    // 設定リンク
-    const settingsLink = screen.getByRole('link', { name: /設定へ/i });
-    expect(settingsLink).toHaveAttribute('href', '/settings');
+    // 営業担当者管理リンク
+    const salesPersonsLink = screen.getByRole('link', { name: /営業担当者管理へ/i });
+    expect(salesPersonsLink).toHaveAttribute('href', '/sales-persons');
   });
 
   it('renders the footer copyright', () => {

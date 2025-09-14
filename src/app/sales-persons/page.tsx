@@ -52,6 +52,9 @@ export default function SalesPersonsPage() {
 
   // 権限チェック: 管理者でない場合はリダイレクト
   useEffect(() => {
+    // 認証情報の読み込み中は何もしない
+    if (!user) return;
+    
     if (!isAuthenticated) {
       router.push('/login');
     } else if (!isManager) {
@@ -60,9 +63,9 @@ export default function SalesPersonsPage() {
         description: 'この機能へのアクセス権限がありません',
         variant: 'destructive',
       });
-      router.push('/reports');
+      router.push('/dashboard');
     }
-  }, [isAuthenticated, isManager, router, toast]);
+  }, [user, isAuthenticated, isManager, router, toast]);
 
   // 営業担当者一覧を取得
   const fetchSalesPersons = async () => {

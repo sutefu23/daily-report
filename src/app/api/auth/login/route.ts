@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { LoginRequestSchema } from '@/lib/schemas/auth';
 import { JWTUtil, CookieUtil, PasswordUtil } from '@/lib/auth';
 import { RateLimitUtil } from '@/lib/auth/rate-limit';
+import { generateCSRFToken } from '@/middleware/security';
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,6 +106,15 @@ export async function POST(request: NextRequest) {
 
     // Cookieにトークンを設定
     CookieUtil.setTokens(response, accessToken, refreshToken);
+
+    // CSRF トークンを生成して設定
+    const csrfToken = generateCSRFToken();
+    response.cookies.set('csrf-token', csrfToken, {
+      httpOnly: false, // JavaScript からアクセス可能にする
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
 
     return response;
   } catch (error) {

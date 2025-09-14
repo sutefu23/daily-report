@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import {
@@ -11,20 +12,17 @@ import {
 } from '@/components/ui/card';
 
 export default function DashboardPage() {
-  // TODO: 実際の認証状態とユーザー情報を取得
-  const isManager = false;
-  const userName = '山田太郎';
+  const { user, isManager, logout } = useAuth();
 
-  const handleLogout = () => {
-    // TODO: ログアウト処理
-    console.log('Logout clicked');
-  };
+  if (!user) {
+    return null;
+  }
 
   return (
     <DashboardLayout
       isManager={isManager}
-      userName={userName}
-      onLogout={handleLogout}
+      userName={user.name}
+      onLogout={logout}
     >
       <div className="space-y-6">
         <PageHeader title="ダッシュボード" />

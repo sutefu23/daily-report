@@ -139,8 +139,16 @@ export function LoginForm({
 
       <div className="text-center text-sm text-muted-foreground">
         <p>テスト用アカウント:</p>
-        <p>メール: yamada@example.com</p>
-        <p>パスワード: password123</p>
+        <div className="mt-2">
+          <p className="font-semibold">一般ユーザー:</p>
+          <p>メール: yamada@example.com</p>
+          <p>パスワード: Password123</p>
+        </div>
+        <div className="mt-2">
+          <p className="font-semibold">管理者:</p>
+          <p>メール: tanaka@example.com</p>
+          <p>パスワード: Password123</p>
+        </div>
       </div>
     </div>
   );

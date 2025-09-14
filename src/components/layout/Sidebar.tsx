@@ -102,7 +102,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   className,
 }) => {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  // Initialize with 'reports' and 'master-data' menus expanded by default
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['reports', 'master-data']));
 
   const toggleExpanded = (itemId: string) => {
     const newExpanded = new Set(expandedItems);

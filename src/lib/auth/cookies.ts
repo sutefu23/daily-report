@@ -1,4 +1,4 @@
-import { serialize, parse } from 'cookie';
+import { serialize } from 'cookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 const ACCESS_TOKEN_NAME = 'access_token';
@@ -63,33 +63,32 @@ export class CookieUtil {
     accessToken: string,
     refreshToken: string
   ): void {
-    const accessCookie = serialize(ACCESS_TOKEN_NAME, accessToken, {
+    // Use response.cookies.set() instead of headers to properly handle multiple cookies
+    response.cookies.set(ACCESS_TOKEN_NAME, accessToken, {
       ...this.getDefaultOptions(),
       maxAge: 60 * 60, // 1時間
     });
 
-    const refreshCookie = serialize(REFRESH_TOKEN_NAME, refreshToken, {
+    response.cookies.set(REFRESH_TOKEN_NAME, refreshToken, {
       ...this.getDefaultOptions(),
       maxAge: COOKIE_MAX_AGE, // 7日間
     });
-
-    response.headers.set('Set-Cookie', `${accessCookie}, ${refreshCookie}`);
   }
 
   /**
    * リクエストからアクセストークンを取得する
    */
   static getAccessToken(request: NextRequest): string | null {
-    const cookies = parse(request.headers.get('cookie') || '');
-    return cookies[ACCESS_TOKEN_NAME] || null;
+    // Use Next.js request.cookies API instead of parsing manually
+    return request.cookies.get(ACCESS_TOKEN_NAME)?.value || null;
   }
 
   /**
    * リクエストからリフレッシュトークンを取得する
    */
   static getRefreshToken(request: NextRequest): string | null {
-    const cookies = parse(request.headers.get('cookie') || '');
-    return cookies[REFRESH_TOKEN_NAME] || null;
+    // Use Next.js request.cookies API instead of parsing manually
+    return request.cookies.get(REFRESH_TOKEN_NAME)?.value || null;
   }
 
   /**
@@ -125,16 +124,15 @@ export class CookieUtil {
    * 両方のトークンを削除する
    */
   static clearTokens(response: NextResponse): void {
-    const accessCookie = serialize(ACCESS_TOKEN_NAME, '', {
+    // Use response.cookies.set() with maxAge: 0 to delete cookies
+    response.cookies.set(ACCESS_TOKEN_NAME, '', {
       ...this.getDefaultOptions(),
       maxAge: 0,
     });
 
-    const refreshCookie = serialize(REFRESH_TOKEN_NAME, '', {
+    response.cookies.set(REFRESH_TOKEN_NAME, '', {
       ...this.getDefaultOptions(),
       maxAge: 0,
     });
-
-    response.headers.set('Set-Cookie', `${accessCookie}, ${refreshCookie}`);
   }
 }

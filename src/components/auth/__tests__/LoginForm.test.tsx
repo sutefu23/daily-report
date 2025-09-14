@@ -37,7 +37,8 @@ describe('LoginForm', () => {
 
     expect(screen.getByText('テスト用アカウント:')).toBeInTheDocument();
     expect(screen.getByText('メール: yamada@example.com')).toBeInTheDocument();
-    expect(screen.getByText('パスワード: password123')).toBeInTheDocument();
+    expect(screen.getAllByText('パスワード: Password123')).toHaveLength(2); // 一般ユーザーと管理者の両方
+    expect(screen.getByText('メール: tanaka@example.com')).toBeInTheDocument();
   });
 
   it('エラーメッセージが表示される', () => {

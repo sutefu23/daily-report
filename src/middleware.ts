@@ -15,6 +15,7 @@ const protectedPaths = [
   '/reports',
   '/customers',
   '/sales-persons',
+  '/analytics',
   '/api/reports',
   '/api/customers',
   '/api/sales-persons',
@@ -25,7 +26,6 @@ const publicPaths = [
   '/login',
   '/api/auth/login',
   '/api/health',
-  '/',
 ];
 
 // API paths that need CSRF protection
@@ -92,8 +92,18 @@ export function middleware(request: NextRequest) {
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
   const isPublicPath = publicPaths.some(path => pathname === path);
   
+  // Redirect root path to dashboard if authenticated
+  if (pathname === '/') {
+    const token = request.cookies.get('access_token');
+    if (token) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } else {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+  
   if (isProtectedPath && !isPublicPath) {
-    const token = request.cookies.get('auth-token');
+    const token = request.cookies.get('access_token');
     
     if (!token) {
       // Redirect to login for web pages, return 401 for API routes
@@ -114,6 +124,17 @@ export function middleware(request: NextRequest) {
     // For now, we'll just check if it exists
   }
   
+  // Generate CSRF token if not exists (for all authenticated users)
+  if (request.cookies.get('access_token') && !request.cookies.get('csrf-token')) {
+    const newToken = generateCSRFToken();
+    response.cookies.set('csrf-token', newToken, {
+      httpOnly: false, // Allow JavaScript access for reading
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+  }
+  
   // CSRF Protection for state-changing operations
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     const isCSRFProtectedPath = csrfProtectedPaths.some(path => pathname.startsWith(path));
@@ -123,24 +144,13 @@ export function middleware(request: NextRequest) {
       const sessionToken = request.cookies.get('csrf-token')?.value;
       
       if (!csrfToken || !sessionToken) {
-        // Generate new CSRF token for forms
-        if (!pathname.startsWith('/api/')) {
-          const newToken = generateCSRFToken();
-          response.cookies.set('csrf-token', newToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/',
-          });
-        } else {
-          return new NextResponse(
-            JSON.stringify({ error: 'CSRF token missing' }),
-            { 
-              status: 403,
-              headers: { 'Content-Type': 'application/json' },
-            }
-          );
-        }
+        return new NextResponse(
+          JSON.stringify({ error: 'CSRF token missing' }),
+          { 
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } else if (!validateCSRFToken(csrfToken, sessionToken)) {
         return new NextResponse(
           JSON.stringify({ error: 'Invalid CSRF token' }),

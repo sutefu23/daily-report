@@ -54,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({ email, password }),
         });
 
@@ -70,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const { user: userData } = await response.json();
         setUser(userData);
-        router.push('/reports');
+        router.push('/dashboard');
       } catch (error) {
         throw error;
       } finally {
@@ -83,8 +84,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Get CSRF token from cookie
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+
       await fetch('/api/auth/logout', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(csrfToken && { 'x-csrf-token': csrfToken }),
+        },
+        credentials: 'include',
       });
       setUser(null);
       router.push('/login');

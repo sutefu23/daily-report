@@ -6,7 +6,7 @@ export const TEST_USERS = {
   // 一般営業担当者
   REGULAR_USER: {
     email: 'yamada@example.com',
-    password: 'Test1234!',
+    password: 'Password123',
     name: '山田太郎',
     department: '営業1課',
     isManager: false,
@@ -14,9 +14,9 @@ export const TEST_USERS = {
   // 管理者
   MANAGER_USER: {
     email: 'tanaka@example.com',
-    password: 'Manager123!',
+    password: 'Password123',
     name: '田中部長',
-    department: '営業部',
+    department: '営業1課',
     isManager: true,
   },
   // 無効なユーザー（ログインエラーテスト用）

@@ -78,7 +78,7 @@ describe('useAuth', () => {
       });
       expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBe(null);
-      expect(mockPush).toHaveBeenCalledWith('/reports');
+      expect(mockPush).toHaveBeenCalledWith('/dashboard');
     });
 
     it('認証エラー（401）が正しく処理される', async () => {

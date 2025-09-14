@@ -6,17 +6,18 @@
 
 - **フレームワーク**: Next.js 15.5.2 (App Router)
 - **言語**: TypeScript
-- **スタイリング**: Tailwind CSS 3.4
-- **データベース**: PostgreSQL + Prisma ORM
-- **認証**: JWT (予定)
-- **テスト**: Vitest + Testing Library
+- **スタイリング**: Tailwind CSS 3.4 + shadcn/ui
+- **データベース**: SQLite + Prisma ORM (開発環境)
+- **認証**: JWT (実装済み)
+- **グラフ**: Recharts
+- **テスト**: Vitest + Testing Library + Playwright (E2E)
 - **コード品質**: ESLint + Prettier + Husky
 
 ## 📋 前提条件
 
 - Node.js 18.0.0 以上
 - npm 9.0.0 以上
-- PostgreSQL 14 以上 (データベース機能使用時)
+- SQLite (開発環境)
 
 ## 🛠 セットアップ
 
@@ -35,19 +36,19 @@ npm install
 
 ### 3. 環境変数の設定
 
-`.env.local.example` をコピーして `.env.local` を作成し、必要な値を設定してください。
+`.env.example` をコピーして `.env` を作成し、必要な値を設定してください。
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env
 ```
 
 必要な環境変数:
 
-- `DATABASE_URL`: PostgreSQL接続文字列
-- `NEXTAUTH_SECRET`: 認証用シークレットキー
+- `DATABASE_URL`: SQLite接続文字列 (デフォルト: `file:./dev.db`)
 - `JWT_SECRET`: JWT署名用シークレットキー
+- `JWT_REFRESH_SECRET`: リフレッシュトークン用シークレットキー
 
-### 4. データベースのセットアップ (今後実装予定)
+### 4. データベースのセットアップ
 
 ```bash
 # Prismaのマイグレーション実行
@@ -64,6 +65,16 @@ npm run dev
 ```
 
 [http://localhost:3000](http://localhost:3000) でアプリケーションにアクセスできます。
+
+## 🔐 テストアカウント
+
+### 一般ユーザー
+- **メールアドレス**: yamada@example.com
+- **パスワード**: Password123
+
+### 管理者
+- **メールアドレス**: tanaka@example.com
+- **パスワード**: Password123
 
 ## 📁 プロジェクト構成
 
@@ -186,15 +197,26 @@ chore: ビルド・設定変更
 5. レビュー・承認
 6. mainブランチへマージ
 
+## ✅ 実装済み機能
+
+- [x] Prismaデータベース設定 (SQLite)
+- [x] shadcn/uiコンポーネント導入
+- [x] JWT認証システム
+- [x] ログイン/ログアウト機能
+- [x] 日報CRUD機能
+- [x] 訪問記録管理
+- [x] 上長コメント機能
+- [x] 顧客マスタ管理 (管理者のみ)
+- [x] 営業担当者マスタ管理 (管理者のみ)
+- [x] 分析・レポート機能
+- [x] 権限管理 (一般ユーザー/管理者)
+
 ## 🚧 今後の実装予定
 
-- [ ] Prismaデータベース設定 (Issue #2)
-- [ ] shadcn/uiコンポーネント導入 (Issue #3)
-- [ ] OpenAPI仕様定義 (Issue #4)
-- [ ] JWT認証システム (Issue #5-7)
-- [ ] 日報CRUD機能 (Issue #8-12)
-- [ ] マスタ管理機能 (Issue #13-15)
-- [ ] Google Cloud Runへのデプロイ (Issue #22-25)
+- [ ] OpenAPI仕様定義
+- [ ] Google Cloud Runへのデプロイ
+- [ ] 月次レポート機能
+- [ ] エクスポート機能
 
 ## 📄 ライセンス
 

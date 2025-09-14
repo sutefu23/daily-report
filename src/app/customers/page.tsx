@@ -16,7 +16,7 @@ import { Search, Plus, FileDown, FileUp } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
 export default function CustomersPage() {
-  const { user, isManager } = useAuth();
+  const { user, isManager, logout } = useAuth();
   const { toast } = useToast();
   const { data, loading, fetchCustomers, createCustomer, updateCustomer, deleteCustomer } = useCustomers();
   
@@ -31,10 +31,18 @@ export default function CustomersPage() {
 
   // Redirect non-managers
   useEffect(() => {
-    if (user && !isManager) {
+    // Wait for user info to load
+    if (!user) return;
+    
+    if (!isManager) {
+      toast({
+        title: 'アクセス拒否',
+        description: 'この機能へのアクセス権限がありません',
+        variant: 'destructive',
+      });
       window.location.href = '/dashboard';
     }
-  }, [user, isManager]);
+  }, [user, isManager, toast]);
 
   // Fetch customers on mount and when search/page changes
   useEffect(() => {
@@ -148,7 +156,7 @@ export default function CustomersPage() {
       <DashboardLayout
         isManager={isManager}
         userName={user?.name}
-        onLogout={() => {}}
+        onLogout={logout}
       >
         <div className="flex h-[50vh] items-center justify-center">
           <p className="text-lg text-muted-foreground">
@@ -163,7 +171,7 @@ export default function CustomersPage() {
     <DashboardLayout
       isManager={isManager}
       userName={user?.name}
-      onLogout={() => {}}
+      onLogout={logout}
     >
       <div className="space-y-6">
         <PageHeader

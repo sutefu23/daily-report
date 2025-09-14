@@ -40,7 +40,9 @@ export function VisitRecordForm({
         setLoadingCustomers(true);
         setCustomerError(null);
         
-        const response = await fetch('/api/customers');
+        const response = await fetch('/api/customers', {
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error('顧客リストの取得に失敗しました');
         }

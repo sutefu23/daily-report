@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function Home() {
+export default function HelpPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="max-w-5xl w-full">

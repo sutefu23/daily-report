@@ -15,7 +15,7 @@ export async function verifyToken(request: NextRequest): Promise<AuthUser | null
   try {
     // Cookieからトークンを取得
     const cookieStore = await cookies();
-    const authToken = cookieStore.get('auth-token')?.value;
+    const authToken = cookieStore.get('access_token')?.value;
 
     // Authorizationヘッダーからトークンを取得（Bearer token形式）
     const authHeader = request.headers.get('authorization');

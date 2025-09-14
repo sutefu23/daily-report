@@ -177,10 +177,8 @@ export function cleanupRateLimitStore(): void {
   }
 }
 
-// Run cleanup every 5 minutes
-if (typeof window === 'undefined') {
-  setInterval(cleanupRateLimitStore, 5 * 60 * 1000);
-}
+// Cleanup is handled on each request in Edge Runtime
+// No setInterval in Edge Runtime
 
 /**
  * Validate and sanitize input
@@ -215,13 +213,8 @@ export function sanitizeInput(input: string): string {
  */
 export function generateCSRFToken(): string {
   const array = new Uint8Array(32);
-  if (typeof window !== 'undefined' && window.crypto) {
-    window.crypto.getRandomValues(array);
-  } else {
-    // Server-side
-    const crypto = require('crypto');
-    crypto.randomFillSync(array);
-  }
+  // Use Web Crypto API which is available in Edge Runtime
+  crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 

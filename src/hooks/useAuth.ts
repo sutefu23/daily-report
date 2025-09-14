@@ -55,8 +55,8 @@ export function useAuth(): UseAuthReturn {
         const loginResponse: LoginResponse = await response.json();
         setUser(loginResponse.user);
 
-        // ログイン成功後、日報一覧ページにリダイレクト
-        router.push('/reports');
+        // ログイン成功後、ダッシュボードにリダイレクト
+        router.push('/dashboard');
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'ログインに失敗しました';
