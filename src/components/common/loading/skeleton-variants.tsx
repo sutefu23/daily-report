@@ -11,11 +11,11 @@ interface TableSkeletonProps {
   className?: string;
 }
 
-export function TableSkeleton({ 
-  rows = 5, 
-  columns = 4, 
+export function TableSkeleton({
+  rows = 5,
+  columns = 4,
   showHeader = true,
-  className 
+  className,
 }: TableSkeletonProps) {
   return (
     <div className={cn('w-full space-y-3', className)}>
@@ -29,7 +29,10 @@ export function TableSkeleton({
       {Array.from({ length: rows }).map((_, rowIndex) => (
         <div key={`row-${rowIndex}`} className="flex gap-4 p-4">
           {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton key={`cell-${rowIndex}-${colIndex}`} className="h-4 flex-1" />
+            <Skeleton
+              key={`cell-${rowIndex}-${colIndex}`}
+              className="h-4 flex-1"
+            />
           ))}
         </div>
       ))}
@@ -44,10 +47,10 @@ interface CardSkeletonProps {
   className?: string;
 }
 
-export function CardSkeleton({ 
-  showImage = false, 
+export function CardSkeleton({
+  showImage = false,
   lines = 3,
-  className 
+  className,
 }: CardSkeletonProps) {
   return (
     <div className={cn('rounded-lg border bg-card p-6 space-y-4', className)}>
@@ -94,11 +97,11 @@ interface ListSkeletonProps {
   className?: string;
 }
 
-export function ListSkeleton({ 
-  items = 5, 
+export function ListSkeleton({
+  items = 5,
   showAvatar = false,
   showActions = false,
-  className 
+  className,
 }: ListSkeletonProps) {
   return (
     <div className={cn('space-y-3', className)}>
@@ -135,7 +138,7 @@ export function DailyReportSkeleton() {
           <Skeleton className="h-6 w-32" />
           <Skeleton className="h-6 w-40" />
         </div>
-        
+
         {/* Visit records section */}
         <div className="space-y-3">
           <Skeleton className="h-5 w-24" />
@@ -193,7 +196,7 @@ export function MasterListSkeleton() {
 
       {/* Table */}
       <TableSkeleton rows={8} columns={5} showHeader={true} />
-      
+
       {/* Pagination */}
       <div className="flex justify-center gap-2">
         <Skeleton className="h-10 w-10" />

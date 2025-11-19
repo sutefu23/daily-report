@@ -23,14 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  MoreHorizontal,
-  Plus,
-  Search,
-  Edit,
-  Key,
-  UserX,
-} from 'lucide-react';
+import { MoreHorizontal, Plus, Search, Edit, Key, UserX } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { NewSalesPersonDialog } from '@/components/sales-persons/new-sales-person-dialog';
@@ -54,7 +47,7 @@ export default function SalesPersonsPage() {
   useEffect(() => {
     // 認証情報の読み込み中は何もしない
     if (!user) return;
-    
+
     if (!isAuthenticated) {
       router.push('/login');
     } else if (!isManager) {
@@ -101,12 +94,13 @@ export default function SalesPersonsPage() {
   }, []);
 
   // 検索フィルタリング
-  const filteredSalesPersons = salesPersons?.filter(
-    (person) =>
-      person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.department.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredSalesPersons =
+    salesPersons?.filter(
+      (person) =>
+        person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.department.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   // アカウントの有効/無効を切り替え
   const toggleAccountStatus = async (
@@ -166,132 +160,134 @@ export default function SalesPersonsPage() {
           </p>
         </div>
 
-      <div className="mb-6 flex justify-between items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="氏名、メール、部署で検索..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
+        <div className="mb-6 flex justify-between items-center gap-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="氏名、メール、部署で検索..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Button onClick={() => setIsNewDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            新規登録
+          </Button>
         </div>
-        <Button onClick={() => setIsNewDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          新規登録
-        </Button>
-      </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableCaption>
-            {loading
-              ? '読み込み中...'
-              : `${filteredSalesPersons.length}名の営業担当者`}
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>氏名</TableHead>
-              <TableHead>メールアドレス</TableHead>
-              <TableHead>部署</TableHead>
-              <TableHead>権限</TableHead>
-              <TableHead>ステータス</TableHead>
-              <TableHead className="text-right">操作</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSalesPersons.map((person) => (
-              <TableRow key={person.id}>
-                <TableCell className="font-medium">{person.name}</TableCell>
-                <TableCell>{person.email}</TableCell>
-                <TableCell>{person.department}</TableCell>
-                <TableCell>
-                  {person.is_manager ? (
-                    <Badge variant="default">管理者</Badge>
-                  ) : (
-                    <Badge variant="secondary">一般</Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {person.is_active ? (
-                    <Badge variant="outline" className="text-green-600">
-                      有効
-                    </Badge>
-                  ) : (
-                    <Badge variant="destructive">無効</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">メニューを開く</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>操作</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => setEditingPerson(person)}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        編集
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setResetPasswordPerson(person)}
-                      >
-                        <Key className="mr-2 h-4 w-4" />
-                        パスワードリセット
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() =>
-                          toggleAccountStatus(person, !person.is_active)
-                        }
-                      >
-                        <UserX className="mr-2 h-4 w-4" />
-                        {person.is_active ? 'アカウント無効化' : 'アカウント有効化'}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredSalesPersons.length === 0 && !loading && (
+        <div className="rounded-md border">
+          <Table>
+            <TableCaption>
+              {loading
+                ? '読み込み中...'
+                : `${filteredSalesPersons.length}名の営業担当者`}
+            </TableCaption>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500">
-                  営業担当者が見つかりません
-                </TableCell>
+                <TableHead>氏名</TableHead>
+                <TableHead>メールアドレス</TableHead>
+                <TableHead>部署</TableHead>
+                <TableHead>権限</TableHead>
+                <TableHead>ステータス</TableHead>
+                <TableHead className="text-right">操作</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {filteredSalesPersons.map((person) => (
+                <TableRow key={person.id}>
+                  <TableCell className="font-medium">{person.name}</TableCell>
+                  <TableCell>{person.email}</TableCell>
+                  <TableCell>{person.department}</TableCell>
+                  <TableCell>
+                    {person.is_manager ? (
+                      <Badge variant="default">管理者</Badge>
+                    ) : (
+                      <Badge variant="secondary">一般</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {person.is_active ? (
+                      <Badge variant="outline" className="text-green-600">
+                        有効
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive">無効</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">メニューを開く</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>操作</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => setEditingPerson(person)}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          編集
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setResetPasswordPerson(person)}
+                        >
+                          <Key className="mr-2 h-4 w-4" />
+                          パスワードリセット
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() =>
+                            toggleAccountStatus(person, !person.is_active)
+                          }
+                        >
+                          <UserX className="mr-2 h-4 w-4" />
+                          {person.is_active
+                            ? 'アカウント無効化'
+                            : 'アカウント有効化'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredSalesPersons.length === 0 && !loading && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-gray-500">
+                    営業担当者が見つかりません
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      {/* ダイアログコンポーネント */}
-      <NewSalesPersonDialog
-        open={isNewDialogOpen}
-        onOpenChange={setIsNewDialogOpen}
-        onSuccess={fetchSalesPersons}
-      />
-
-      {editingPerson && (
-        <EditSalesPersonDialog
-          open={!!editingPerson}
-          onOpenChange={(open) => !open && setEditingPerson(null)}
-          salesPerson={editingPerson}
+        {/* ダイアログコンポーネント */}
+        <NewSalesPersonDialog
+          open={isNewDialogOpen}
+          onOpenChange={setIsNewDialogOpen}
           onSuccess={fetchSalesPersons}
         />
-      )}
 
-      {resetPasswordPerson && (
-        <PasswordResetDialog
-          open={!!resetPasswordPerson}
-          onOpenChange={(open) => !open && setResetPasswordPerson(null)}
-          salesPerson={resetPasswordPerson}
-        />
-      )}
+        {editingPerson && (
+          <EditSalesPersonDialog
+            open={!!editingPerson}
+            onOpenChange={(open) => !open && setEditingPerson(null)}
+            salesPerson={editingPerson}
+            onSuccess={fetchSalesPersons}
+          />
+        )}
+
+        {resetPasswordPerson && (
+          <PasswordResetDialog
+            open={!!resetPasswordPerson}
+            onOpenChange={(open) => !open && setResetPasswordPerson(null)}
+            salesPerson={resetPasswordPerson}
+          />
+        )}
       </div>
     </DashboardLayout>
   );

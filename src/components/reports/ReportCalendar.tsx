@@ -6,7 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameMonth, isToday, isSameDay } from 'date-fns';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  getDay,
+  addMonths,
+  subMonths,
+  isSameMonth,
+  isToday,
+  isSameDay,
+} from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +63,7 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
   // 日付ごとの日報をグループ化
   const reportsByDate = React.useMemo(() => {
     const grouped: { [key: string]: Report[] } = {};
-    reports.forEach(report => {
+    reports.forEach((report) => {
       const dateKey = format(new Date(report.report_date), 'yyyy-MM-dd');
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
@@ -78,7 +89,7 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
     setSelectedDate(date);
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayReports = reportsByDate[dateStr] || [];
-    
+
     if (dayReports.length === 1) {
       // 1件の場合は詳細ページへ
       router.push(`/reports/${dayReports[0].id}`);
@@ -94,12 +105,10 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
   const getDayContent = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayReports = reportsByDate[dateStr] || [];
-    
+
     return (
       <div className="h-full">
-        <div className="text-sm font-medium mb-1">
-          {format(date, 'd')}
-        </div>
+        <div className="text-sm font-medium mb-1">{format(date, 'd')}</div>
         {dayReports.length > 0 ? (
           <div className="space-y-1">
             {dayReports.slice(0, 2).map((report, idx) => (
@@ -118,9 +127,7 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
             )}
           </div>
         ) : (
-          <div className="text-xs text-muted-foreground">
-            日報なし
-          </div>
+          <div className="text-xs text-muted-foreground">日報なし</div>
         )}
       </div>
     );
@@ -160,9 +167,9 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
             <div
               key={day}
               className={cn(
-                "text-center py-2 text-sm font-medium",
-                index === 0 && "text-red-500",
-                index === 6 && "text-blue-500"
+                'text-center py-2 text-sm font-medium',
+                index === 0 && 'text-red-500',
+                index === 6 && 'text-blue-500'
               )}
             >
               {day}
@@ -190,12 +197,12 @@ export const ReportCalendar: React.FC<ReportCalendarProps> = ({
               <div
                 key={date.toISOString()}
                 className={cn(
-                  "min-h-[80px] p-2 bg-background cursor-pointer hover:bg-accent transition-colors",
-                  isToday(date) && "bg-primary/5 ring-1 ring-primary",
-                  selectedDate && isSameDay(date, selectedDate) && "bg-accent",
-                  !isSameMonth(date, currentDate) && "opacity-50",
-                  dayOfWeek === 0 && "text-red-500",
-                  dayOfWeek === 6 && "text-blue-500"
+                  'min-h-[80px] p-2 bg-background cursor-pointer hover:bg-accent transition-colors',
+                  isToday(date) && 'bg-primary/5 ring-1 ring-primary',
+                  selectedDate && isSameDay(date, selectedDate) && 'bg-accent',
+                  !isSameMonth(date, currentDate) && 'opacity-50',
+                  dayOfWeek === 0 && 'text-red-500',
+                  dayOfWeek === 6 && 'text-blue-500'
                 )}
                 onClick={() => handleDateClick(date)}
               >

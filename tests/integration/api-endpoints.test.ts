@@ -7,11 +7,24 @@ import { testUsers, createMockData } from '../utils/prisma-mock';
 import { prisma as mockPrisma } from '@/lib/prisma';
 
 // API ルートハンドラーをインポート（モック後にインポート）
-import { GET as getReports, POST as createReport } from '@/app/api/reports/route';
-import { GET as getReport, PUT as updateReport, DELETE as deleteReport } from '@/app/api/reports/[id]/route';
+import {
+  GET as getReports,
+  POST as createReport,
+} from '@/app/api/reports/route';
+import {
+  GET as getReport,
+  PUT as updateReport,
+  DELETE as deleteReport,
+} from '@/app/api/reports/[id]/route';
 import { POST as createComment } from '@/app/api/reports/[id]/comments/route';
-import { GET as getCustomers, POST as createCustomer } from '@/app/api/customers/route';
-import { GET as getSalesPersons, POST as createSalesPerson } from '@/app/api/sales-persons/route';
+import {
+  GET as getCustomers,
+  POST as createCustomer,
+} from '@/app/api/customers/route';
+import {
+  GET as getSalesPersons,
+  POST as createSalesPerson,
+} from '@/app/api/sales-persons/route';
 
 describe('API Endpoints Integration Tests', () => {
   let regularUserToken: string;
@@ -19,7 +32,7 @@ describe('API Endpoints Integration Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // JWTトークンを生成
     regularUserToken = JWTUtil.generateAccessToken(testUsers.regularUser);
     managerUserToken = JWTUtil.generateAccessToken(testUsers.managerUser);
@@ -48,7 +61,7 @@ describe('API Endpoints Integration Tests', () => {
 
       // 2. 重複チェック（なし）
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
-      
+
       // 3. 作成処理
       const createdReport = {
         reportId: 1,
@@ -59,18 +72,21 @@ describe('API Endpoints Integration Tests', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      
+
       mockPrisma.dailyReport.create.mockResolvedValue(createdReport);
       mockPrisma.visitRecord.createMany.mockResolvedValue({ count: 2 });
 
-      const createRequest = new NextRequest('http://localhost:3000/api/reports', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(createData),
-      });
+      const createRequest = new NextRequest(
+        'http://localhost:3000/api/reports',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(createData),
+        }
+      );
 
       const createResponse = await createReport(createRequest);
       const createResult = await createResponse.json();
@@ -95,13 +111,19 @@ describe('API Endpoints Integration Tests', () => {
             visitId: 1,
             visitContent: 'システム導入の検討について打ち合わせ',
             visitTime: '10:30',
-            customer: createMockData.customer({ customerId: 1, companyName: 'A社' }),
+            customer: createMockData.customer({
+              customerId: 1,
+              companyName: 'A社',
+            }),
           },
           {
             visitId: 2,
             visitContent: 'サービス更新の提案',
             visitTime: '14:00',
-            customer: createMockData.customer({ customerId: 2, companyName: 'B社' }),
+            customer: createMockData.customer({
+              customerId: 2,
+              companyName: 'B社',
+            }),
           },
         ],
         managerComments: [],
@@ -109,11 +131,14 @@ describe('API Endpoints Integration Tests', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(reportWithDetails);
 
-      const getRequest = new NextRequest('http://localhost:3000/api/reports/1', {
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-        },
-      });
+      const getRequest = new NextRequest(
+        'http://localhost:3000/api/reports/1',
+        {
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+          },
+        }
+      );
 
       const getResponse = await getReport(getRequest, { params: { id: '1' } });
       const getResult = await getResponse.json();
@@ -143,7 +168,9 @@ describe('API Endpoints Integration Tests', () => {
         visitRecords: [{ visitId: 1 }],
       };
 
-      mockPrisma.dailyReport.findUnique.mockResolvedValue(existingReportForUpdate);
+      mockPrisma.dailyReport.findUnique.mockResolvedValue(
+        existingReportForUpdate
+      );
       mockPrisma.dailyReport.update.mockResolvedValue({
         ...createdReport,
         problem: updateData.problem,
@@ -153,16 +180,21 @@ describe('API Endpoints Integration Tests', () => {
       mockPrisma.visitRecord.deleteMany.mockResolvedValue({ count: 2 });
       mockPrisma.visitRecord.createMany.mockResolvedValue({ count: 1 });
 
-      const updateRequest = new NextRequest('http://localhost:3000/api/reports/1', {
-        method: 'PUT',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
-      });
+      const updateRequest = new NextRequest(
+        'http://localhost:3000/api/reports/1',
+        {
+          method: 'PUT',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
 
-      const updateResponse = await updateReport(updateRequest, { params: { id: '1' } });
+      const updateResponse = await updateReport(updateRequest, {
+        params: { id: '1' },
+      });
       const updateResult = await updateResponse.json();
 
       expect(updateResponse.status).toBe(200);
@@ -187,16 +219,21 @@ describe('API Endpoints Integration Tests', () => {
         },
       });
 
-      const commentRequest = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${managerUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(commentData),
-      });
+      const commentRequest = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${managerUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(commentData),
+        }
+      );
 
-      const commentResponse = await createComment(commentRequest, { params: { id: '1' } });
+      const commentResponse = await createComment(commentRequest, {
+        params: { id: '1' },
+      });
       const commentResult = await commentResponse.json();
 
       // デバッグ: エラーレスポンスの内容を出力
@@ -215,14 +252,19 @@ describe('API Endpoints Integration Tests', () => {
       });
       mockPrisma.dailyReport.delete.mockResolvedValue(createdReport);
 
-      const deleteRequest = new NextRequest('http://localhost:3000/api/reports/1', {
-        method: 'DELETE',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-        },
-      });
+      const deleteRequest = new NextRequest(
+        'http://localhost:3000/api/reports/1',
+        {
+          method: 'DELETE',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+          },
+        }
+      );
 
-      const deleteResponse = await deleteReport(deleteRequest, { params: { id: '1' } });
+      const deleteResponse = await deleteReport(deleteRequest, {
+        params: { id: '1' },
+      });
 
       expect(deleteResponse.status).toBe(204);
       expect(mockPrisma.dailyReport.delete).toHaveBeenCalledWith({
@@ -246,13 +288,18 @@ describe('API Endpoints Integration Tests', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(otherUserReport);
 
-      const unauthorizedRequest = new NextRequest('http://localhost:3000/api/reports/2', {
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-        },
-      });
+      const unauthorizedRequest = new NextRequest(
+        'http://localhost:3000/api/reports/2',
+        {
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+          },
+        }
+      );
 
-      const unauthorizedResponse = await getReport(unauthorizedRequest, { params: { id: '2' } });
+      const unauthorizedResponse = await getReport(unauthorizedRequest, {
+        params: { id: '2' },
+      });
       expect(unauthorizedResponse.status).toBe(403);
 
       // 2. 管理者が他人の日報にアクセス（成功）
@@ -265,34 +312,44 @@ describe('API Endpoints Integration Tests', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(reportForManager);
 
-      const managerRequest = new NextRequest('http://localhost:3000/api/reports/2', {
-        headers: {
-          authorization: `Bearer ${managerUserToken}`,
-        },
+      const managerRequest = new NextRequest(
+        'http://localhost:3000/api/reports/2',
+        {
+          headers: {
+            authorization: `Bearer ${managerUserToken}`,
+          },
+        }
+      );
+
+      const managerResponse = await getReport(managerRequest, {
+        params: { id: '2' },
       });
 
-      const managerResponse = await getReport(managerRequest, { params: { id: '2' } });
-      
       // デバッグ: エラーレスポンスの内容を出力
       if (managerResponse.status !== 200) {
         const responseBody = await managerResponse.json();
         console.log('Manager Report Response Status:', managerResponse.status);
         console.log('Manager Report Response Body:', responseBody);
       }
-      
+
       expect(managerResponse.status).toBe(200);
 
       // 3. 一般ユーザーがコメント追加を試行（失敗）
-      const commentAttempt = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ comment: 'テストコメント' }),
-      });
+      const commentAttempt = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({ comment: 'テストコメント' }),
+        }
+      );
 
-      const commentAttemptResponse = await createComment(commentAttempt, { params: { id: '1' } });
+      const commentAttemptResponse = await createComment(commentAttempt, {
+        params: { id: '1' },
+      });
       expect(commentAttemptResponse.status).toBe(403);
     });
   });
@@ -307,14 +364,17 @@ describe('API Endpoints Integration Tests', () => {
         visits: [], // 必須項目不足
       };
 
-      const invalidCreateRequest = new NextRequest('http://localhost:3000/api/reports', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(invalidReportData),
-      });
+      const invalidCreateRequest = new NextRequest(
+        'http://localhost:3000/api/reports',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(invalidReportData),
+        }
+      );
 
       const invalidCreateResponse = await createReport(invalidCreateRequest);
       const invalidCreateResult = await invalidCreateResponse.json();
@@ -331,16 +391,22 @@ describe('API Endpoints Integration Tests', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue({ reportId: 1 });
 
-      const invalidCommentRequest = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${managerUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(invalidCommentData),
-      });
+      const invalidCommentRequest = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${managerUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(invalidCommentData),
+        }
+      );
 
-      const invalidCommentResponse = await createComment(invalidCommentRequest, { params: { id: '1' } });
+      const invalidCommentResponse = await createComment(
+        invalidCommentRequest,
+        { params: { id: '1' } }
+      );
       const invalidCommentResult = await invalidCommentResponse.json();
 
       expect(invalidCommentResponse.status).toBe(400);
@@ -353,13 +419,18 @@ describe('API Endpoints Integration Tests', () => {
       // 存在しない日報にアクセス
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
 
-      const notFoundRequest = new NextRequest('http://localhost:3000/api/reports/999', {
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-        },
-      });
+      const notFoundRequest = new NextRequest(
+        'http://localhost:3000/api/reports/999',
+        {
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+          },
+        }
+      );
 
-      const notFoundResponse = await getReport(notFoundRequest, { params: { id: '999' } });
+      const notFoundResponse = await getReport(notFoundRequest, {
+        params: { id: '999' },
+      });
       const notFoundResult = await notFoundResponse.json();
 
       expect(notFoundResponse.status).toBe(404);
@@ -385,14 +456,17 @@ describe('API Endpoints Integration Tests', () => {
         salesPersonId: testUsers.regularUser.id,
       });
 
-      const duplicateRequest = new NextRequest('http://localhost:3000/api/reports', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(duplicateData),
-      });
+      const duplicateRequest = new NextRequest(
+        'http://localhost:3000/api/reports',
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(duplicateData),
+        }
+      );
 
       const duplicateResponse = await createReport(duplicateRequest);
       const duplicateResult = await duplicateResponse.json();
@@ -402,7 +476,9 @@ describe('API Endpoints Integration Tests', () => {
     });
 
     it('認証なしでアクセスした場合に401を返す', async () => {
-      const unauthenticatedRequest = new NextRequest('http://localhost:3000/api/reports');
+      const unauthenticatedRequest = new NextRequest(
+        'http://localhost:3000/api/reports'
+      );
 
       const unauthenticatedResponse = await getReports(unauthenticatedRequest);
       const unauthenticatedResult = await unauthenticatedResponse.json();
@@ -412,11 +488,14 @@ describe('API Endpoints Integration Tests', () => {
     });
 
     it('無効なJWTトークンでアクセスした場合に401を返す', async () => {
-      const invalidTokenRequest = new NextRequest('http://localhost:3000/api/reports', {
-        headers: {
-          authorization: 'Bearer invalid-token-123',
-        },
-      });
+      const invalidTokenRequest = new NextRequest(
+        'http://localhost:3000/api/reports',
+        {
+          headers: {
+            authorization: 'Bearer invalid-token-123',
+          },
+        }
+      );
 
       const invalidTokenResponse = await getReports(invalidTokenRequest);
       const invalidTokenResult = await invalidTokenResponse.json();
@@ -430,7 +509,9 @@ describe('API Endpoints Integration Tests', () => {
     it('ページネーションパラメータが正しく処理される', async () => {
       const mockReports = Array.from({ length: 5 }, (_, i) => ({
         ...createMockData.dailyReport({ reportId: i + 1 }),
-        salesPerson: createMockData.salesPerson({ salesPersonId: testUsers.regularUser.id }),
+        salesPerson: createMockData.salesPerson({
+          salesPersonId: testUsers.regularUser.id,
+        }),
         visitRecords: [],
         managerComments: [],
       }));
@@ -473,32 +554,41 @@ describe('API Endpoints Integration Tests', () => {
     it('大量データでの一覧取得が適切に処理される', async () => {
       const largeDataSet = Array.from({ length: 100 }, (_, i) => ({
         ...createMockData.dailyReport({ reportId: i + 1 }),
-        salesPerson: createMockData.salesPerson({ salesPersonId: testUsers.regularUser.id }),
+        salesPerson: createMockData.salesPerson({
+          salesPersonId: testUsers.regularUser.id,
+        }),
         visitRecords: Array.from({ length: 3 }, (_, j) => ({ visitId: j + 1 })),
-        managerComments: Array.from({ length: 2 }, (_, k) => ({ commentId: k + 1 })),
+        managerComments: Array.from({ length: 2 }, (_, k) => ({
+          commentId: k + 1,
+        })),
       }));
 
-      mockPrisma.dailyReport.findMany.mockResolvedValue(largeDataSet.slice(0, 20));
+      mockPrisma.dailyReport.findMany.mockResolvedValue(
+        largeDataSet.slice(0, 20)
+      );
       mockPrisma.dailyReport.count.mockResolvedValue(1000);
 
       const startTime = Date.now();
-      
-      const largeDataRequest = new NextRequest('http://localhost:3000/api/reports', {
-        headers: {
-          authorization: `Bearer ${regularUserToken}`,
-        },
-      });
+
+      const largeDataRequest = new NextRequest(
+        'http://localhost:3000/api/reports',
+        {
+          headers: {
+            authorization: `Bearer ${regularUserToken}`,
+          },
+        }
+      );
 
       const largeDataResponse = await getReports(largeDataRequest);
       const largeDataResult = await largeDataResponse.json();
-      
+
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
       expect(largeDataResponse.status).toBe(200);
       expect(largeDataResult.data).toHaveLength(20);
       expect(largeDataResult.pagination.total).toBe(1000);
-      
+
       // レスポンス時間の確認（モック環境では高速だが、実環境での目安）
       expect(responseTime).toBeLessThan(1000); // 1秒以内
     });
@@ -523,8 +613,8 @@ describe('API Endpoints Integration Tests', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
       mockPrisma.dailyReport.create
-        .mockResolvedValueOnce({ 
-          reportId: 1, 
+        .mockResolvedValueOnce({
+          reportId: 1,
           salesPersonId: testUsers.regularUser.id,
           reportDate: new Date(reportData1.report_date),
           problem: reportData1.problem,
@@ -532,8 +622,8 @@ describe('API Endpoints Integration Tests', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         })
-        .mockResolvedValueOnce({ 
-          reportId: 2, 
+        .mockResolvedValueOnce({
+          reportId: 2,
           salesPersonId: testUsers.regularUser.id,
           reportDate: new Date(reportData2.report_date),
           problem: reportData2.problem,

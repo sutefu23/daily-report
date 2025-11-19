@@ -13,9 +13,15 @@ export class LoginPage {
   constructor(page: Page) {
     this.page = page;
     this.emailField = page.locator('input[name="email"], input[type="email"]');
-    this.passwordField = page.locator('input[name="password"], input[type="password"]');
-    this.loginButton = page.locator('button[type="submit"], button:has-text("ログイン")');
-    this.errorMessage = page.locator('[role="alert"], .error-message, text=エラー');
+    this.passwordField = page.locator(
+      'input[name="password"], input[type="password"]'
+    );
+    this.loginButton = page.locator(
+      'button[type="submit"], button:has-text("ログイン")'
+    );
+    this.errorMessage = page.locator(
+      '[role="alert"], .error-message, text=エラー'
+    );
   }
 
   async goto(): Promise<void> {

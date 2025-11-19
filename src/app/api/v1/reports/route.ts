@@ -53,14 +53,14 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const page = parseInt(searchParams.get('page') || '1', 10);
   const perPage = parseInt(searchParams.get('per_page') || '20', 10);
-  
+
   // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   const startIndex = (page - 1) * perPage;
   const endIndex = startIndex + perPage;
   const paginatedReports = mockReports.slice(startIndex, endIndex);
-  
+
   return NextResponse.json({
     data: paginatedReports,
     pagination: {
@@ -74,23 +74,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  
+
   // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   // Validate required fields
   if (!body.report_date || !body.problem || !body.plan) {
     return NextResponse.json(
-      { 
-        error: { 
-          code: 'VALIDATION_ERROR', 
+      {
+        error: {
+          code: 'VALIDATION_ERROR',
           message: '必須項目が入力されていません',
-        } 
+        },
       },
       { status: 400 }
     );
   }
-  
+
   const newReport = {
     id: mockReports.length + 1,
     report_date: body.report_date,
@@ -99,6 +99,6 @@ export async function POST(request: NextRequest) {
     plan: body.plan,
     created_at: new Date().toISOString(),
   };
-  
+
   return NextResponse.json(newReport, { status: 201 });
 }

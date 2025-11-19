@@ -276,7 +276,9 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await getReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -295,7 +297,9 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: Promise.resolve({ id: '999' }) });
+      const response = await getReport(request, {
+        params: Promise.resolve({ id: '999' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -314,7 +318,9 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await getReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await getReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -361,7 +367,9 @@ describe('Reports API', () => {
         body: JSON.stringify(updateData),
       });
 
-      const response = await updateReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await updateReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -385,7 +393,9 @@ describe('Reports API', () => {
         body: JSON.stringify({ problem: 'test' }),
       });
 
-      const response = await updateReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await updateReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -407,7 +417,9 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await deleteReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await deleteReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
 
       expect(response.status).toBe(204);
       expect(prisma.dailyReport.delete).toHaveBeenCalledWith({
@@ -428,7 +440,9 @@ describe('Reports API', () => {
         },
       });
 
-      const response = await deleteReport(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await deleteReport(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(403);
@@ -471,7 +485,9 @@ describe('Reports API', () => {
         }
       );
 
-      const response = await createComment(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await createComment(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(201);
@@ -495,7 +511,9 @@ describe('Reports API', () => {
         }
       );
 
-      const response = await createComment(request, { params: Promise.resolve({ id: '1' }) });
+      const response = await createComment(request, {
+        params: Promise.resolve({ id: '1' }),
+      });
       const data = await response.json();
 
       expect(response.status).toBe(403);

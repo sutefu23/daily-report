@@ -18,14 +18,23 @@ import { useDebounce } from '@/hooks/use-debounce';
 export default function CustomersPage() {
   const { user, isManager, logout } = useAuth();
   const { toast } = useToast();
-  const { data, loading, fetchCustomers, createCustomer, updateCustomer, deleteCustomer } = useCustomers();
-  
+  const {
+    data,
+    loading,
+    fetchCustomers,
+    createCustomer,
+    updateCustomer,
+    deleteCustomer,
+  } = useCustomers();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -33,7 +42,7 @@ export default function CustomersPage() {
   useEffect(() => {
     // Wait for user info to load
     if (!user) return;
-    
+
     if (!isManager) {
       toast({
         title: 'アクセス拒否',
@@ -85,7 +94,7 @@ export default function CustomersPage() {
 
   const handleUpdate = async (formData: any) => {
     if (!selectedCustomer) return;
-    
+
     try {
       await updateCustomer(selectedCustomer.id, formData);
       toast({
@@ -106,7 +115,7 @@ export default function CustomersPage() {
 
   const handleDelete = async () => {
     if (!selectedCustomer) return;
-    
+
     try {
       await deleteCustomer(selectedCustomer.id);
       toast({
@@ -194,26 +203,15 @@ export default function CustomersPage() {
 
           {/* Actions */}
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleImport}
-            >
+            <Button variant="outline" size="sm" onClick={handleImport}>
               <FileUp className="mr-2 h-4 w-4" />
               インポート
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-            >
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <FileDown className="mr-2 h-4 w-4" />
               エクスポート
             </Button>
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              size="sm"
-            >
+            <Button onClick={() => setIsCreateDialogOpen(true)} size="sm">
               <Plus className="mr-2 h-4 w-4" />
               新規登録
             </Button>

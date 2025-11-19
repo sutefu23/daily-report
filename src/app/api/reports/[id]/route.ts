@@ -203,7 +203,7 @@ export async function PUT(
       }
 
       const body = await req.json();
-      
+
       // バリデーション
       const validatedData = UpdateReportRequestSchema.parse(body);
 
@@ -223,14 +223,16 @@ export async function PUT(
         // 訪問記録の更新処理
         if (validatedData.visits !== undefined) {
           // 既存の訪問記録IDを取得
-          const existingVisitIds = existingReport.visitRecords.map(v => v.visitId);
+          const existingVisitIds = existingReport.visitRecords.map(
+            (v) => v.visitId
+          );
           const updateVisitIds = validatedData.visits
-            .filter(v => v.id !== undefined)
-            .map(v => v.id!);
+            .filter((v) => v.id !== undefined)
+            .map((v) => v.id!);
 
           // 削除対象の訪問記録を特定
           const deleteVisitIds = existingVisitIds.filter(
-            id => !updateVisitIds.includes(id)
+            (id) => !updateVisitIds.includes(id)
           );
 
           // 削除

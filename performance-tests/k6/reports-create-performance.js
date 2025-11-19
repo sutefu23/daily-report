@@ -11,16 +11,16 @@ const successRate = new Rate('create_success_rate');
 // テスト設定
 export const options = {
   stages: [
-    { duration: '30s', target: 10 },   // ウォームアップ
-    { duration: '1m', target: 30 },    // 負荷を徐々に上げる
-    { duration: '3m', target: 50 },    // 50同時ユーザーで維持
-    { duration: '30s', target: 0 },    // クールダウン
+    { duration: '30s', target: 10 }, // ウォームアップ
+    { duration: '1m', target: 30 }, // 負荷を徐々に上げる
+    { duration: '3m', target: 50 }, // 50同時ユーザーで維持
+    { duration: '30s', target: 0 }, // クールダウン
   ],
   thresholds: {
-    'report_create_time': ['p(95)<2000'],     // 95%が2秒以内
-    'report_create_time': ['p(99)<3000'],     // 99%が3秒以内
-    'create_success_rate': ['rate>0.99'],     // 成功率99%以上
-    'errors': ['rate<0.01'],                  // エラー率1%未満
+    report_create_time: ['p(95)<2000'], // 95%が2秒以内
+    report_create_time: ['p(99)<3000'], // 99%が3秒以内
+    create_success_rate: ['rate>0.99'], // 成功率99%以上
+    errors: ['rate<0.01'], // エラー率1%未満
   },
 };
 
@@ -45,33 +45,33 @@ export function setup() {
         headers: { 'Content-Type': 'application/json' },
       }
     );
-    
+
     if (loginRes.status === 200) {
       const authData = JSON.parse(loginRes.body);
-      users.push({ 
-        token: authData.token, 
+      users.push({
+        token: authData.token,
         userId: authData.user.id,
-        name: authData.user.name 
+        name: authData.user.name,
       });
     }
   }
-  
+
   return { users };
 }
 
 export default function (data) {
   // ランダムなユーザーを選択
   const user = data.users[Math.floor(Math.random() * data.users.length)];
-  
+
   const headers = {
-    'Authorization': `Bearer ${user.token}`,
+    Authorization: `Bearer ${user.token}`,
     'Content-Type': 'application/json',
   };
 
   // 日報作成用のデータを生成
   const reportDate = generateRandomDate();
   const visitCount = Math.floor(Math.random() * 5) + 1; // 1-5件の訪問記録
-  
+
   const reportData = {
     report_date: reportDate,
     problem: generateProblemText(),
@@ -81,11 +81,9 @@ export default function (data) {
 
   // 日報作成リクエスト
   const startTime = Date.now();
-  const res = http.post(
-    `${BASE_URL}/api/reports`,
-    JSON.stringify(reportData),
-    { headers }
-  );
+  const res = http.post(`${BASE_URL}/api/reports`, JSON.stringify(reportData), {
+    headers,
+  });
   const responseTime = Date.now() - startTime;
 
   // レスポンスチェック
@@ -105,9 +103,10 @@ export default function (data) {
   });
 
   // 重複エラーの場合は成功として扱う（同一日付の日報作成試行）
-  const isDuplicateError = res.status === 409 || 
+  const isDuplicateError =
+    res.status === 409 ||
     (res.status === 400 && res.body.includes('duplicate'));
-  
+
   errorRate.add(!result && !isDuplicateError);
   successRate.add(isSuccess || isDuplicateError);
   createTime.add(responseTime);
@@ -154,18 +153,18 @@ function generateVisits(count) {
     '見積もり提出と詳細説明。前向きに検討いただける。',
     'クレーム対応。問題は解決し、関係修復。',
   ];
-  
+
   for (let i = 0; i < count; i++) {
     const hour = 9 + Math.floor(Math.random() * 9); // 9-17時
     const minute = Math.floor(Math.random() * 60);
-    
+
     visits.push({
       customer_id: customers[Math.floor(Math.random() * customers.length)],
       visit_time: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`,
       visit_content: contents[Math.floor(Math.random() * contents.length)],
     });
   }
-  
+
   return visits;
 }
 
@@ -178,7 +177,7 @@ export function handleSummary(data) {
 
 function textSummary(data) {
   let summary = '\n=== Report Creation Performance Test Results ===\n\n';
-  
+
   // Create time metrics
   const createTimeMetric = data.metrics['report_create_time'];
   if (createTimeMetric) {
@@ -188,32 +187,32 @@ function textSummary(data) {
     summary += `  99th percentile: ${createTimeMetric.values['p(99)'].toFixed(2)}ms\n`;
     summary += `  Max: ${createTimeMetric.values.max.toFixed(2)}ms\n\n`;
   }
-  
+
   // Success rate
   const successRateMetric = data.metrics['create_success_rate'];
   if (successRateMetric) {
     summary += `Success Rate: ${(successRateMetric.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // Error rate
   const errors = data.metrics['errors'];
   if (errors) {
     summary += `Error Rate: ${(errors.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // Total requests
   const reqCount = data.metrics['http_reqs'];
   if (reqCount) {
     summary += `Total Requests: ${reqCount.values.count}\n`;
     summary += `Request Rate: ${reqCount.values.rate.toFixed(2)} req/s\n`;
   }
-  
+
   // Thresholds
   summary += '\nThresholds:\n';
   for (const [key, value] of Object.entries(data.thresholds || {})) {
     const status = value.ok ? '✓' : '✗';
     summary += `  ${status} ${key}\n`;
   }
-  
+
   return summary;
 }

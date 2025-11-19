@@ -22,11 +22,7 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="flex flex-col items-center justify-between space-y-2 md:flex-row md:space-y-0">
           <div className="flex flex-col items-center space-y-1 md:flex-row md:space-x-4 md:space-y-0">
             <p>© {currentYear} 営業日報システム. All rights reserved.</p>
-            {showVersion && (
-              <p className="text-xs">
-                Version {version}
-              </p>
-            )}
+            {showVersion && <p className="text-xs">Version {version}</p>}
           </div>
           <div className="flex space-x-4">
             <a

@@ -67,7 +67,8 @@ export function VisitRecordList({ visits, isLoading }: VisitRecordListProps) {
                       {index + 1}.
                     </span>
                     <span className="font-semibold">
-                      {visit.customer?.company_name || `顧客ID: ${visit.customer_id}`}
+                      {visit.customer?.company_name ||
+                        `顧客ID: ${visit.customer_id}`}
                     </span>
                     {visit.customer?.contact_person && (
                       <span className="text-sm text-muted-foreground ml-2">

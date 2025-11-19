@@ -117,7 +117,9 @@ describe('/api/customers', () => {
       prisma.customer.count.mockResolvedValue(1);
       prisma.customer.findMany.mockResolvedValue([mockCustomer]);
 
-      const request = new NextRequest('http://localhost/api/customers?search=ABC');
+      const request = new NextRequest(
+        'http://localhost/api/customers?search=ABC'
+      );
       const response = await GET(request);
 
       expect(response.status).toBe(200);
@@ -151,7 +153,9 @@ describe('/api/customers', () => {
       prisma.customer.count.mockResolvedValue(50);
       prisma.customer.findMany.mockResolvedValue([]);
 
-      const request = new NextRequest('http://localhost/api/customers?page=2&per_page=10');
+      const request = new NextRequest(
+        'http://localhost/api/customers?page=2&per_page=10'
+      );
       const response = await GET(request);
 
       expect(response.status).toBe(200);

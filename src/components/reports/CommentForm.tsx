@@ -13,7 +13,11 @@ interface CommentFormProps {
   isManager: boolean;
 }
 
-export function CommentForm({ reportId, onCommentAdded, isManager }: CommentFormProps) {
+export function CommentForm({
+  reportId,
+  onCommentAdded,
+  isManager,
+}: CommentFormProps) {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +28,7 @@ export function CommentForm({ reportId, onCommentAdded, isManager }: CommentForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!comment.trim()) {
       setError('コメントを入力してください');
       return;
@@ -57,7 +61,7 @@ export function CommentForm({ reportId, onCommentAdded, isManager }: CommentForm
     <div className="space-y-4">
       <div className="border-t pt-4">
         <h3 className="text-lg font-semibold mb-4">コメントを追加</h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="comment">コメント</Label>

@@ -103,7 +103,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const pathname = usePathname();
   // Initialize with 'reports' and 'master-data' menus expanded by default
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['reports', 'master-data']));
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(
+    new Set(['reports', 'master-data'])
+  );
 
   const toggleExpanded = (itemId: string) => {
     const newExpanded = new Set(expandedItems);
@@ -142,8 +144,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderMenuItem = (item: MenuItem, depth = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
-    const isActive = pathname === item.href || 
-      (hasChildren && item.children?.some(child => pathname === child.href));
+    const isActive =
+      pathname === item.href ||
+      (hasChildren && item.children?.some((child) => pathname === child.href));
 
     if (hasChildren && !isCollapsed) {
       return (
@@ -228,7 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </nav>
       </ScrollArea>
-      
+
       {onCollapse && (
         <div className="border-t p-3">
           <Button

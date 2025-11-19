@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/schemas/auth';
 
@@ -87,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Get CSRF token from cookie
       const csrfToken = document.cookie
         .split('; ')
-        .find(row => row.startsWith('csrf-token='))
+        .find((row) => row.startsWith('csrf-token='))
         ?.split('=')[1];
 
       await fetch('/api/auth/logout', {

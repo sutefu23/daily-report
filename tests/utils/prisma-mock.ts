@@ -102,7 +102,7 @@ export function createMockPrismaClient() {
 // Prismaクライアントを全体的にモック
 export function mockPrismaClient() {
   const mockPrisma = createMockPrismaClient();
-  
+
   vi.mock('@prisma/client', () => ({
     PrismaClient: vi.fn(() => mockPrisma),
   }));
@@ -113,7 +113,7 @@ export function mockPrismaClient() {
 // グローバルレベルでのPrismaモック設定
 export function setupGlobalPrismaMock() {
   const mockPrisma = createMockPrismaClient();
-  
+
   // vi.mock()はファイルのトップレベルで実行される必要があるため、
   // この関数は使用しないことを推奨
   return mockPrisma;

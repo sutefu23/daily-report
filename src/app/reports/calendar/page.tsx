@@ -35,7 +35,7 @@ export default function ReportCalendarPage() {
     try {
       const startDate = format(startOfMonth(date), 'yyyy-MM-dd');
       const endDate = format(endOfMonth(date), 'yyyy-MM-dd');
-      
+
       const params = new URLSearchParams({
         start_date: startDate,
         end_date: endDate,

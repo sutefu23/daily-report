@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createMockPrismaClient, createMockData, testUsers } from '../../utils/prisma-mock';
+import {
+  createMockPrismaClient,
+  createMockData,
+  testUsers,
+} from '../../utils/prisma-mock';
 
 // データベース操作をモック
 const mockPrisma = createMockPrismaClient();
@@ -9,18 +13,27 @@ vi.mock('@/lib/db', () => ({
 
 // テスト対象のデータベース関数をここに実装
 export class ReportsService {
-  static async getReports(userId: number, options: {
-    page?: number;
-    perPage?: number;
-    startDate?: Date;
-    endDate?: Date;
-    isManager?: boolean;
-  } = {}) {
-    const { page = 1, perPage = 20, startDate, endDate, isManager = false } = options;
+  static async getReports(
+    userId: number,
+    options: {
+      page?: number;
+      perPage?: number;
+      startDate?: Date;
+      endDate?: Date;
+      isManager?: boolean;
+    } = {}
+  ) {
+    const {
+      page = 1,
+      perPage = 20,
+      startDate,
+      endDate,
+      isManager = false,
+    } = options;
     const offset = (page - 1) * perPage;
 
     const where: any = {};
-    
+
     // 管理者でない場合は自分の日報のみ
     if (!isManager) {
       where.salesPersonId = userId;
@@ -82,7 +95,11 @@ export class ReportsService {
     };
   }
 
-  static async getReportById(reportId: number, userId: number, isManager: boolean = false) {
+  static async getReportById(
+    reportId: number,
+    userId: number,
+    isManager: boolean = false
+  ) {
     const report = await mockPrisma.dailyReport.findUnique({
       where: { reportId },
       include: {
@@ -208,16 +225,20 @@ export class ReportsService {
     });
   }
 
-  static async updateReport(reportId: number, userId: number, data: {
-    problem?: string;
-    plan?: string;
-    visits?: Array<{
-      id?: number;
-      customerId: number;
-      visitContent: string;
-      visitTime?: string;
-    }>;
-  }) {
+  static async updateReport(
+    reportId: number,
+    userId: number,
+    data: {
+      problem?: string;
+      plan?: string;
+      visits?: Array<{
+        id?: number;
+        customerId: number;
+        visitContent: string;
+        visitTime?: string;
+      }>;
+    }
+  ) {
     // 存在チェック
     const existingReport = await mockPrisma.dailyReport.findUnique({
       where: { reportId },
@@ -372,7 +393,10 @@ describe('ReportsService', () => {
       mockPrisma.dailyReport.findMany.mockResolvedValue([]);
       mockPrisma.dailyReport.count.mockResolvedValue(50);
 
-      const result = await ReportsService.getReports(1, { page: 2, perPage: 10 });
+      const result = await ReportsService.getReports(1, {
+        page: 2,
+        perPage: 10,
+      });
 
       expect(mockPrisma.dailyReport.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -405,7 +429,10 @@ describe('ReportsService', () => {
         managerComments: [
           {
             ...createMockData.managerComment({ commentId: 1 }),
-            manager: createMockData.salesPerson({ salesPersonId: 2, name: '管理者' }),
+            manager: createMockData.salesPerson({
+              salesPersonId: 2,
+              name: '管理者',
+            }),
           },
         ],
       };
@@ -438,7 +465,9 @@ describe('ReportsService', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(mockReport);
 
-      await expect(ReportsService.getReportById(1, 1, false)).rejects.toThrow('FORBIDDEN');
+      await expect(ReportsService.getReportById(1, 1, false)).rejects.toThrow(
+        'FORBIDDEN'
+      );
     });
 
     it('管理者は他人の日報にアクセスできる', async () => {
@@ -510,7 +539,9 @@ describe('ReportsService', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue({ reportId: 1 });
 
-      await expect(ReportsService.createReport(reportData)).rejects.toThrow('DUPLICATE_REPORT');
+      await expect(ReportsService.createReport(reportData)).rejects.toThrow(
+        'DUPLICATE_REPORT'
+      );
     });
 
     it('訪問記録なしで日報を作成できる', async () => {
@@ -577,8 +608,9 @@ describe('ReportsService', () => {
     it('存在しない日報の更新でエラーを投げる', async () => {
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
 
-      await expect(ReportsService.updateReport(999, 1, { problem: 'test' }))
-        .rejects.toThrow('NOT_FOUND');
+      await expect(
+        ReportsService.updateReport(999, 1, { problem: 'test' })
+      ).rejects.toThrow('NOT_FOUND');
     });
 
     it('他人の日報の更新でエラーを投げる', async () => {
@@ -590,8 +622,9 @@ describe('ReportsService', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(existingReport);
 
-      await expect(ReportsService.updateReport(1, 1, { problem: 'test' }))
-        .rejects.toThrow('FORBIDDEN');
+      await expect(
+        ReportsService.updateReport(1, 1, { problem: 'test' })
+      ).rejects.toThrow('FORBIDDEN');
     });
   });
 
@@ -615,7 +648,9 @@ describe('ReportsService', () => {
     it('存在しない日報の削除でエラーを投げる', async () => {
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
 
-      await expect(ReportsService.deleteReport(999, 1)).rejects.toThrow('NOT_FOUND');
+      await expect(ReportsService.deleteReport(999, 1)).rejects.toThrow(
+        'NOT_FOUND'
+      );
     });
 
     it('他人の日報の削除でエラーを投げる', async () => {
@@ -626,7 +661,9 @@ describe('ReportsService', () => {
 
       mockPrisma.dailyReport.findUnique.mockResolvedValue(existingReport);
 
-      await expect(ReportsService.deleteReport(1, 1)).rejects.toThrow('FORBIDDEN');
+      await expect(ReportsService.deleteReport(1, 1)).rejects.toThrow(
+        'FORBIDDEN'
+      );
     });
   });
 });

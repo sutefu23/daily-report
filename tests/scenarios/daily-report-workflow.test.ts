@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createMockPrismaClient, testUsers, createMockData } from '../utils/prisma-mock';
+import {
+  createMockPrismaClient,
+  testUsers,
+  createMockData,
+} from '../utils/prisma-mock';
 import { JWTUtil } from '@/lib/auth';
 
 // 実際のワークフロー統合テスト
@@ -23,12 +27,12 @@ class DailyReportWorkflow {
       const user = await mockPrisma.salesPerson.findUnique({
         where: { salesPersonId: userId },
       });
-      
+
       if (!user) {
         workflow.errors.push('ユーザーが見つかりません');
         return workflow;
       }
-      
+
       workflow.data.user = user;
 
       // ステップ2: 既存の日報確認（重複防止）
@@ -41,7 +45,7 @@ class DailyReportWorkflow {
           },
         },
       });
-      
+
       if (existingReport) {
         workflow.errors.push('同じ日付の日報が既に存在します');
         return workflow;
@@ -57,14 +61,15 @@ class DailyReportWorkflow {
       const reportData = {
         salesPersonId: userId,
         reportDate: new Date(date),
-        problem: '新規開拓が困難な状況です。競合他社の動向を調査する必要があります。',
+        problem:
+          '新規開拓が困難な状況です。競合他社の動向を調査する必要があります。',
         plan: '既存顧客へのフォローアップを強化し、紹介による新規開拓を進めます。',
       };
 
       const report = await mockPrisma.dailyReport.create({
         data: reportData,
       });
-      
+
       workflow.data.report = report;
 
       // ステップ5: 訪問記録作成
@@ -73,7 +78,8 @@ class DailyReportWorkflow {
         {
           reportId: report.reportId,
           customerId: customers[0]?.customerId || 1,
-          visitContent: 'システム導入に関する詳細説明を実施。次回見積もり提出予定。',
+          visitContent:
+            'システム導入に関する詳細説明を実施。次回見積もり提出予定。',
           visitTime: '10:00',
         },
         {
@@ -87,13 +93,13 @@ class DailyReportWorkflow {
       await mockPrisma.visitRecord.createMany({
         data: visitData,
       });
-      
+
       workflow.data.visits = visitData;
 
       // ステップ6: 管理者による確認（別の処理として）
       if (user.isManager) {
         workflow.steps.push('MANAGER_REVIEW');
-        
+
         // 部下の日報を確認する処理をシミュレート
         const subordinateReports = await mockPrisma.dailyReport.findMany({
           where: {
@@ -110,7 +116,7 @@ class DailyReportWorkflow {
             },
           },
         });
-        
+
         workflow.data.subordinateReports = subordinateReports;
       }
 
@@ -126,14 +132,19 @@ class DailyReportWorkflow {
 
       workflow.steps.push('COMPLETE');
       return workflow;
-
     } catch (error) {
-      workflow.errors.push(`ワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      workflow.errors.push(
+        `ワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       return workflow;
     }
   }
 
-  static async executeManagerCommentFlow(managerId: number, reportId: number, comment: string) {
+  static async executeManagerCommentFlow(
+    managerId: number,
+    reportId: number,
+    comment: string
+  ) {
     const workflow = {
       steps: [] as string[],
       data: {} as any,
@@ -197,14 +208,19 @@ class DailyReportWorkflow {
 
       workflow.steps.push('COMPLETE');
       return workflow;
-
     } catch (error) {
-      workflow.errors.push(`コメントワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      workflow.errors.push(
+        `コメントワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       return workflow;
     }
   }
 
-  static async executeReportUpdateFlow(userId: number, reportId: number, updateData: any) {
+  static async executeReportUpdateFlow(
+    userId: number,
+    reportId: number,
+    updateData: any
+  ) {
     const workflow = {
       steps: [] as string[],
       data: {} as any,
@@ -235,7 +251,8 @@ class DailyReportWorkflow {
       workflow.steps.push('CHECK_UPDATE_DEADLINE');
       const now = new Date();
       const createdAt = new Date(report.createdAt);
-      const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+      const hoursDiff =
+        (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
 
       if (hoursDiff > 24) {
         workflow.errors.push('作成から24時間経過した日報は編集できません');
@@ -268,7 +285,7 @@ class DailyReportWorkflow {
       // ステップ5: 訪問記録更新
       if (updateData.visits) {
         workflow.steps.push('UPDATE_VISITS');
-        
+
         // 既存の訪問記録を削除
         await mockPrisma.visitRecord.deleteMany({
           where: { reportId },
@@ -304,14 +321,19 @@ class DailyReportWorkflow {
 
       workflow.steps.push('COMPLETE');
       return workflow;
-
     } catch (error) {
-      workflow.errors.push(`更新ワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      workflow.errors.push(
+        `更新ワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       return workflow;
     }
   }
 
-  static async executeMonthlySummaryFlow(userId: number, year: number, month: number) {
+  static async executeMonthlySummaryFlow(
+    userId: number,
+    year: number,
+    month: number
+  ) {
     const workflow = {
       steps: [] as string[],
       data: {} as any,
@@ -323,7 +345,7 @@ class DailyReportWorkflow {
       workflow.steps.push('SET_PERIOD');
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0);
-      
+
       workflow.data.period = {
         start: startDate,
         end: endDate,
@@ -370,12 +392,28 @@ class DailyReportWorkflow {
       workflow.steps.push('CALCULATE_STATISTICS');
       const statistics = {
         totalReports: reports.length,
-        totalVisits: reports.reduce((sum, report) => sum + report.visitRecords.length, 0),
-        totalComments: reports.reduce((sum, report) => sum + report.managerComments.length, 0),
-        averageVisitsPerDay: reports.length > 0 ? reports.reduce((sum, report) => sum + report.visitRecords.length, 0) / reports.length : 0,
+        totalVisits: reports.reduce(
+          (sum, report) => sum + report.visitRecords.length,
+          0
+        ),
+        totalComments: reports.reduce(
+          (sum, report) => sum + report.managerComments.length,
+          0
+        ),
+        averageVisitsPerDay:
+          reports.length > 0
+            ? reports.reduce(
+                (sum, report) => sum + report.visitRecords.length,
+                0
+              ) / reports.length
+            : 0,
         workingDaysWithReports: reports.length,
         workingDaysRatio: reports.length / workflow.data.period.totalDays,
-        uniqueCustomers: new Set(reports.flatMap(report => report.visitRecords.map(visit => visit.customer.customerId))).size,
+        uniqueCustomers: new Set(
+          reports.flatMap((report) =>
+            report.visitRecords.map((visit) => visit.customer.customerId)
+          )
+        ).size,
         mostVisitedCustomers: this.calculateMostVisitedCustomers(reports),
         commonIssues: this.extractCommonIssues(reports),
         achievementTrends: this.calculateAchievementTrends(reports),
@@ -397,8 +435,12 @@ class DailyReportWorkflow {
             customerEngagement: `${statistics.uniqueCustomers}社との接触`,
           },
           highlights: [
-            statistics.totalVisits > 50 ? '積極的な営業活動を実施' : '訪問頻度の向上が必要',
-            statistics.totalComments > 10 ? '管理者との連携が活発' : 'コミュニケーション強化の余地あり',
+            statistics.totalVisits > 50
+              ? '積極的な営業活動を実施'
+              : '訪問頻度の向上が必要',
+            statistics.totalComments > 10
+              ? '管理者との連携が活発'
+              : 'コミュニケーション強化の余地あり',
           ],
           recommendations: this.generateRecommendations(statistics),
         },
@@ -408,39 +450,55 @@ class DailyReportWorkflow {
 
       workflow.steps.push('COMPLETE');
       return workflow;
-
     } catch (error) {
-      workflow.errors.push(`月次サマリーワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      workflow.errors.push(
+        `月次サマリーワークフローエラー: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       return workflow;
     }
   }
 
   private static calculateMostVisitedCustomers(reports: any[]) {
     const customerVisits = new Map();
-    
-    reports.forEach(report => {
+
+    reports.forEach((report) => {
       report.visitRecords.forEach((visit: any) => {
         const customerId = visit.customer.customerId;
         const customerName = visit.customer.companyName;
-        const current = customerVisits.get(customerId) || { name: customerName, count: 0 };
+        const current = customerVisits.get(customerId) || {
+          name: customerName,
+          count: 0,
+        };
         current.count++;
         customerVisits.set(customerId, current);
       });
     });
 
     return Array.from(customerVisits.entries())
-      .map(([id, data]) => ({ customerId: id, companyName: data.name, visitCount: data.count }))
+      .map(([id, data]) => ({
+        customerId: id,
+        companyName: data.name,
+        visitCount: data.count,
+      }))
       .sort((a, b) => b.visitCount - a.visitCount)
       .slice(0, 5);
   }
 
   private static extractCommonIssues(reports: any[]) {
-    const issueKeywords = ['競合', '価格', '決裁', '納期', '仕様', '予算', '承認'];
+    const issueKeywords = [
+      '競合',
+      '価格',
+      '決裁',
+      '納期',
+      '仕様',
+      '予算',
+      '承認',
+    ];
     const issueCounts = new Map();
 
-    reports.forEach(report => {
+    reports.forEach((report) => {
       const problemText = report.problem.toLowerCase();
-      issueKeywords.forEach(keyword => {
+      issueKeywords.forEach((keyword) => {
         if (problemText.includes(keyword)) {
           issueCounts.set(keyword, (issueCounts.get(keyword) || 0) + 1);
         }
@@ -462,13 +520,17 @@ class DailyReportWorkflow {
     while (weekStart < reports.length) {
       const weekEnd = Math.min(weekStart + 7, reports.length);
       const weekReports = reports.slice(weekStart, weekEnd);
-      const weekVisits = weekReports.reduce((sum, report) => sum + report.visitRecords.length, 0);
-      
+      const weekVisits = weekReports.reduce(
+        (sum, report) => sum + report.visitRecords.length,
+        0
+      );
+
       weeklyData.push({
         week: currentWeek,
         reports: weekReports.length,
         visits: weekVisits,
-        averageVisitsPerReport: weekReports.length > 0 ? weekVisits / weekReports.length : 0,
+        averageVisitsPerReport:
+          weekReports.length > 0 ? weekVisits / weekReports.length : 0,
       });
 
       currentWeek++;
@@ -486,18 +548,24 @@ class DailyReportWorkflow {
     }
 
     if (statistics.averageVisitsPerDay < 2) {
-      recommendations.push('1日あたりの訪問件数を増やすことを検討してください（目標：2-3件/日）');
+      recommendations.push(
+        '1日あたりの訪問件数を増やすことを検討してください（目標：2-3件/日）'
+      );
     }
 
     if (statistics.totalComments < 5) {
-      recommendations.push('管理者とのコミュニケーションを増やし、相談や報告を積極的に行いましょう');
+      recommendations.push(
+        '管理者とのコミュニケーションを増やし、相談や報告を積極的に行いましょう'
+      );
     }
 
     if (statistics.uniqueCustomers < 10) {
       recommendations.push('訪問する顧客の幅を広げ、新規開拓を強化しましょう');
     }
 
-    return recommendations.length > 0 ? recommendations : ['現在の活動レベルを維持し、継続的な改善に取り組みましょう'];
+    return recommendations.length > 0
+      ? recommendations
+      : ['現在の活動レベルを維持し、継続的な改善に取り組みましょう'];
   }
 }
 
@@ -509,11 +577,11 @@ describe('Daily Report Workflow Integration Tests', () => {
   describe('完全な日報作成ワークフロー', () => {
     it('営業担当者が日報を作成する一連のフローが正常に実行される', async () => {
       // モックデータの設定
-      const mockUser = createMockData.salesPerson({ 
+      const mockUser = createMockData.salesPerson({
         salesPersonId: testUsers.regularUser.id,
-        isManager: false 
+        isManager: false,
       });
-      
+
       const mockCustomers = [
         createMockData.customer({ customerId: 1, companyName: 'A株式会社' }),
         createMockData.customer({ customerId: 2, companyName: 'B商事' }),
@@ -579,18 +647,26 @@ describe('Daily Report Workflow Integration Tests', () => {
       const mockSubordinateReports = [
         {
           ...createMockData.dailyReport({ reportId: 2, salesPersonId: 3 }),
-          salesPerson: createMockData.salesPerson({ salesPersonId: 3, name: '部下A' }),
+          salesPerson: createMockData.salesPerson({
+            salesPersonId: 3,
+            name: '部下A',
+          }),
         },
         {
           ...createMockData.dailyReport({ reportId: 3, salesPersonId: 4 }),
-          salesPerson: createMockData.salesPerson({ salesPersonId: 4, name: '部下B' }),
+          salesPerson: createMockData.salesPerson({
+            salesPersonId: 4,
+            name: '部下B',
+          }),
         },
       ];
 
       mockPrisma.salesPerson.findUnique.mockResolvedValue(mockManager);
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
       mockPrisma.customer.findMany.mockResolvedValue([]);
-      mockPrisma.dailyReport.create.mockResolvedValue(createMockData.dailyReport());
+      mockPrisma.dailyReport.create.mockResolvedValue(
+        createMockData.dailyReport()
+      );
       mockPrisma.visitRecord.createMany.mockResolvedValue({ count: 0 });
       mockPrisma.dailyReport.findMany.mockResolvedValue(mockSubordinateReports);
 
@@ -610,7 +686,9 @@ describe('Daily Report Workflow Integration Tests', () => {
         salesPersonId: testUsers.regularUser.id,
       });
 
-      mockPrisma.salesPerson.findUnique.mockResolvedValue(createMockData.salesPerson());
+      mockPrisma.salesPerson.findUnique.mockResolvedValue(
+        createMockData.salesPerson()
+      );
       mockPrisma.dailyReport.findUnique.mockResolvedValue(existingReport);
 
       const result = await DailyReportWorkflow.executeFullWorkflow(
@@ -633,10 +711,10 @@ describe('Daily Report Workflow Integration Tests', () => {
 
       const mockReport = {
         ...createMockData.dailyReport({ reportId: 1, salesPersonId: 3 }),
-        salesPerson: createMockData.salesPerson({ 
-          salesPersonId: 3, 
-          name: '山田営業', 
-          email: 'yamada@example.com' 
+        salesPerson: createMockData.salesPerson({
+          salesPersonId: 3,
+          name: '山田営業',
+          email: 'yamada@example.com',
         }),
       };
 
@@ -705,9 +783,7 @@ describe('Daily Report Workflow Integration Tests', () => {
           salesPersonId: testUsers.regularUser.id,
           createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000), // 2時間前
         }),
-        visitRecords: [
-          { visitId: 1, customerId: 1, visitContent: '元の内容' },
-        ],
+        visitRecords: [{ visitId: 1, customerId: 1, visitContent: '元の内容' }],
       };
 
       const updatedReport = {
@@ -782,7 +858,9 @@ describe('Daily Report Workflow Integration Tests', () => {
         { problem: '更新テスト' }
       );
 
-      expect(result.errors).toContain('作成から24時間経過した日報は編集できません');
+      expect(result.errors).toContain(
+        '作成から24時間経過した日報は編集できません'
+      );
       expect(result.steps).not.toContain('UPDATE_REPORT');
     });
   });
@@ -796,14 +874,15 @@ describe('Daily Report Workflow Integration Tests', () => {
           reportDate: new Date(2025, 0, i + 1), // 2025年1月
           problem: `課題${i + 1}: ${i % 3 === 0 ? '競合対策' : i % 3 === 1 ? '価格交渉' : '仕様調整'}`,
         }),
-        visitRecords: Array.from({ length: i % 3 + 1 }, (_, j) => ({
+        visitRecords: Array.from({ length: (i % 3) + 1 }, (_, j) => ({
           visitId: i * 10 + j,
           customer: createMockData.customer({
             customerId: (j % 5) + 1,
             companyName: `顧客${(j % 5) + 1}`,
           }),
         })),
-        managerComments: i % 4 === 0 ? [{ commentId: i, comment: `コメント${i}` }] : [],
+        managerComments:
+          i % 4 === 0 ? [{ commentId: i, comment: `コメント${i}` }] : [],
       }));
 
       mockPrisma.dailyReport.findMany.mockResolvedValue(mockReports);
@@ -845,10 +924,13 @@ describe('Daily Report Workflow Integration Tests', () => {
           reportId: i + 1,
           salesPersonId: testUsers.regularUser.id,
         }),
-        visitRecords: [{ // 1件ずつのみ
-          visitId: i,
-          customer: createMockData.customer({ customerId: 1 }),
-        }],
+        visitRecords: [
+          {
+            // 1件ずつのみ
+            visitId: i,
+            customer: createMockData.customer({ customerId: 1 }),
+          },
+        ],
         managerComments: [], // コメントなし
       }));
 
@@ -861,15 +943,25 @@ describe('Daily Report Workflow Integration Tests', () => {
       );
 
       const recommendations = result.data.summary.summary.recommendations;
-      expect(recommendations.some((r: string) => r.includes('日報の提出率向上'))).toBe(true);
-      expect(recommendations.some((r: string) => r.includes('訪問件数を増やす'))).toBe(true);
-      expect(recommendations.some((r: string) => r.includes('コミュニケーションを増やし'))).toBe(true);
+      expect(
+        recommendations.some((r: string) => r.includes('日報の提出率向上'))
+      ).toBe(true);
+      expect(
+        recommendations.some((r: string) => r.includes('訪問件数を増やす'))
+      ).toBe(true);
+      expect(
+        recommendations.some((r: string) =>
+          r.includes('コミュニケーションを増やし')
+        )
+      ).toBe(true);
     });
   });
 
   describe('エラー処理とリカバリー', () => {
     it('データベースエラーが発生した場合に適切にエラーハンドリングされる', async () => {
-      mockPrisma.salesPerson.findUnique.mockRejectedValue(new Error('Database connection failed'));
+      mockPrisma.salesPerson.findUnique.mockRejectedValue(
+        new Error('Database connection failed')
+      );
 
       const result = await DailyReportWorkflow.executeFullWorkflow(
         testUsers.regularUser.id,
@@ -877,15 +969,21 @@ describe('Daily Report Workflow Integration Tests', () => {
       );
 
       expect(result.errors.length).toBeGreaterThan(0);
-      expect(result.errors[0]).toContain('ワークフローエラー: Database connection failed');
+      expect(result.errors[0]).toContain(
+        'ワークフローエラー: Database connection failed'
+      );
       expect(result.steps).toContain('AUTHENTICATE');
     });
 
     it('部分的な処理失敗でも完了したステップは記録される', async () => {
-      mockPrisma.salesPerson.findUnique.mockResolvedValue(createMockData.salesPerson());
+      mockPrisma.salesPerson.findUnique.mockResolvedValue(
+        createMockData.salesPerson()
+      );
       mockPrisma.dailyReport.findUnique.mockResolvedValue(null);
       mockPrisma.customer.findMany.mockResolvedValue([]);
-      mockPrisma.dailyReport.create.mockRejectedValue(new Error('Insert failed'));
+      mockPrisma.dailyReport.create.mockRejectedValue(
+        new Error('Insert failed')
+      );
 
       const result = await DailyReportWorkflow.executeFullWorkflow(
         testUsers.regularUser.id,
@@ -932,7 +1030,7 @@ describe('Daily Report Workflow Integration Tests', () => {
       expect(result.errors).toHaveLength(0);
       expect(result.data.statistics.totalReports).toBe(30);
       expect(result.data.statistics.totalVisits).toBe(90);
-      
+
       const processingTime = endTime - startTime;
       expect(processingTime).toBeLessThan(1000); // 1秒以内で処理完了
     });

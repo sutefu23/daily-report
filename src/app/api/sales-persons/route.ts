@@ -9,7 +9,6 @@ import {
 import type { ApiError, PaginatedResponse, SalesPerson } from '@/types/api';
 import { verifyToken } from '@/lib/auth/verify';
 
-
 /**
  * 営業担当者一覧取得
  */

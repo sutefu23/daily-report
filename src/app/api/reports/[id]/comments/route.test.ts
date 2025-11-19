@@ -18,7 +18,7 @@ vi.mock('@/lib/auth/middleware', () => ({
   }),
   requireManager: vi.fn((request: NextRequest, handler: Function) => {
     const isManager = request.headers.get('x-test-manager') === 'true';
-    
+
     if (!isManager) {
       return new Response(
         JSON.stringify({
@@ -30,7 +30,7 @@ vi.mock('@/lib/auth/middleware', () => ({
         { status: 403 }
       );
     }
-    
+
     const mockRequest = {
       ...request,
       user: {
@@ -99,9 +99,12 @@ describe('Comments API', () => {
       (getCommentsByReportId as any).mockResolvedValue(mockComments);
 
       // リクエストの作成
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'GET',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'GET',
+        }
+      );
 
       // APIの実行
       const response = await GET(request, { params: { id: '1' } });
@@ -131,9 +134,12 @@ describe('Comments API', () => {
     it('存在しない日報IDの場合は404エラーを返す', async () => {
       (checkReportExists as any).mockResolvedValue(false);
 
-      const request = new NextRequest('http://localhost:3000/api/reports/999/comments', {
-        method: 'GET',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/999/comments',
+        {
+          method: 'GET',
+        }
+      );
 
       const response = await GET(request, { params: { id: '999' } });
       const data = await response.json();
@@ -152,9 +158,12 @@ describe('Comments API', () => {
     });
 
     it('無効な日報IDの場合は400エラーを返す', async () => {
-      const request = new NextRequest('http://localhost:3000/api/reports/invalid/comments', {
-        method: 'GET',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/invalid/comments',
+        {
+          method: 'GET',
+        }
+      );
 
       const response = await GET(request, { params: { id: 'invalid' } });
       const data = await response.json();
@@ -175,9 +184,12 @@ describe('Comments API', () => {
       (checkReportExists as any).mockResolvedValue(true);
       (getCommentsByReportId as any).mockResolvedValue([]);
 
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'GET',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'GET',
+        }
+      );
 
       const response = await GET(request, { params: { id: '1' } });
       const data = await response.json();
@@ -208,16 +220,19 @@ describe('Comments API', () => {
       (checkReportExists as any).mockResolvedValue(true);
       (createComment as any).mockResolvedValue(mockNewComment);
 
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'true',
-        },
-        body: JSON.stringify({
-          comment: '新規開拓について明日相談しましょう',
-        }),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'true',
+          },
+          body: JSON.stringify({
+            comment: '新規開拓について明日相談しましょう',
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: '1' } });
       const data = await response.json();
@@ -245,16 +260,19 @@ describe('Comments API', () => {
     });
 
     it('一般ユーザーはコメントを追加できない', async () => {
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'false',
-        },
-        body: JSON.stringify({
-          comment: 'コメントを追加',
-        }),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'false',
+          },
+          body: JSON.stringify({
+            comment: 'コメントを追加',
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: '1' } });
       const data = await response.json();
@@ -272,16 +290,19 @@ describe('Comments API', () => {
     });
 
     it('空のコメントは追加できない', async () => {
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'true',
-        },
-        body: JSON.stringify({
-          comment: '',
-        }),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'true',
+          },
+          body: JSON.stringify({
+            comment: '',
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: '1' } });
       const data = await response.json();
@@ -298,17 +319,20 @@ describe('Comments API', () => {
 
     it('501文字以上のコメントは追加できない', async () => {
       const longComment = 'あ'.repeat(501);
-      
-      const request = new NextRequest('http://localhost:3000/api/reports/1/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'true',
-        },
-        body: JSON.stringify({
-          comment: longComment,
-        }),
-      });
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/1/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'true',
+          },
+          body: JSON.stringify({
+            comment: longComment,
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: '1' } });
       const data = await response.json();
@@ -316,7 +340,9 @@ describe('Comments API', () => {
       expect(response.status).toBe(400);
       expect(data.error.code).toBe('VALIDATION_ERROR');
       expect(data.error.message).toBe('入力値が不正です');
-      expect(data.error.details[0].message).toBe('コメントは500文字以内で入力してください');
+      expect(data.error.details[0].message).toBe(
+        'コメントは500文字以内で入力してください'
+      );
 
       expect(checkReportExists).not.toHaveBeenCalled();
       expect(createComment).not.toHaveBeenCalled();
@@ -326,16 +352,19 @@ describe('Comments API', () => {
     it('存在しない日報にはコメントを追加できない', async () => {
       (checkReportExists as any).mockResolvedValue(false);
 
-      const request = new NextRequest('http://localhost:3000/api/reports/999/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'true',
-        },
-        body: JSON.stringify({
-          comment: 'コメントを追加',
-        }),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/999/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'true',
+          },
+          body: JSON.stringify({
+            comment: 'コメントを追加',
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: '999' } });
       const data = await response.json();
@@ -354,16 +383,19 @@ describe('Comments API', () => {
     });
 
     it('無効な日報IDの場合は400エラーを返す', async () => {
-      const request = new NextRequest('http://localhost:3000/api/reports/invalid/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-test-manager': 'true',
-        },
-        body: JSON.stringify({
-          comment: 'コメントを追加',
-        }),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/reports/invalid/comments',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-test-manager': 'true',
+          },
+          body: JSON.stringify({
+            comment: 'コメントを追加',
+          }),
+        }
+      );
 
       const response = await POST(request, { params: { id: 'invalid' } });
       const data = await response.json();

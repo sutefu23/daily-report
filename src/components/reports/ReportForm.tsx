@@ -32,7 +32,9 @@ export function ReportForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [isDirty, setIsDirty] = useState(false);
 
   // フォームデータ
@@ -126,7 +128,7 @@ export function ReportForm({
   // フォーム送信
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       setError('入力内容に誤りがあります。確認してください。');
       return;
@@ -146,7 +148,7 @@ export function ReportForm({
       // Get CSRF token from cookie
       const csrfToken = document.cookie
         .split('; ')
-        .find(row => row.startsWith('csrf-token='))
+        .find((row) => row.startsWith('csrf-token='))
         ?.split('=')[1];
 
       const response = await fetch('/api/reports', {
@@ -180,7 +182,9 @@ export function ReportForm({
       router.push('/reports');
     } catch (error) {
       console.error('Report submission error:', error);
-      setError(error instanceof Error ? error.message : '日報の作成に失敗しました');
+      setError(
+        error instanceof Error ? error.message : '日報の作成に失敗しました'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -223,12 +227,16 @@ export function ReportForm({
             <div>
               <Label>日付</Label>
               <p className="text-lg font-medium">
-                {format(new Date(reportDate), 'yyyy年M月d日(E)', { locale: ja })}
+                {format(new Date(reportDate), 'yyyy年M月d日(E)', {
+                  locale: ja,
+                })}
               </p>
             </div>
             <div>
               <Label>作成者</Label>
-              <p className="text-lg font-medium">{userName || '読み込み中...'}</p>
+              <p className="text-lg font-medium">
+                {userName || '読み込み中...'}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -272,10 +280,14 @@ export function ReportForm({
             <div className="flex items-center justify-between">
               <div>
                 {validationErrors.problem && (
-                  <p className="text-sm text-red-500">{validationErrors.problem[0]}</p>
+                  <p className="text-sm text-red-500">
+                    {validationErrors.problem[0]}
+                  </p>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">{problem.length}/1000文字</p>
+              <p className="text-xs text-muted-foreground">
+                {problem.length}/1000文字
+              </p>
             </div>
           </div>
         </CardContent>
@@ -304,10 +316,14 @@ export function ReportForm({
             <div className="flex items-center justify-between">
               <div>
                 {validationErrors.plan && (
-                  <p className="text-sm text-red-500">{validationErrors.plan[0]}</p>
+                  <p className="text-sm text-red-500">
+                    {validationErrors.plan[0]}
+                  </p>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">{plan.length}/1000文字</p>
+              <p className="text-xs text-muted-foreground">
+                {plan.length}/1000文字
+              </p>
             </div>
           </div>
         </CardContent>

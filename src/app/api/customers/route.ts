@@ -41,8 +41,18 @@ export async function GET(request: NextRequest) {
 
     if (validatedParams.search) {
       where.OR = [
-        { companyName: { contains: validatedParams.search, mode: 'insensitive' } },
-        { contactPerson: { contains: validatedParams.search, mode: 'insensitive' } },
+        {
+          companyName: {
+            contains: validatedParams.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          contactPerson: {
+            contains: validatedParams.search,
+            mode: 'insensitive',
+          },
+        },
       ];
     }
 

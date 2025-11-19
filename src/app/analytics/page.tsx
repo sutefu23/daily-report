@@ -3,35 +3,41 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-picker-range';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api/simple-client';
 import { useToast } from '@/components/ui/use-toast';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   LineChart,
-  Line
+  Line,
 } from 'recharts';
-import { 
-  TrendingUp, 
-  Users, 
-  FileText, 
+import {
+  TrendingUp,
+  Users,
+  FileText,
   Building,
   Calendar,
   Download,
-  Filter
+  Filter,
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -54,7 +60,7 @@ export default function AnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState({
     from: startOfMonth(new Date()),
-    to: endOfMonth(new Date())
+    to: endOfMonth(new Date()),
   });
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     totalReports: 0,
@@ -63,7 +69,7 @@ export default function AnalyticsPage() {
     topCustomers: [],
     reportsByDate: [],
     visitsByCustomer: [],
-    userActivity: []
+    userActivity: [],
   });
 
   // Fetch analytics data
@@ -77,11 +83,15 @@ export default function AnalyticsPage() {
       });
 
       const reports = reportsResponse.data || [];
-      
+
       // Calculate analytics
       const totalReports = reports.length;
-      const totalVisits = reports.reduce((sum: number, report: any) => sum + (report.visit_count || 0), 0);
-      const activeUsers = new Set(reports.map((r: any) => r.sales_person?.id)).size;
+      const totalVisits = reports.reduce(
+        (sum: number, report: any) => sum + (report.visit_count || 0),
+        0
+      );
+      const activeUsers = new Set(reports.map((r: any) => r.sales_person?.id))
+        .size;
 
       // Reports by date
       const reportsByDateMap = new Map<string, number>();
@@ -89,7 +99,10 @@ export default function AnalyticsPage() {
         const date = format(new Date(report.report_date), 'MM/dd');
         reportsByDateMap.set(date, (reportsByDateMap.get(date) || 0) + 1);
       });
-      const reportsByDate = Array.from(reportsByDateMap, ([date, count]) => ({ date, count }));
+      const reportsByDate = Array.from(reportsByDateMap, ([date, count]) => ({
+        date,
+        count,
+      }));
 
       // Mock data for demonstration (in real app, this would come from API)
       const topCustomers = [
@@ -97,12 +110,12 @@ export default function AnalyticsPage() {
         { name: 'XYZ工業', visits: 12 },
         { name: 'DEF商社', visits: 10 },
         { name: 'GHI製造', visits: 8 },
-        { name: 'JKL物産', visits: 6 }
+        { name: 'JKL物産', visits: 6 },
       ];
 
-      const visitsByCustomer = topCustomers.map(c => ({
+      const visitsByCustomer = topCustomers.map((c) => ({
         customer: c.name,
-        visits: c.visits
+        visits: c.visits,
       }));
 
       const userActivity = [
@@ -119,7 +132,7 @@ export default function AnalyticsPage() {
         topCustomers,
         reportsByDate,
         visitsByCustomer,
-        userActivity
+        userActivity,
       });
     } catch (error) {
       console.error('Failed to fetch analytics data:', error);
@@ -160,8 +173,8 @@ export default function AnalyticsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <PageHeader 
-            title="分析・レポート" 
+          <PageHeader
+            title="分析・レポート"
             description="営業活動の分析とレポート"
           />
           <div className="flex gap-2">
@@ -185,30 +198,26 @@ export default function AnalyticsPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                日報総数
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">日報総数</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.totalReports}</div>
-              <p className="text-xs text-muted-foreground">
-                期間内の日報数
-              </p>
+              <div className="text-2xl font-bold">
+                {analyticsData.totalReports}
+              </div>
+              <p className="text-xs text-muted-foreground">期間内の日報数</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                訪問件数
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">訪問件数</CardTitle>
               <Building className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.totalVisits}</div>
-              <p className="text-xs text-muted-foreground">
-                期間内の訪問総数
-              </p>
+              <div className="text-2xl font-bold">
+                {analyticsData.totalVisits}
+              </div>
+              <p className="text-xs text-muted-foreground">期間内の訪問総数</p>
             </CardContent>
           </Card>
           <Card>
@@ -219,7 +228,9 @@ export default function AnalyticsPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.activeUsers}</div>
+              <div className="text-2xl font-bold">
+                {analyticsData.activeUsers}
+              </div>
               <p className="text-xs text-muted-foreground">
                 日報を作成したユーザー
               </p>
@@ -227,15 +238,15 @@ export default function AnalyticsPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                平均訪問数
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">平均訪問数</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {analyticsData.totalReports > 0 
-                  ? (analyticsData.totalVisits / analyticsData.totalReports).toFixed(1)
+                {analyticsData.totalReports > 0
+                  ? (
+                      analyticsData.totalVisits / analyticsData.totalReports
+                    ).toFixed(1)
                   : '0'}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -261,10 +272,10 @@ export default function AnalyticsPage() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="count" 
-                    stroke="#8884d8" 
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#8884d8"
                     name="日報数"
                   />
                 </LineChart>
@@ -332,7 +343,10 @@ export default function AnalyticsPage() {
                     dataKey="visits"
                   >
                     {analyticsData.topCustomers.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />

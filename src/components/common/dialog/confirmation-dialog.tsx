@@ -22,7 +22,13 @@ interface ConfirmationOptions {
   type?: DialogType;
   confirmText?: string;
   cancelText?: string;
-  confirmButtonVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  confirmButtonVariant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
   onConfirm?: () => void | Promise<void>;
   onCancel?: () => void;
   showCancel?: boolean;
@@ -33,28 +39,41 @@ interface ConfirmationContextType {
   showDialog: (options: ConfirmationOptions) => void;
 }
 
-const ConfirmationContext = createContext<ConfirmationContextType | undefined>(undefined);
+const ConfirmationContext = createContext<ConfirmationContextType | undefined>(
+  undefined
+);
 
 export function useConfirmation() {
   const context = useContext(ConfirmationContext);
   if (!context) {
-    throw new Error('useConfirmation must be used within a ConfirmationProvider');
+    throw new Error(
+      'useConfirmation must be used within a ConfirmationProvider'
+    );
   }
   return context;
 }
 
-export function ConfirmationProvider({ children }: { children: React.ReactNode }) {
+export function ConfirmationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState<ConfirmationOptions | null>(null);
-  const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null);
+  const [resolvePromise, setResolvePromise] = useState<
+    ((value: boolean) => void) | null
+  >(null);
 
-  const confirm = useCallback((options: ConfirmationOptions): Promise<boolean> => {
-    return new Promise((resolve) => {
-      setOptions(options);
-      setIsOpen(true);
-      setResolvePromise(() => resolve);
-    });
-  }, []);
+  const confirm = useCallback(
+    (options: ConfirmationOptions): Promise<boolean> => {
+      return new Promise((resolve) => {
+        setOptions(options);
+        setIsOpen(true);
+        setResolvePromise(() => resolve);
+      });
+    },
+    []
+  );
 
   const showDialog = useCallback((options: ConfirmationOptions) => {
     setOptions(options);
@@ -103,7 +122,7 @@ export function ConfirmationProvider({ children }: { children: React.ReactNode }
 
   const getButtonVariant = () => {
     if (options?.confirmButtonVariant) return options.confirmButtonVariant;
-    
+
     const variants: Record<DialogType, 'default' | 'destructive'> = {
       confirm: 'default',
       warning: 'destructive',
@@ -135,9 +154,13 @@ export function ConfirmationProvider({ children }: { children: React.ReactNode }
                 {options?.cancelText || 'キャンセル'}
               </AlertDialogCancel>
             )}
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleConfirm}
-              className={getButtonVariant() === 'destructive' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+              className={
+                getButtonVariant() === 'destructive'
+                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  : ''
+              }
             >
               {options?.confirmText || '確認'}
             </AlertDialogAction>
@@ -199,7 +222,7 @@ export function ConfirmationDialog({
 
   const getButtonVariant = () => {
     if (confirmButtonVariant) return confirmButtonVariant;
-    
+
     const variants: Record<DialogType, 'default' | 'destructive'> = {
       confirm: 'default',
       warning: 'destructive',
@@ -219,9 +242,7 @@ export function ConfirmationDialog({
             {getIcon()}
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            {description}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           {showCancel && (
@@ -229,9 +250,13 @@ export function ConfirmationDialog({
               {cancelText}
             </AlertDialogCancel>
           )}
-          <AlertDialogAction 
+          <AlertDialogAction
             onClick={handleConfirm}
-            className={getButtonVariant() === 'destructive' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            className={
+              getButtonVariant() === 'destructive'
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                : ''
+            }
           >
             {confirmText}
           </AlertDialogAction>
@@ -268,7 +293,8 @@ export function usePresetDialogs() {
     confirmLeave: () =>
       confirm({
         title: '未保存の変更',
-        description: '保存されていない変更があります。このまま離れてもよろしいですか？',
+        description:
+          '保存されていない変更があります。このまま離れてもよろしいですか？',
         type: 'warning',
         confirmText: '離れる',
         cancelText: '留まる',

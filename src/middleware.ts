@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { 
-  applySecurityHeaders, 
-  checkSecurityThreats, 
+import {
+  applySecurityHeaders,
+  checkSecurityThreats,
   checkRateLimit,
   generateCSRFToken,
-  validateCSRFToken
+  validateCSRFToken,
 } from './middleware/security';
 import { securityConfig } from './config/security';
 
@@ -22,11 +22,7 @@ const protectedPaths = [
 ];
 
 // Paths that are public
-const publicPaths = [
-  '/login',
-  '/api/auth/login',
-  '/api/health',
-];
+const publicPaths = ['/login', '/api/auth/login', '/api/health'];
 
 // API paths that need CSRF protection
 const csrfProtectedPaths = [
@@ -39,10 +35,10 @@ const csrfProtectedPaths = [
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const pathname = request.nextUrl.pathname;
-  
+
   // Apply security headers to all responses
   applySecurityHeaders(response);
-  
+
   // Force HTTPS in production
   if (process.env.NODE_ENV === 'production') {
     const proto = request.headers.get('x-forwarded-proto');
@@ -53,32 +49,38 @@ export function middleware(request: NextRequest) {
       );
     }
   }
-  
+
   // Check for security threats
   const securityCheck = checkSecurityThreats(request);
   if (!securityCheck.isValid) {
     console.error(`Security threat detected: ${securityCheck.reason}`);
-    return new NextResponse(
-      JSON.stringify({ error: 'Invalid request' }),
-      { 
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new NextResponse(JSON.stringify({ error: 'Invalid request' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
-  
+
   // Rate limiting
-  const clientIdentifier = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-  const rateLimitConfig = securityConfig.rateLimiting.endpoints[pathname as keyof typeof securityConfig.rateLimiting.endpoints] || securityConfig.rateLimiting.endpoints.default;
-  const rateLimitResult = checkRateLimit(`${clientIdentifier}:${pathname}`, rateLimitConfig);
-  
+  const clientIdentifier =
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+  const rateLimitConfig =
+    securityConfig.rateLimiting.endpoints[
+      pathname as keyof typeof securityConfig.rateLimiting.endpoints
+    ] || securityConfig.rateLimiting.endpoints.default;
+  const rateLimitResult = checkRateLimit(
+    `${clientIdentifier}:${pathname}`,
+    rateLimitConfig
+  );
+
   if (!rateLimitResult.allowed) {
     return new NextResponse(
-      JSON.stringify({ 
+      JSON.stringify({
         error: 'Too many requests. Please try again later.',
-        retryAfter: rateLimitResult.retryAfter 
+        retryAfter: rateLimitResult.retryAfter,
       }),
-      { 
+      {
         status: 429,
         headers: {
           'Content-Type': 'application/json',
@@ -87,11 +89,13 @@ export function middleware(request: NextRequest) {
       }
     );
   }
-  
+
   // Check authentication for protected paths
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
-  const isPublicPath = publicPaths.some(path => pathname === path);
-  
+  const isProtectedPath = protectedPaths.some((path) =>
+    pathname.startsWith(path)
+  );
+  const isPublicPath = publicPaths.some((path) => pathname === path);
+
   // Redirect root path to dashboard if authenticated
   if (pathname === '/') {
     const token = request.cookies.get('access_token');
@@ -101,31 +105,34 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
-  
+
   if (isProtectedPath && !isPublicPath) {
     const token = request.cookies.get('access_token');
-    
+
     if (!token) {
       // Redirect to login for web pages, return 401 for API routes
       if (pathname.startsWith('/api/')) {
         return new NextResponse(
           JSON.stringify({ error: 'Authentication required' }),
-          { 
+          {
             status: 401,
             headers: { 'Content-Type': 'application/json' },
           }
         );
       }
-      
+
       return NextResponse.redirect(new URL('/login', request.url));
     }
-    
+
     // TODO: Validate JWT token here
     // For now, we'll just check if it exists
   }
-  
+
   // Generate CSRF token if not exists (for all authenticated users)
-  if (request.cookies.get('access_token') && !request.cookies.get('csrf-token')) {
+  if (
+    request.cookies.get('access_token') &&
+    !request.cookies.get('csrf-token')
+  ) {
     const newToken = generateCSRFToken();
     response.cookies.set('csrf-token', newToken, {
       httpOnly: false, // Allow JavaScript access for reading
@@ -134,19 +141,21 @@ export function middleware(request: NextRequest) {
       path: '/',
     });
   }
-  
+
   // CSRF Protection for state-changing operations
   if (request.method !== 'GET' && request.method !== 'HEAD') {
-    const isCSRFProtectedPath = csrfProtectedPaths.some(path => pathname.startsWith(path));
-    
+    const isCSRFProtectedPath = csrfProtectedPaths.some((path) =>
+      pathname.startsWith(path)
+    );
+
     if (isCSRFProtectedPath) {
       const csrfToken = request.headers.get('x-csrf-token');
       const sessionToken = request.cookies.get('csrf-token')?.value;
-      
+
       if (!csrfToken || !sessionToken) {
         return new NextResponse(
           JSON.stringify({ error: 'CSRF token missing' }),
-          { 
+          {
             status: 403,
             headers: { 'Content-Type': 'application/json' },
           }
@@ -154,7 +163,7 @@ export function middleware(request: NextRequest) {
       } else if (!validateCSRFToken(csrfToken, sessionToken)) {
         return new NextResponse(
           JSON.stringify({ error: 'Invalid CSRF token' }),
-          { 
+          {
             status: 403,
             headers: { 'Content-Type': 'application/json' },
           }
@@ -162,14 +171,17 @@ export function middleware(request: NextRequest) {
       }
     }
   }
-  
+
   // Add security headers for API responses
   if (pathname.startsWith('/api/')) {
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate'
+    );
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
   }
-  
+
   return response;
 }
 

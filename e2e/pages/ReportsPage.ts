@@ -21,8 +21,12 @@ export class ReportsPage {
     this.pageTitle = page.locator('h1:has-text("日報一覧")');
     this.newReportButton = page.locator('button:has-text("新規日報作成")');
     this.searchForm = page.locator('form, [data-testid="search-form"]');
-    this.startDateField = page.locator('input[name="startDate"], input[type="date"]:first');
-    this.endDateField = page.locator('input[name="endDate"], input[type="date"]:last');
+    this.startDateField = page.locator(
+      'input[name="startDate"], input[type="date"]:first'
+    );
+    this.endDateField = page.locator(
+      'input[name="endDate"], input[type="date"]:last'
+    );
     this.salesPersonField = page.locator('select[name="salesPersonId"]');
     this.searchButton = page.locator('button:has-text("検索")');
     this.reportTable = page.locator('table, [data-testid="report-table"]');
@@ -60,18 +64,27 @@ export class ReportsPage {
   }
 
   async clickReportDetail(reportDate: string): Promise<void> {
-    const detailLink = this.page.locator(`tr:has-text("${reportDate}") button:has-text("詳細")`);
+    const detailLink = this.page.locator(
+      `tr:has-text("${reportDate}") button:has-text("詳細")`
+    );
     await detailLink.click();
     await this.page.waitForLoadState('networkidle');
   }
 
-  async expectReportInList(reportDate: string, salesPersonName: string): Promise<void> {
-    const reportRow = this.page.locator(`tr:has-text("${reportDate}"):has-text("${salesPersonName}")`);
+  async expectReportInList(
+    reportDate: string,
+    salesPersonName: string
+  ): Promise<void> {
+    const reportRow = this.page.locator(
+      `tr:has-text("${reportDate}"):has-text("${salesPersonName}")`
+    );
     await expect(reportRow).toBeVisible();
   }
 
   async expectNoReports(): Promise<void> {
-    const noDataMessage = this.page.locator('text=データがありません, text=日報が見つかりません');
+    const noDataMessage = this.page.locator(
+      'text=データがありません, text=日報が見つかりません'
+    );
     await expect(noDataMessage).toBeVisible();
   }
 

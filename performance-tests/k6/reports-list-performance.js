@@ -9,16 +9,16 @@ const listLoadTime = new Trend('reports_list_load_time');
 // テスト設定
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },  // ウォームアップ
-    { duration: '2m', target: 100 },  // 同時ユーザー100まで増加
-    { duration: '3m', target: 100 },  // 100ユーザーで維持
-    { duration: '1m', target: 0 },    // クールダウン
+    { duration: '30s', target: 20 }, // ウォームアップ
+    { duration: '2m', target: 100 }, // 同時ユーザー100まで増加
+    { duration: '3m', target: 100 }, // 100ユーザーで維持
+    { duration: '1m', target: 0 }, // クールダウン
   ],
   thresholds: {
-    'reports_list_load_time': ['p(95)<3000'], // 95%が3秒以内
-    'reports_list_load_time': ['p(99)<5000'], // 99%が5秒以内
-    'errors': ['rate<0.01'],                  // エラー率1%未満
-    'http_req_failed': ['rate<0.01'],         // HTTPエラー率1%未満
+    reports_list_load_time: ['p(95)<3000'], // 95%が3秒以内
+    reports_list_load_time: ['p(99)<5000'], // 99%が5秒以内
+    errors: ['rate<0.01'], // エラー率1%未満
+    http_req_failed: ['rate<0.01'], // HTTPエラー率1%未満
   },
 };
 
@@ -38,59 +38,57 @@ export function setup() {
         headers: { 'Content-Type': 'application/json' },
       }
     );
-    
+
     if (loginRes.status === 200) {
       const authData = JSON.parse(loginRes.body);
       users.push({ token: authData.token, userId: authData.user.id });
     }
   }
-  
+
   return { users };
 }
 
 export default function (data) {
   // ランダムなユーザーを選択
   const user = data.users[Math.floor(Math.random() * data.users.length)];
-  
+
   const headers = {
-    'Authorization': `Bearer ${user.token}`,
+    Authorization: `Bearer ${user.token}`,
     'Content-Type': 'application/json',
   };
 
   // 異なる検索条件でテスト
   const testCases = [
-    { 
-      name: 'All Reports', 
-      params: '' 
+    {
+      name: 'All Reports',
+      params: '',
     },
-    { 
-      name: 'Recent Reports', 
-      params: '?start_date=' + getDateString(-7) + '&end_date=' + getDateString(0) 
+    {
+      name: 'Recent Reports',
+      params:
+        '?start_date=' + getDateString(-7) + '&end_date=' + getDateString(0),
     },
-    { 
-      name: 'Reports with Pagination', 
-      params: '?page=1&per_page=20' 
+    {
+      name: 'Reports with Pagination',
+      params: '?page=1&per_page=20',
     },
-    { 
-      name: 'Reports by User', 
-      params: `?sales_person_id=${user.userId}` 
+    {
+      name: 'Reports by User',
+      params: `?sales_person_id=${user.userId}`,
     },
-    { 
-      name: 'Large Page Size', 
-      params: '?per_page=100' 
+    {
+      name: 'Large Page Size',
+      params: '?per_page=100',
     },
   ];
 
   const testCase = testCases[Math.floor(Math.random() * testCases.length)];
-  
+
   const startTime = Date.now();
-  const res = http.get(
-    `${BASE_URL}/api/reports${testCase.params}`,
-    { 
-      headers,
-      tags: { name: testCase.name }
-    }
-  );
+  const res = http.get(`${BASE_URL}/api/reports${testCase.params}`, {
+    headers,
+    tags: { name: testCase.name },
+  });
   const loadTime = Date.now() - startTime;
 
   // レスポンスチェック
@@ -137,7 +135,7 @@ export function handleSummary(data) {
 
 function textSummary(data) {
   let summary = '\n=== Reports List Performance Test Results ===\n\n';
-  
+
   // List load time metrics
   const loadTime = data.metrics['reports_list_load_time'];
   if (loadTime) {
@@ -147,7 +145,7 @@ function textSummary(data) {
     summary += `  99th percentile: ${loadTime.values['p(99)'].toFixed(2)}ms\n`;
     summary += `  Max: ${loadTime.values.max.toFixed(2)}ms\n\n`;
   }
-  
+
   // Request metrics
   const reqDuration = data.metrics['http_req_duration'];
   if (reqDuration) {
@@ -155,26 +153,26 @@ function textSummary(data) {
     summary += `  Median: ${reqDuration.values.med.toFixed(2)}ms\n`;
     summary += `  95th percentile: ${reqDuration.values['p(95)'].toFixed(2)}ms\n\n`;
   }
-  
+
   // Error rate
   const errors = data.metrics['errors'];
   if (errors) {
     summary += `Error Rate: ${(errors.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // Total requests
   const reqCount = data.metrics['http_reqs'];
   if (reqCount) {
     summary += `Total Requests: ${reqCount.values.count}\n`;
     summary += `Request Rate: ${reqCount.values.rate.toFixed(2)} req/s\n`;
   }
-  
+
   // Thresholds
   summary += '\nThresholds:\n';
   for (const [key, value] of Object.entries(data.thresholds || {})) {
     const status = value.ok ? '✓' : '✗';
     summary += `  ${status} ${key}\n`;
   }
-  
+
   return summary;
 }

@@ -12,6 +12,7 @@ export default defineConfig({
     testTimeout: 20000, // 20秒に増やす
     hookTimeout: 20000, // フックのタイムアウトも増やす
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',

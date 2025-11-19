@@ -39,13 +39,13 @@ export function sanitizeText(input: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;')
     .replace(/\//g, '&#x2F;');
-  
+
   // Remove any remaining HTML tags (shouldn't be any after encoding)
   sanitized = sanitized.replace(/<[^>]*>/g, '');
-  
+
   // Remove null bytes
   sanitized = sanitized.replace(/\0/g, '');
-  
+
   return sanitized.trim();
 }
 
@@ -84,7 +84,10 @@ export const usernameSchema = z
   .string()
   .min(3, validationMessages.min(3))
   .max(30, validationMessages.max(30))
-  .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens')
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Username can only contain letters, numbers, underscores, and hyphens'
+  )
   .transform(sanitizeText);
 
 /**
@@ -124,10 +127,12 @@ export const dateSchema = z
   .refine((date) => {
     const [year, month, day] = date.split('-').map(Number);
     const parsed = new Date(year, month - 1, day);
-    return !isNaN(parsed.getTime()) && 
-           parsed.getFullYear() === year && 
-           parsed.getMonth() === month - 1 && 
-           parsed.getDate() === day;
+    return (
+      !isNaN(parsed.getTime()) &&
+      parsed.getFullYear() === year &&
+      parsed.getMonth() === month - 1 &&
+      parsed.getDate() === day
+    );
   }, 'Invalid date');
 
 /**
@@ -201,19 +206,19 @@ export function hasSQLInjectionPattern(input: string): boolean {
   if (/^[A-Za-z]+('[A-Za-z]+)?$/.test(input)) {
     return false;
   }
-  
+
   const sqlPatterns = [
     /(\bunion\b.*\bselect\b|\bselect\b.*\bfrom\b|\binsert\b.*\binto\b|\bdelete\b.*\bfrom\b|\bdrop\b.*\btable\b|\bupdate\b.*\bset\b)/i,
-    /(';|";|--|\/\*|\*\/|xp_|sp_|0x)/i,  // SQL comment indicators
-    /'#/,  // MySQL comment
+    /(';|";|--|\/\*|\*\/|xp_|sp_|0x)/i, // SQL comment indicators
+    /'#/, // MySQL comment
     /(exec|execute|cast|declare|nvarchar|varchar)/i,
-    /(\bor\b|\band\b)\s*['"]?\d+['"]?\s*=\s*['"]?\d+/i,  // Include quoted versions
+    /(\bor\b|\band\b)\s*['"]?\d+['"]?\s*=\s*['"]?\d+/i, // Include quoted versions
     /\bwaitfor\b\s+\bdelay\b/i,
-    /'.*--/,  // Quote followed by comment
-    /'\s*(or|and)\s+/i,  // Quote followed by OR/AND
+    /'.*--/, // Quote followed by comment
+    /'\s*(or|and)\s+/i, // Quote followed by OR/AND
   ];
-  
-  return sqlPatterns.some(pattern => pattern.test(input));
+
+  return sqlPatterns.some((pattern) => pattern.test(input));
 }
 
 /**
@@ -232,8 +237,8 @@ export function hasXSSPattern(input: string): boolean {
     /window\.(location|open)/gi,
     /eval\s*\(/gi,
   ];
-  
-  return xssPatterns.some(pattern => pattern.test(input));
+
+  return xssPatterns.some((pattern) => pattern.test(input));
 }
 
 /**
@@ -248,71 +253,74 @@ export function hasPathTraversalPattern(input: string): boolean {
     /\.\.%c0%af/gi,
     /\.\.%c1%9c/gi,
     /\.\.%252f/gi,
-    /%2e%2e%2f/gi,  // URL encoded ../
-    /%2e%2e/gi,     // URL encoded ..
+    /%2e%2e%2f/gi, // URL encoded ../
+    /%2e%2e/gi, // URL encoded ..
     /file:\/\//gi,
   ];
-  
-  return pathPatterns.some(pattern => pattern.test(input));
+
+  return pathPatterns.some((pattern) => pattern.test(input));
 }
 
 /**
  * Comprehensive input validation
  */
-export function validateInput(input: string, type: 'text' | 'email' | 'url' | 'phone' = 'text'): {
+export function validateInput(
+  input: string,
+  type: 'text' | 'email' | 'url' | 'phone' = 'text'
+): {
   isValid: boolean;
   sanitized: string;
   errors: string[];
 } {
   const errors: string[] = [];
-  
+
   // Check for SQL injection
   if (hasSQLInjectionPattern(input)) {
     errors.push('Input contains potentially dangerous SQL patterns');
   }
-  
+
   // Check for XSS
   if (hasXSSPattern(input)) {
     errors.push('Input contains potentially dangerous script patterns');
   }
-  
+
   // Check for path traversal
   if (hasPathTraversalPattern(input)) {
     errors.push('Input contains potentially dangerous path patterns');
   }
-  
+
   // Type-specific validation
   let sanitized = input;
-  
+
   switch (type) {
     case 'email':
       try {
         sanitized = emailSchema.parse(input);
-      } catch (e) {
+      } catch (_e) {
         errors.push('Invalid email format');
       }
       break;
-      
+
     case 'url':
       try {
         sanitized = urlSchema.parse(input);
-      } catch (e) {
+      } catch (_e) {
         errors.push('Invalid URL format');
       }
       break;
-      
+
     case 'phone':
       try {
         sanitized = phoneSchema.parse(input);
-      } catch (e) {
+      } catch (_e) {
         errors.push('Invalid phone number format');
       }
       break;
-      
+
     default:
       sanitized = sanitizeText(input);
   }
-  
+
   return {
     isValid: errors.length === 0,
     sanitized,
@@ -329,37 +337,37 @@ export function checkPasswordStrength(password: string): {
 } {
   const feedback: string[] = [];
   let score = 0;
-  
+
   // Length check
   if (password.length >= 8) score += 1;
   if (password.length >= 12) score += 1;
   if (password.length >= 16) score += 1;
-  
+
   // Character variety (Pass123 has 3 of these)
   if (/[a-z]/.test(password)) score += 1;
   if (/[A-Z]/.test(password)) score += 1;
   if (/\d/.test(password)) score += 1;
   if (/[@$!%*?&]/.test(password)) score += 1;
-  
+
   // Common patterns to avoid
   if (/(.)\1{2,}/.test(password)) {
     feedback.push('Avoid repeating characters');
     score -= 1;
   }
-  
+
   if (/^(password|123456|qwerty)/i.test(password)) {
     feedback.push('Avoid common passwords');
     score = 0;
   }
-  
+
   if (/\d{4,}/.test(password)) {
     feedback.push('Avoid sequences of numbers');
     score -= 1;
   }
-  
+
   // Normalize score
   score = Math.max(0, Math.min(5, score));
-  
+
   // Provide feedback based on score
   if (score === 0) {
     feedback.push('Very weak password');
@@ -372,6 +380,6 @@ export function checkPasswordStrength(password: string): {
   } else {
     feedback.push('Strong password');
   }
-  
+
   return { score, feedback };
 }

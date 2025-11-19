@@ -37,7 +37,7 @@ describe('Home Page', () => {
     const customerCard = screen.getByRole('heading', { name: /👥 顧客管理/i });
     expect(customerCard).toBeInTheDocument();
 
-    // 営業担当者管理カード  
+    // 営業担当者管理カード
     const salesPersonsCard = screen.getByRole('heading', {
       name: /👥 営業担当者管理/i,
     });
@@ -60,7 +60,9 @@ describe('Home Page', () => {
     expect(customersLink).toHaveAttribute('href', '/customers');
 
     // 営業担当者管理リンク
-    const salesPersonsLink = screen.getByRole('link', { name: /営業担当者管理へ/i });
+    const salesPersonsLink = screen.getByRole('link', {
+      name: /営業担当者管理へ/i,
+    });
     expect(salesPersonsLink).toHaveAttribute('href', '/sales-persons');
   });
 

@@ -16,7 +16,7 @@ export default function Error({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Application error:', error);
-    
+
     // In production, you might want to send this to a logging service
     // Example: logErrorToService(error, error.digest);
   }, [error]);

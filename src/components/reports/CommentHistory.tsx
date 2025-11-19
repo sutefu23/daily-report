@@ -67,12 +67,18 @@ export function CommentHistory({ comments, isLoading }: CommentHistoryProps) {
                       {comment.manager?.name || '管理者'}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {format(new Date(comment.created_at), 'yyyy/MM/dd HH:mm', {
-                        locale: ja,
-                      })}
+                      {format(
+                        new Date(comment.created_at),
+                        'yyyy/MM/dd HH:mm',
+                        {
+                          locale: ja,
+                        }
+                      )}
                     </span>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {comment.comment}
+                  </p>
                 </div>
               </div>
             </CardContent>

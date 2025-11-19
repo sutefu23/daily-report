@@ -104,9 +104,13 @@ describe('Comments Database Operations', () => {
     });
 
     it('データベースエラーの場合はエラーをスローする', async () => {
-      prisma.managerComment.findMany.mockRejectedValue(new Error('Database error'));
+      prisma.managerComment.findMany.mockRejectedValue(
+        new Error('Database error')
+      );
 
-      await expect(getCommentsByReportId(1)).rejects.toThrow('コメントの取得に失敗しました');
+      await expect(getCommentsByReportId(1)).rejects.toThrow(
+        'コメントの取得に失敗しました'
+      );
     });
   });
 
@@ -136,7 +140,9 @@ describe('Comments Database Operations', () => {
     });
 
     it('データベースエラーの場合はfalseを返す', async () => {
-      prisma.dailyReport.findUnique.mockRejectedValue(new Error('Database error'));
+      prisma.dailyReport.findUnique.mockRejectedValue(
+        new Error('Database error')
+      );
 
       const result = await checkReportExists(1);
 
@@ -160,11 +166,15 @@ describe('Comments Database Operations', () => {
 
       // 日報存在チェック用のモック
       prisma.dailyReport.findUnique.mockResolvedValue({ reportId: 1 });
-      
+
       // コメント作成用のモック
       prisma.managerComment.create.mockResolvedValue(mockNewComment);
 
-      const result = await createComment(1, 2, '新規開拓について明日相談しましょう');
+      const result = await createComment(
+        1,
+        2,
+        '新規開拓について明日相談しましょう'
+      );
 
       expect(result).toEqual(mockNewComment);
       expect(prisma.dailyReport.findUnique).toHaveBeenCalledWith({
@@ -191,8 +201,10 @@ describe('Comments Database Operations', () => {
     it('日報が存在しない場合はエラーをスローする', async () => {
       prisma.dailyReport.findUnique.mockResolvedValue(null);
 
-      await expect(createComment(999, 2, 'コメント')).rejects.toThrow('指定された日報が見つかりません');
-      
+      await expect(createComment(999, 2, 'コメント')).rejects.toThrow(
+        '指定された日報が見つかりません'
+      );
+
       expect(prisma.dailyReport.findUnique).toHaveBeenCalledWith({
         where: { reportId: 999 },
         select: { reportId: true },
@@ -202,9 +214,13 @@ describe('Comments Database Operations', () => {
 
     it('データベースエラーの場合は適切なエラーをスローする', async () => {
       prisma.dailyReport.findUnique.mockResolvedValue({ reportId: 1 });
-      prisma.managerComment.create.mockRejectedValue(new Error('Database error'));
+      prisma.managerComment.create.mockRejectedValue(
+        new Error('Database error')
+      );
 
-      await expect(createComment(1, 2, 'コメント')).rejects.toThrow('Database error');
+      await expect(createComment(1, 2, 'コメント')).rejects.toThrow(
+        'Database error'
+      );
     });
   });
 
@@ -242,7 +258,9 @@ describe('Comments Database Operations', () => {
     });
 
     it('データベースエラーの場合はfalseを返す', async () => {
-      prisma.salesPerson.findUnique.mockRejectedValue(new Error('Database error'));
+      prisma.salesPerson.findUnique.mockRejectedValue(
+        new Error('Database error')
+      );
 
       const result = await isManager(1);
 

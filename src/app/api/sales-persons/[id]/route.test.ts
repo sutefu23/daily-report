@@ -52,7 +52,7 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: false,
       });
-      
+
       const mockSalesPerson = {
         salesPersonId: 1,
         name: '山田太郎',
@@ -64,9 +64,13 @@ describe('/api/sales-persons/[id]', () => {
         updatedAt: new Date('2025-01-01'),
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(mockSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        mockSalesPerson
+      );
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/1');
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/1'
+      );
 
       // Act
       const response = await GET(request, { params: mockParams });
@@ -95,10 +99,12 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: false,
       });
-      
+
       mockPrismaClient.salesPerson.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/999');
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/999'
+      );
 
       // Act
       const response = await GET(request, { params: { id: '999' } });
@@ -117,8 +123,10 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: false,
       });
-      
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/invalid');
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/invalid'
+      );
 
       // Act
       const response = await GET(request, { params: { id: 'invalid' } });
@@ -139,7 +147,7 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: true,
       });
-      
+
       const updateData = {
         name: '山田太郎（更新）',
         department: '営業2課',
@@ -162,13 +170,18 @@ describe('/api/sales-persons/[id]', () => {
         updatedAt: new Date('2025-01-02'),
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
       mockPrismaClient.salesPerson.update.mockResolvedValue(updatedSalesPerson);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/1', {
-        method: 'PUT',
-        body: JSON.stringify(updateData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/1',
+        {
+          method: 'PUT',
+          body: JSON.stringify(updateData),
+        }
+      );
 
       // Act
       const response = await PUT(request, { params: mockParams });
@@ -200,7 +213,7 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: true,
       });
-      
+
       const updateData = {
         email: 'existing@example.com',
       };
@@ -219,10 +232,13 @@ describe('/api/sales-persons/[id]', () => {
         .mockResolvedValueOnce(existingSalesPerson) // 存在チェック
         .mockResolvedValueOnce(duplicateUser); // 重複チェック
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/1', {
-        method: 'PUT',
-        body: JSON.stringify(updateData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/1',
+        {
+          method: 'PUT',
+          body: JSON.stringify(updateData),
+        }
+      );
 
       // Act
       const response = await PUT(request, { params: mockParams });
@@ -242,20 +258,27 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: true,
       });
-      
+
       const existingSalesPerson = {
         salesPersonId: 1,
         name: '山田太郎',
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
       mockPrismaClient.dailyReport.findFirst.mockResolvedValue(null); // 関連する日報なし
       mockPrismaClient.managerComment.findFirst.mockResolvedValue(null); // 関連するコメントなし
-      mockPrismaClient.salesPerson.delete.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.delete.mockResolvedValue(
+        existingSalesPerson
+      );
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/1', {
-        method: 'DELETE',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/1',
+        {
+          method: 'DELETE',
+        }
+      );
 
       // Act
       const response = await DELETE(request, { params: mockParams });
@@ -278,7 +301,7 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: true,
       });
-      
+
       const existingSalesPerson = {
         salesPersonId: 1,
         name: '山田太郎',
@@ -286,17 +309,24 @@ describe('/api/sales-persons/[id]', () => {
 
       const relatedReports = [{ reportId: 1 }]; // 関連する日報あり
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
-      mockPrismaClient.dailyReport.findFirst.mockResolvedValue(relatedReports[0]); // 関連する日報あり
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
+      mockPrismaClient.dailyReport.findFirst.mockResolvedValue(
+        relatedReports[0]
+      ); // 関連する日報あり
       mockPrismaClient.managerComment.findFirst.mockResolvedValue(null);
       mockPrismaClient.salesPerson.update.mockResolvedValue({
         ...existingSalesPerson,
         isActive: false,
       });
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/1', {
-        method: 'DELETE',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/1',
+        {
+          method: 'DELETE',
+        }
+      );
 
       // Act
       const response = await DELETE(request, { params: mockParams });
@@ -317,15 +347,20 @@ describe('/api/sales-persons/[id]', () => {
         email: 'test@example.com',
         is_manager: true,
       });
-      
+
       mockPrismaClient.salesPerson.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons/999', {
-        method: 'DELETE',
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons/999',
+        {
+          method: 'DELETE',
+        }
+      );
 
       // Act
-      const response = await DELETE(request, { params: Promise.resolve({ id: '999' }) });
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: '999' }),
+      });
       const data = await response.json();
 
       // Assert

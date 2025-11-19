@@ -213,8 +213,8 @@ describe('Sales Person Validation Schemas', () => {
       const result = resetPasswordSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const confirmPasswordError = result.error.issues.find(
-          (e) => e.path.includes('confirmPassword')
+        const confirmPasswordError = result.error.issues.find((e) =>
+          e.path.includes('confirmPassword')
         );
         expect(confirmPasswordError?.message).toBe('パスワードが一致しません');
       }
@@ -270,22 +270,36 @@ describe('Sales Person Validation Schemas', () => {
 
     it('ページ番号の境界値チェック', () => {
       // 不正な値
-      expect(searchSalesPersonSchema.safeParse({ page: 0 }).success).toBe(false);
-      expect(searchSalesPersonSchema.safeParse({ page: -1 }).success).toBe(false);
+      expect(searchSalesPersonSchema.safeParse({ page: 0 }).success).toBe(
+        false
+      );
+      expect(searchSalesPersonSchema.safeParse({ page: -1 }).success).toBe(
+        false
+      );
 
       // 有効な値
       expect(searchSalesPersonSchema.safeParse({ page: 1 }).success).toBe(true);
-      expect(searchSalesPersonSchema.safeParse({ page: 100 }).success).toBe(true);
+      expect(searchSalesPersonSchema.safeParse({ page: 100 }).success).toBe(
+        true
+      );
     });
 
     it('1ページあたりの件数の境界値チェック', () => {
       // 不正な値
-      expect(searchSalesPersonSchema.safeParse({ per_page: 0 }).success).toBe(false);
-      expect(searchSalesPersonSchema.safeParse({ per_page: 101 }).success).toBe(false);
+      expect(searchSalesPersonSchema.safeParse({ per_page: 0 }).success).toBe(
+        false
+      );
+      expect(searchSalesPersonSchema.safeParse({ per_page: 101 }).success).toBe(
+        false
+      );
 
       // 有効な値
-      expect(searchSalesPersonSchema.safeParse({ per_page: 1 }).success).toBe(true);
-      expect(searchSalesPersonSchema.safeParse({ per_page: 100 }).success).toBe(true);
+      expect(searchSalesPersonSchema.safeParse({ per_page: 1 }).success).toBe(
+        true
+      );
+      expect(searchSalesPersonSchema.safeParse({ per_page: 100 }).success).toBe(
+        true
+      );
     });
 
     it('ブール値の変換が正しく動作する', () => {

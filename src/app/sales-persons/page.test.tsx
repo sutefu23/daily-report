@@ -29,7 +29,9 @@ vi.mock('@/hooks/useAuth', () => ({
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockAuthValue,
-  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 // Mock components
@@ -49,7 +51,12 @@ vi.mock('@/components/sales-persons/new-sales-person-dialog', () => ({
 }));
 
 vi.mock('@/components/sales-persons/edit-sales-person-dialog', () => ({
-  EditSalesPersonDialog: ({ open, salesPerson, onOpenChange, onSuccess }: any) => (
+  EditSalesPersonDialog: ({
+    open,
+    salesPerson,
+    onOpenChange,
+    onSuccess,
+  }: any) => (
     <div data-testid="edit-dialog" data-open={open}>
       <span>{salesPerson?.name}</span>
       <button onClick={() => onOpenChange(false)}>Close</button>
@@ -174,7 +181,8 @@ describe('SalesPersonsPage', () => {
     });
 
     // Act
-    const searchInput = screen.getByPlaceholderText('氏名、メール、部署で検索...');
+    const searchInput =
+      screen.getByPlaceholderText('氏名、メール、部署で検索...');
     await user.type(searchInput, '山田');
 
     // Assert
@@ -197,7 +205,10 @@ describe('SalesPersonsPage', () => {
     await user.click(newButton);
 
     // Assert
-    expect(screen.getByTestId('new-dialog')).toHaveAttribute('data-open', 'true');
+    expect(screen.getByTestId('new-dialog')).toHaveAttribute(
+      'data-open',
+      'true'
+    );
   }, 10000);
 
   it('編集ダイアログが開く', async () => {
@@ -210,7 +221,9 @@ describe('SalesPersonsPage', () => {
     });
 
     // Act
-    const moreButtons = screen.getAllByRole('button', { name: 'メニューを開く' });
+    const moreButtons = screen.getAllByRole('button', {
+      name: 'メニューを開く',
+    });
     await user.click(moreButtons[0]);
 
     const editButton = screen.getByText('編集');
@@ -232,7 +245,9 @@ describe('SalesPersonsPage', () => {
     });
 
     // Act
-    const moreButtons = screen.getAllByRole('button', { name: 'メニューを開く' });
+    const moreButtons = screen.getAllByRole('button', {
+      name: 'メニューを開く',
+    });
     await user.click(moreButtons[0]);
 
     const resetButton = screen.getByText('パスワードリセット');
@@ -268,7 +283,9 @@ describe('SalesPersonsPage', () => {
     });
 
     // Act
-    const moreButtons = screen.getAllByRole('button', { name: 'メニューを開く' });
+    const moreButtons = screen.getAllByRole('button', {
+      name: 'メニューを開く',
+    });
     await user.click(moreButtons[0]);
 
     const toggleButton = screen.getByText('アカウント無効化');
@@ -311,7 +328,9 @@ describe('SalesPersonsPage', () => {
 
     // Assert
     await waitFor(() => {
-      expect(screen.getByText('営業担当者が見つかりません')).toBeInTheDocument();
+      expect(
+        screen.getByText('営業担当者が見つかりません')
+      ).toBeInTheDocument();
     });
   });
 
@@ -338,7 +357,8 @@ describe('SalesPersonsPage', () => {
     });
 
     // Act
-    const searchInput = screen.getByPlaceholderText('氏名、メール、部署で検索...');
+    const searchInput =
+      screen.getByPlaceholderText('氏名、メール、部署で検索...');
     await user.type(searchInput, '営業1課');
 
     // Assert
@@ -348,13 +368,13 @@ describe('SalesPersonsPage', () => {
   it('ダイアログの成功コールバックが正しく動作する', async () => {
     // Arrange
     const user = userEvent.setup();
-    
+
     // 最初のデータフェッチをモック
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ data: mockSalesPersons }),
     });
-    
+
     render(<SalesPersonsPage />);
 
     await waitFor(() => {

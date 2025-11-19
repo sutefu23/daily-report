@@ -30,8 +30,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public static getDerivedStateFromError(error: Error): Partial<State> {
     const errorId = `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    return { 
-      hasError: true, 
+    return {
+      hasError: true,
       error,
       errorId,
     };
@@ -91,27 +91,33 @@ export class ErrorBoundary extends Component<Props, State> {
             </Alert>
 
             {/* Error details in development mode */}
-            {this.props.showDetails !== false && process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="rounded-lg border bg-muted p-4 space-y-2">
-                <p className="text-sm font-medium">エラー詳細 (開発環境のみ表示)</p>
-                <div className="text-xs space-y-1">
-                  <p className="font-mono text-destructive">{this.state.error.toString()}</p>
-                  {this.state.errorInfo && (
-                    <details className="cursor-pointer">
-                      <summary className="text-muted-foreground hover:text-foreground">
-                        スタックトレース
-                      </summary>
-                      <pre className="mt-2 whitespace-pre-wrap text-muted-foreground overflow-auto max-h-48">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    </details>
-                  )}
+            {this.props.showDetails !== false &&
+              process.env.NODE_ENV === 'development' &&
+              this.state.error && (
+                <div className="rounded-lg border bg-muted p-4 space-y-2">
+                  <p className="text-sm font-medium">
+                    エラー詳細 (開発環境のみ表示)
+                  </p>
+                  <div className="text-xs space-y-1">
+                    <p className="font-mono text-destructive">
+                      {this.state.error.toString()}
+                    </p>
+                    {this.state.errorInfo && (
+                      <details className="cursor-pointer">
+                        <summary className="text-muted-foreground hover:text-foreground">
+                          スタックトレース
+                        </summary>
+                        <pre className="mt-2 whitespace-pre-wrap text-muted-foreground overflow-auto max-h-48">
+                          {this.state.errorInfo.componentStack}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    エラーID: {this.state.errorId}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  エラーID: {this.state.errorId}
-                </p>
-              </div>
-            )}
+              )}
 
             {/* Action buttons */}
             <div className="flex gap-2">
@@ -157,18 +163,18 @@ interface ErrorBoundaryWrapperProps {
   resetOnPropsChange?: boolean;
 }
 
-export function ErrorBoundaryWrapper({ 
-  children, 
+export function ErrorBoundaryWrapper({
+  children,
   resetKeys = [],
   resetOnPropsChange = false,
-  ...props 
+  ...props
 }: ErrorBoundaryWrapperProps) {
   const [resetCount, setResetCount] = React.useState(0);
 
   // Reset error boundary when keys change
   React.useEffect(() => {
     if (resetOnPropsChange) {
-      setResetCount(prev => prev + 1);
+      setResetCount((prev) => prev + 1);
     }
   }, resetKeys);
 

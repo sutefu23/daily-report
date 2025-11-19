@@ -67,11 +67,13 @@ export const TEST_REPORT_DATA = {
       {
         customerId: 2,
         visitTime: '14:30',
-        visitContent: 'テスト用の訪問内容です。既存システムの保守相談を行いました。',
+        visitContent:
+          'テスト用の訪問内容です。既存システムの保守相談を行いました。',
       },
     ],
   },
-  COMMENT_TEXT: 'テスト用のコメントです。お疲れ様でした。次回の訪問も期待しています。',
+  COMMENT_TEXT:
+    'テスト用のコメントです。お疲れ様でした。次回の訪問も期待しています。',
 } as const;
 
 export const VALIDATION_TEST_DATA = {

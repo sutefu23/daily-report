@@ -10,10 +10,10 @@ describe('Error Component', () => {
   const mockError = new Error('Test error message') as Error & {
     digest?: string;
   };
-  
+
   // console.errorをモック - 各テストの前に設定
   let consoleErrorSpy: any;
-  
+
   beforeEach(() => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -31,7 +31,7 @@ describe('Error Component', () => {
       name: /500/i,
     });
     expect(statusHeading).toBeInTheDocument();
-    
+
     const errorHeading = screen.getByRole('heading', {
       level: 2,
       name: /エラーが発生しました/i,
@@ -46,12 +46,14 @@ describe('Error Component', () => {
       /申し訳ございません。予期しないエラーが発生しました。/i
     );
     expect(message).toBeInTheDocument();
-    expect(message.textContent).toContain('問題が解決しない場合はシステム管理者にお問い合わせください');
+    expect(message.textContent).toContain(
+      '問題が解決しない場合はシステム管理者にお問い合わせください'
+    );
   });
 
   it('logs error to console', async () => {
     render(<ErrorBoundary error={mockError} reset={mockReset} />);
-    
+
     // Wait for useEffect to run
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -93,7 +95,7 @@ describe('Error Component', () => {
     } as Error & { digest?: string };
 
     render(<ErrorBoundary error={errorWithDigest} reset={mockReset} />);
-    
+
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Application error:',

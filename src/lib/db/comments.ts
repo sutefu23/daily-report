@@ -1,7 +1,11 @@
-import { ManagerComment, Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
-export interface CommentWithManager extends ManagerComment {
+export interface CommentWithManager {
+  commentId: number;
+  reportId: number;
+  managerId: number;
+  comment: string;
+  createdAt: Date;
   manager: {
     salesPersonId: number;
     name: string;
@@ -13,7 +17,9 @@ export interface CommentWithManager extends ManagerComment {
  * @param reportId 日報ID
  * @returns コメント一覧（管理者情報付き）
  */
-export async function getCommentsByReportId(reportId: number): Promise<CommentWithManager[]> {
+export async function getCommentsByReportId(
+  reportId: number
+): Promise<CommentWithManager[]> {
   try {
     const comments = await prisma.managerComment.findMany({
       where: {
@@ -57,7 +63,10 @@ export async function checkReportExists(reportId: number): Promise<boolean> {
 
     return report !== null;
   } catch (error) {
-    console.error(`Failed to check report existence for ID ${reportId}:`, error);
+    console.error(
+      `Failed to check report existence for ID ${reportId}:`,
+      error
+    );
     return false;
   }
 }
@@ -101,11 +110,11 @@ export async function createComment(
     return newComment;
   } catch (error) {
     console.error('Failed to create comment:', error);
-    
+
     if (error instanceof Error) {
       throw error;
     }
-    
+
     throw new Error('コメントの作成に失敗しました');
   }
 }

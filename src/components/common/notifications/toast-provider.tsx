@@ -61,13 +61,11 @@ export function useNotification() {
       description,
       duration,
       className: classNames[type],
-      action: action
-        ? (
-            <ToastAction altText={action.label} onClick={action.onClick}>
-              {action.label}
-            </ToastAction>
-          )
-        : undefined,
+      action: action ? (
+        <ToastAction altText={action.label} onClick={action.onClick}>
+          {action.label}
+        </ToastAction>
+      ) : undefined,
     });
   };
 
@@ -190,10 +188,10 @@ export const notify = {
 // Component to initialize global toast
 export function GlobalToastInitializer() {
   const { toast } = useToast();
-  
+
   useEffect(() => {
     setGlobalToast(toast);
   }, [toast]);
-  
+
   return null;
 }

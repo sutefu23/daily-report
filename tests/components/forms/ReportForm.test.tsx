@@ -29,17 +29,20 @@ interface ReportFormProps {
 }
 
 // モックコンポーネント（実際の実装に基づいて作成）
-function ReportForm({ 
-  initialData = {}, 
-  onSubmit, 
-  isLoading = false, 
-  isEditMode = false 
+function ReportForm({
+  initialData = {},
+  onSubmit,
+  isLoading = false,
+  isEditMode = false,
 }: ReportFormProps) {
   const [formData, setFormData] = React.useState<ReportFormData>({
-    report_date: initialData.report_date || new Date().toISOString().split('T')[0],
+    report_date:
+      initialData.report_date || new Date().toISOString().split('T')[0],
     problem: initialData.problem || '',
     plan: initialData.plan || '',
-    visits: initialData.visits || [{ customer_id: 0, visit_content: '', visit_time: '' }],
+    visits: initialData.visits || [
+      { customer_id: 0, visit_content: '', visit_time: '' },
+    ],
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -59,8 +62,8 @@ function ReportForm({
       newErrors.plan = '明日の計画は1000文字以内で入力してください';
     }
 
-    const validVisits = formData.visits.filter(visit => 
-      visit.customer_id > 0 && visit.visit_content.trim()
+    const validVisits = formData.visits.filter(
+      (visit) => visit.customer_id > 0 && visit.visit_content.trim()
     );
 
     if (validVisits.length === 0) {
@@ -75,10 +78,15 @@ function ReportForm({
         if (!visit.visit_content.trim()) {
           newErrors[`visit_content_${index}`] = '訪問内容を入力してください';
         } else if (visit.visit_content.length > 500) {
-          newErrors[`visit_content_${index}`] = '訪問内容は500文字以内で入力してください';
+          newErrors[`visit_content_${index}`] =
+            '訪問内容は500文字以内で入力してください';
         }
-        if (visit.visit_time && !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(visit.visit_time)) {
-          newErrors[`visit_time_${index}`] = '時刻はHH:MM形式で入力してください';
+        if (
+          visit.visit_time &&
+          !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(visit.visit_time)
+        ) {
+          newErrors[`visit_time_${index}`] =
+            '時刻はHH:MM形式で入力してください';
         }
       }
     });
@@ -89,11 +97,11 @@ function ReportForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
-    const validVisits = formData.visits.filter(visit => 
-      visit.customer_id > 0 && visit.visit_content.trim()
+    const validVisits = formData.visits.filter(
+      (visit) => visit.customer_id > 0 && visit.visit_content.trim()
     );
 
     try {
@@ -107,23 +115,26 @@ function ReportForm({
   };
 
   const addVisit = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      visits: [...prev.visits, { customer_id: 0, visit_content: '', visit_time: '' }],
+      visits: [
+        ...prev.visits,
+        { customer_id: 0, visit_content: '', visit_time: '' },
+      ],
     }));
   };
 
   const removeVisit = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       visits: prev.visits.filter((_, i) => i !== index),
     }));
   };
 
   const updateVisit = (index: number, field: keyof Visit, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      visits: prev.visits.map((visit, i) => 
+      visits: prev.visits.map((visit, i) =>
         i === index ? { ...visit, [field]: value } : visit
       ),
     }));
@@ -139,10 +150,14 @@ function ReportForm({
             id="report_date"
             type="date"
             value={formData.report_date}
-            onChange={(e) => setFormData(prev => ({ ...prev, report_date: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, report_date: e.target.value }))
+            }
             disabled={isEditMode} // 編集モードでは日付変更不可
             required
-            aria-describedby={errors.report_date ? 'report_date_error' : undefined}
+            aria-describedby={
+              errors.report_date ? 'report_date_error' : undefined
+            }
           />
           {errors.report_date && (
             <div id="report_date_error" className="error-message" role="alert">
@@ -157,7 +172,9 @@ function ReportForm({
           <textarea
             id="problem"
             value={formData.problem}
-            onChange={(e) => setFormData(prev => ({ ...prev, problem: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, problem: e.target.value }))
+            }
             maxLength={1000}
             rows={4}
             placeholder="本日の課題や相談したい事項を入力してください"
@@ -180,16 +197,16 @@ function ReportForm({
           <textarea
             id="plan"
             value={formData.plan}
-            onChange={(e) => setFormData(prev => ({ ...prev, plan: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, plan: e.target.value }))
+            }
             maxLength={1000}
             rows={4}
             placeholder="明日の活動計画を入力してください"
             required
             aria-describedby={errors.plan ? 'plan_error' : undefined}
           />
-          <div className="character-count">
-            {formData.plan.length}/1000文字
-          </div>
+          <div className="character-count">{formData.plan.length}/1000文字</div>
           {errors.plan && (
             <div id="plan_error" className="error-message" role="alert">
               {errors.plan}
@@ -210,7 +227,7 @@ function ReportForm({
               ＋訪問記録を追加
             </button>
           </div>
-          
+
           {errors.visits && (
             <div className="error-message" role="alert">
               {errors.visits}
@@ -239,9 +256,15 @@ function ReportForm({
                 <select
                   id={`customer_${index}`}
                   value={visit.customer_id}
-                  onChange={(e) => updateVisit(index, 'customer_id', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateVisit(index, 'customer_id', parseInt(e.target.value))
+                  }
                   required={visit.visit_content.trim() !== ''}
-                  aria-describedby={errors[`visit_customer_${index}`] ? `customer_${index}_error` : undefined}
+                  aria-describedby={
+                    errors[`visit_customer_${index}`]
+                      ? `customer_${index}_error`
+                      : undefined
+                  }
                 >
                   <option value={0}>顧客を選択してください</option>
                   <option value={1}>A株式会社</option>
@@ -249,7 +272,11 @@ function ReportForm({
                   <option value={3}>C工業</option>
                 </select>
                 {errors[`visit_customer_${index}`] && (
-                  <div id={`customer_${index}_error`} className="error-message" role="alert">
+                  <div
+                    id={`customer_${index}_error`}
+                    className="error-message"
+                    role="alert"
+                  >
                     {errors[`visit_customer_${index}`]}
                   </div>
                 )}
@@ -262,11 +289,21 @@ function ReportForm({
                   id={`visit_time_${index}`}
                   type="time"
                   value={visit.visit_time || ''}
-                  onChange={(e) => updateVisit(index, 'visit_time', e.target.value)}
-                  aria-describedby={errors[`visit_time_${index}`] ? `visit_time_${index}_error` : undefined}
+                  onChange={(e) =>
+                    updateVisit(index, 'visit_time', e.target.value)
+                  }
+                  aria-describedby={
+                    errors[`visit_time_${index}`]
+                      ? `visit_time_${index}_error`
+                      : undefined
+                  }
                 />
                 {errors[`visit_time_${index}`] && (
-                  <div id={`visit_time_${index}_error`} className="error-message" role="alert">
+                  <div
+                    id={`visit_time_${index}_error`}
+                    className="error-message"
+                    role="alert"
+                  >
                     {errors[`visit_time_${index}`]}
                   </div>
                 )}
@@ -278,18 +315,28 @@ function ReportForm({
                 <textarea
                   id={`visit_content_${index}`}
                   value={visit.visit_content}
-                  onChange={(e) => updateVisit(index, 'visit_content', e.target.value)}
+                  onChange={(e) =>
+                    updateVisit(index, 'visit_content', e.target.value)
+                  }
                   maxLength={500}
                   rows={3}
                   placeholder="訪問内容を入力してください"
                   required={visit.customer_id > 0}
-                  aria-describedby={errors[`visit_content_${index}`] ? `visit_content_${index}_error` : undefined}
+                  aria-describedby={
+                    errors[`visit_content_${index}`]
+                      ? `visit_content_${index}_error`
+                      : undefined
+                  }
                 />
                 <div className="character-count">
                   {visit.visit_content.length}/500文字
                 </div>
                 {errors[`visit_content_${index}`] && (
-                  <div id={`visit_content_${index}_error`} className="error-message" role="alert">
+                  <div
+                    id={`visit_content_${index}_error`}
+                    className="error-message"
+                    role="alert"
+                  >
                     {errors[`visit_content_${index}`]}
                   </div>
                 )}
@@ -305,11 +352,15 @@ function ReportForm({
             disabled={isLoading}
             aria-describedby={isLoading ? 'loading_message' : undefined}
           >
-            {isLoading ? '保存中...' : (isEditMode ? '更新' : '保存')}
+            {isLoading ? '保存中...' : isEditMode ? '更新' : '保存'}
           </button>
-          
+
           {isLoading && (
-            <div id="loading_message" className="loading-message" aria-live="polite">
+            <div
+              id="loading_message"
+              className="loading-message"
+              aria-live="polite"
+            >
               データを保存しています...
             </div>
           )}
@@ -336,7 +387,9 @@ describe('ReportForm Component', () => {
     it('フォームが正常にレンダリングされる', () => {
       render(<ReportForm onSubmit={mockOnSubmit} />);
 
-      expect(screen.getByRole('form', { name: '日報フォーム' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('form', { name: '日報フォーム' })
+      ).toBeInTheDocument();
       expect(screen.getByLabelText('日報日付')).toBeInTheDocument();
       expect(screen.getByLabelText('課題・相談事項')).toBeInTheDocument();
       expect(screen.getByLabelText('明日の計画')).toBeInTheDocument();
@@ -386,13 +439,11 @@ describe('ReportForm Component', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
-    it(
-      '文字数制限を超過した場合にエラーメッセージが表示される',
-      async () => {
-        render(<ReportForm onSubmit={mockOnSubmit} />);
+    it('文字数制限を超過した場合にエラーメッセージが表示される', async () => {
+      render(<ReportForm onSubmit={mockOnSubmit} />);
 
-        const problemTextarea = screen.getByLabelText('課題・相談事項');
-        const planTextarea = screen.getByLabelText('明日の計画');
+      const problemTextarea = screen.getByLabelText('課題・相談事項');
+      const planTextarea = screen.getByLabelText('明日の計画');
 
       // 長いテキストを直接設定（typeの代わりにfireEventを使用）
       const longText = 'a'.repeat(1001);
@@ -402,11 +453,9 @@ describe('ReportForm Component', () => {
       const submitButton = screen.getByRole('button', { name: '保存' });
       await user.click(submitButton);
 
-        // Form should not submit when validation fails
-        expect(mockOnSubmit).not.toHaveBeenCalled();
-      },
-      15000
-    );
+      // Form should not submit when validation fails
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+    }, 15000);
 
     it('訪問記録で顧客が選択されていない場合にエラーが表示される', async () => {
       render(<ReportForm onSubmit={mockOnSubmit} />);
@@ -462,7 +511,9 @@ describe('ReportForm Component', () => {
       expect(screen.getByText('訪問記録 2')).toBeInTheDocument();
 
       // 2番目の訪問記録を削除
-      const deleteButton = screen.getByRole('button', { name: '訪問記録2を削除' });
+      const deleteButton = screen.getByRole('button', {
+        name: '訪問記録2を削除',
+      });
       await user.click(deleteButton);
 
       expect(screen.getByText('訪問記録 1')).toBeInTheDocument();
@@ -473,130 +524,129 @@ describe('ReportForm Component', () => {
       render(<ReportForm onSubmit={mockOnSubmit} />);
 
       // 初期状態では訪問記録が1つしかないため、削除ボタンが存在しない
-      expect(screen.queryByRole('button', { name: /を削除/ })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /を削除/ })
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('フォーム送信', () => {
-    it(
-      '有効なデータでフォーム送信が成功する',
-      async () => {
-        mockOnSubmit.mockResolvedValue(undefined);
+    it('有効なデータでフォーム送信が成功する', async () => {
+      mockOnSubmit.mockResolvedValue(undefined);
 
-        render(<ReportForm onSubmit={mockOnSubmit} />);
+      render(<ReportForm onSubmit={mockOnSubmit} />);
 
-        // フォームに有効なデータを入力
-        await user.type(screen.getByLabelText('課題・相談事項'), '今日の課題です');
-        await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
+      // フォームに有効なデータを入力
+      await user.type(
+        screen.getByLabelText('課題・相談事項'),
+        '今日の課題です'
+      );
+      await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
 
-        const customerSelect = screen.getByLabelText('顧客');
-        await user.selectOptions(customerSelect, '1');
+      const customerSelect = screen.getByLabelText('顧客');
+      await user.selectOptions(customerSelect, '1');
 
-        await user.type(screen.getByLabelText('訪問内容'), '訪問した内容です');
+      await user.type(screen.getByLabelText('訪問内容'), '訪問した内容です');
 
-        const timeInput = screen.getByLabelText('訪問時刻（任意）');
-        await user.type(timeInput, '10:30');
+      const timeInput = screen.getByLabelText('訪問時刻（任意）');
+      await user.type(timeInput, '10:30');
 
-        const submitButton = screen.getByRole('button', { name: '保存' });
-        await user.click(submitButton);
+      const submitButton = screen.getByRole('button', { name: '保存' });
+      await user.click(submitButton);
 
-        await waitFor(() => {
-          expect(mockOnSubmit).toHaveBeenCalledWith({
-            report_date: expect.any(String),
-            problem: '今日の課題です',
-            plan: '明日の計画です',
-            visits: [
-              {
-                customer_id: 1,
-                visit_content: '訪問した内容です',
-                visit_time: '10:30',
-              },
-            ],
-          });
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith({
+          report_date: expect.any(String),
+          problem: '今日の課題です',
+          plan: '明日の計画です',
+          visits: [
+            {
+              customer_id: 1,
+              visit_content: '訪問した内容です',
+              visit_time: '10:30',
+            },
+          ],
         });
-      },
-      10000
-    );
+      });
+    }, 10000);
 
-    it(
-      '複数の訪問記録でフォーム送信が成功する',
-      async () => {
-        mockOnSubmit.mockResolvedValue(undefined);
+    it('複数の訪問記録でフォーム送信が成功する', async () => {
+      mockOnSubmit.mockResolvedValue(undefined);
 
-        render(<ReportForm onSubmit={mockOnSubmit} />);
+      render(<ReportForm onSubmit={mockOnSubmit} />);
 
-        // メインフィールドを入力
-        await user.type(screen.getByLabelText('課題・相談事項'), '今日の課題です');
-        await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
+      // メインフィールドを入力
+      await user.type(
+        screen.getByLabelText('課題・相談事項'),
+        '今日の課題です'
+      );
+      await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
 
-        // 1つ目の訪問記録
-        const customerSelect1 = screen.getByLabelText('顧客');
-        await user.selectOptions(customerSelect1, '1');
-        await user.type(screen.getByLabelText('訪問内容'), '最初の訪問');
+      // 1つ目の訪問記録
+      const customerSelect1 = screen.getByLabelText('顧客');
+      await user.selectOptions(customerSelect1, '1');
+      await user.type(screen.getByLabelText('訪問内容'), '最初の訪問');
 
-        // 2つ目の訪問記録を追加
-        const addButton = screen.getByRole('button', { name: '訪問記録を追加' });
-        await user.click(addButton);
+      // 2つ目の訪問記録を追加
+      const addButton = screen.getByRole('button', { name: '訪問記録を追加' });
+      await user.click(addButton);
 
-        // 2つ目の訪問記録を入力
-        const customerSelects = screen.getAllByLabelText('顧客');
-        await user.selectOptions(customerSelects[1], '2');
+      // 2つ目の訪問記録を入力
+      const customerSelects = screen.getAllByLabelText('顧客');
+      await user.selectOptions(customerSelects[1], '2');
 
-        const visitContentInputs = screen.getAllByLabelText('訪問内容');
-        await user.type(visitContentInputs[1], '2番目の訪問');
+      const visitContentInputs = screen.getAllByLabelText('訪問内容');
+      await user.type(visitContentInputs[1], '2番目の訪問');
 
-        const submitButton = screen.getByRole('button', { name: '保存' });
-        await user.click(submitButton);
+      const submitButton = screen.getByRole('button', { name: '保存' });
+      await user.click(submitButton);
 
-        await waitFor(() => {
-          expect(mockOnSubmit).toHaveBeenCalled();
-          const callArgs = mockOnSubmit.mock.calls[0][0];
-          expect(callArgs).toHaveProperty('problem', '今日の課題です');
-          expect(callArgs).toHaveProperty('plan', '明日の計画です');
-          expect(callArgs.visits).toHaveLength(2);
-        });
-      },
-      10000
-    );
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled();
+        const callArgs = mockOnSubmit.mock.calls[0][0];
+        expect(callArgs).toHaveProperty('problem', '今日の課題です');
+        expect(callArgs).toHaveProperty('plan', '明日の計画です');
+        expect(callArgs.visits).toHaveLength(2);
+      });
+    }, 10000);
 
-    it(
-      '空の訪問記録は送信データから除外される',
-      async () => {
-        mockOnSubmit.mockResolvedValue(undefined);
+    it('空の訪問記録は送信データから除外される', async () => {
+      mockOnSubmit.mockResolvedValue(undefined);
 
-        render(<ReportForm onSubmit={mockOnSubmit} />);
+      render(<ReportForm onSubmit={mockOnSubmit} />);
 
-        // メインフィールドのみ入力（訪問記録は空のまま）
-        await user.type(screen.getByLabelText('課題・相談事項'), '今日の課題です');
-        await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
+      // メインフィールドのみ入力（訪問記録は空のまま）
+      await user.type(
+        screen.getByLabelText('課題・相談事項'),
+        '今日の課題です'
+      );
+      await user.type(screen.getByLabelText('明日の計画'), '明日の計画です');
 
-        // 訪問記録を追加して、1つ目だけ入力
-        const addButton = screen.getByRole('button', { name: '訪問記録を追加' });
-        await user.click(addButton);
+      // 訪問記録を追加して、1つ目だけ入力
+      const addButton = screen.getByRole('button', { name: '訪問記録を追加' });
+      await user.click(addButton);
 
-        const customerSelects = screen.getAllByLabelText('顧客');
-        await user.selectOptions(customerSelects[0], '1');
+      const customerSelects = screen.getAllByLabelText('顧客');
+      await user.selectOptions(customerSelects[0], '1');
 
-        const visitContentInputs = screen.getAllByLabelText('訪問内容');
-        await user.type(visitContentInputs[0], '有効な訪問記録');
+      const visitContentInputs = screen.getAllByLabelText('訪問内容');
+      await user.type(visitContentInputs[0], '有効な訪問記録');
 
-        // 2つ目の訪問記録は空のまま
+      // 2つ目の訪問記録は空のまま
 
-        const submitButton = screen.getByRole('button', { name: '保存' });
-        await user.click(submitButton);
+      const submitButton = screen.getByRole('button', { name: '保存' });
+      await user.click(submitButton);
 
-        await waitFor(() => {
-          expect(mockOnSubmit).toHaveBeenCalled();
-          const callArgs = mockOnSubmit.mock.calls[0][0];
-          expect(callArgs).toHaveProperty('problem', '今日の課題です');
-          expect(callArgs).toHaveProperty('plan', '明日の計画です');
-          if (callArgs.visits) {
-            expect(callArgs.visits.length).toBeGreaterThan(0);
-          }
-        });
-      },
-      10000
-    );
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled();
+        const callArgs = mockOnSubmit.mock.calls[0][0];
+        expect(callArgs).toHaveProperty('problem', '今日の課題です');
+        expect(callArgs).toHaveProperty('plan', '明日の計画です');
+        if (callArgs.visits) {
+          expect(callArgs.visits.length).toBeGreaterThan(0);
+        }
+      });
+    }, 10000);
   });
 
   describe('ローディング状態', () => {
@@ -626,7 +676,9 @@ describe('ReportForm Component', () => {
 
       await user.type(problemTextarea, testText);
 
-      expect(screen.getByText(`${testText.length}/1000文字`)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${testText.length}/1000文字`)
+      ).toBeInTheDocument();
     });
 
     it('訪問内容の文字数が正しく表示される', async () => {
@@ -637,7 +689,9 @@ describe('ReportForm Component', () => {
 
       await user.type(visitContentTextarea, testText);
 
-      expect(screen.getByText(`${testText.length}/500文字`)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${testText.length}/500文字`)
+      ).toBeInTheDocument();
     });
   });
 
@@ -688,7 +742,9 @@ describe('ReportForm Component', () => {
 
   describe('エラーハンドリング', () => {
     it('フォーム送信エラーがコンソールに出力される', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const submitError = new Error('Submit failed');
       mockOnSubmit.mockRejectedValue(submitError);
 
@@ -706,7 +762,10 @@ describe('ReportForm Component', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Submit error:', submitError);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Submit error:',
+          submitError
+        );
       });
 
       consoleErrorSpy.mockRestore();

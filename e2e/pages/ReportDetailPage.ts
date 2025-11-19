@@ -22,13 +22,25 @@ export class ReportDetailPage {
     this.page = page;
     this.pageTitle = page.locator('h1:has-text("日報詳細")');
     this.reportDate = page.locator('[data-testid="report-date"], .report-date');
-    this.salesPersonName = page.locator('[data-testid="sales-person"], .sales-person');
+    this.salesPersonName = page.locator(
+      '[data-testid="sales-person"], .sales-person'
+    );
     this.editButton = page.locator('button:has-text("編集")');
-    this.problemSection = page.locator('[data-testid="problem-section"], section:has-text("課題")');
-    this.planSection = page.locator('[data-testid="plan-section"], section:has-text("計画")');
-    this.visitRecordsSection = page.locator('[data-testid="visit-records"], section:has-text("訪問記録")');
-    this.commentsSection = page.locator('[data-testid="comments"], section:has-text("コメント")');
-    this.commentForm = page.locator('[data-testid="comment-form"], .comment-form');
+    this.problemSection = page.locator(
+      '[data-testid="problem-section"], section:has-text("課題")'
+    );
+    this.planSection = page.locator(
+      '[data-testid="plan-section"], section:has-text("計画")'
+    );
+    this.visitRecordsSection = page.locator(
+      '[data-testid="visit-records"], section:has-text("訪問記録")'
+    );
+    this.commentsSection = page.locator(
+      '[data-testid="comments"], section:has-text("コメント")'
+    );
+    this.commentForm = page.locator(
+      '[data-testid="comment-form"], .comment-form'
+    );
     this.commentTextArea = page.locator('textarea[name="comment"]');
     this.postCommentButton = page.locator('button:has-text("投稿")');
     this.backButton = page.locator('button:has-text("戻る")');
@@ -57,14 +69,21 @@ export class ReportDetailPage {
     await expect(this.planSection).toContainText(data.plan);
   }
 
-  async expectVisitRecord(customerName: string, visitContent: string): Promise<void> {
-    const visitRecord = this.visitRecordsSection.locator(`text=${customerName}`).locator('..');
+  async expectVisitRecord(
+    customerName: string,
+    visitContent: string
+  ): Promise<void> {
+    const visitRecord = this.visitRecordsSection
+      .locator(`text=${customerName}`)
+      .locator('..');
     await expect(visitRecord).toBeVisible();
     await expect(visitRecord).toContainText(visitContent);
   }
 
   async expectVisitRecordCount(count: number): Promise<void> {
-    const visitItems = this.visitRecordsSection.locator('.visit-item, [data-testid="visit-item"]');
+    const visitItems = this.visitRecordsSection.locator(
+      '.visit-item, [data-testid="visit-item"]'
+    );
     await expect(visitItems).toHaveCount(count);
   }
 
@@ -105,7 +124,9 @@ export class ReportDetailPage {
   }
 
   async expectCommentCount(count: number): Promise<void> {
-    const commentItems = this.commentsSection.locator('.comment-item, [data-testid="comment"]');
+    const commentItems = this.commentsSection.locator(
+      '.comment-item, [data-testid="comment"]'
+    );
     await expect(commentItems).toHaveCount(count);
   }
 
@@ -115,9 +136,11 @@ export class ReportDetailPage {
   }
 
   async expectCommentValidationError(message?: string): Promise<void> {
-    const errorLocator = this.page.locator('[data-testid="comment-error"], .comment-error');
+    const errorLocator = this.page.locator(
+      '[data-testid="comment-error"], .comment-error'
+    );
     await expect(errorLocator).toBeVisible();
-    
+
     if (message) {
       await expect(errorLocator).toContainText(message);
     }

@@ -51,8 +51,8 @@ export default function NotFound() {
           <p className="text-sm text-muted-foreground">
             問題が解決しない場合は
           </p>
-          <Link 
-            href="/contact" 
+          <Link
+            href="/contact"
             className="text-sm text-primary hover:underline"
           >
             システム管理者にお問い合わせください

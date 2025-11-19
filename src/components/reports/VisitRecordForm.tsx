@@ -39,14 +39,14 @@ export function VisitRecordForm({
       try {
         setLoadingCustomers(true);
         setCustomerError(null);
-        
+
         const response = await fetch('/api/customers', {
           credentials: 'include',
         });
         if (!response.ok) {
           throw new Error('顧客リストの取得に失敗しました');
         }
-        
+
         const data = await response.json();
         setCustomers(data.data || []);
       } catch (error) {
@@ -77,7 +77,11 @@ export function VisitRecordForm({
   };
 
   // 訪問記録を更新
-  const updateVisitRecord = (index: number, field: keyof VisitRecordInput, value: any) => {
+  const updateVisitRecord = (
+    index: number,
+    field: keyof VisitRecordInput,
+    value: any
+  ) => {
     const updated = [...visitRecords];
     updated[index] = {
       ...updated[index],
@@ -139,17 +143,29 @@ export function VisitRecordForm({
                       <Select
                         value={record.customer_id?.toString() || ''}
                         onValueChange={(value) =>
-                          updateVisitRecord(index, 'customer_id', parseInt(value, 10))
+                          updateVisitRecord(
+                            index,
+                            'customer_id',
+                            parseInt(value, 10)
+                          )
                         }
                         disabled={loadingCustomers}
                       >
                         <SelectTrigger id={`customer-${index}`}>
-                          <SelectValue placeholder={loadingCustomers ? '読み込み中...' : '顧客を選択'} />
+                          <SelectValue
+                            placeholder={
+                              loadingCustomers ? '読み込み中...' : '顧客を選択'
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {customers.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id.toString()}>
-                              {customer.company_name} - {customer.contact_person}
+                            <SelectItem
+                              key={customer.id}
+                              value={customer.id.toString()}
+                            >
+                              {customer.company_name} -{' '}
+                              {customer.contact_person}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -171,7 +187,11 @@ export function VisitRecordForm({
                         type="time"
                         value={record.visit_time || ''}
                         onChange={(e) =>
-                          updateVisitRecord(index, 'visit_time', e.target.value || null)
+                          updateVisitRecord(
+                            index,
+                            'visit_time',
+                            e.target.value || null
+                          )
                         }
                         placeholder="HH:MM"
                       />
@@ -191,7 +211,11 @@ export function VisitRecordForm({
                       id={`visit-content-${index}`}
                       value={record.visit_content}
                       onChange={(e) =>
-                        updateVisitRecord(index, 'visit_content', e.target.value)
+                        updateVisitRecord(
+                          index,
+                          'visit_content',
+                          e.target.value
+                        )
                       }
                       placeholder="訪問内容を入力してください（最大500文字）"
                       maxLength={500}
@@ -235,7 +259,9 @@ export function VisitRecordForm({
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
             <p>訪問記録がありません。</p>
-            <p className="mt-2">「訪問記録を追加」ボタンをクリックして追加してください。</p>
+            <p className="mt-2">
+              「訪問記録を追加」ボタンをクリックして追加してください。
+            </p>
           </CardContent>
         </Card>
       )}

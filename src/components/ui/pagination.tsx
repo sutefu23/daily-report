@@ -1,6 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -57,8 +62,8 @@ export const Pagination: React.FC<PaginationProps> = ({
       pages.push(1);
 
       // Calculate start and end of visible pages
-      let start = Math.max(2, currentPage - halfVisible);
-      let end = Math.min(totalPages - 1, currentPage + halfVisible);
+      const start = Math.max(2, currentPage - halfVisible);
+      const end = Math.min(totalPages - 1, currentPage + halfVisible);
 
       // Add ellipsis if needed
       if (start > 2) {
@@ -93,7 +98,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       <div className="text-sm text-muted-foreground">
         {total}件中 {startItem}-{endItem}件を表示
       </div>
-      
+
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
@@ -104,7 +109,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         >
           <ChevronsLeft className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="icon"
@@ -141,7 +146,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="icon"

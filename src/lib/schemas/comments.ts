@@ -56,9 +56,12 @@ export const CommentsListResponseSchema = z
   });
 
 // コメント作成レスポンス
-export const CreateCommentResponseSchema = CommentSchema.openapi('CreateCommentResponse', {
-  description: '日報コメント作成レスポンス',
-});
+export const CreateCommentResponseSchema = CommentSchema.openapi(
+  'CreateCommentResponse',
+  {
+    description: '日報コメント作成レスポンス',
+  }
+);
 
 // エラーレスポンス
 export const ErrorResponseSchema = z

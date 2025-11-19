@@ -2,12 +2,22 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 
 // Import our custom components
-import { Spinner, ProgressSpinner, LoadingButton } from '@/components/common/loading/spinner';
+import {
+  Spinner,
+  ProgressSpinner,
+  LoadingButton,
+} from '@/components/common/loading/spinner';
 import {
   TableSkeleton,
   CardSkeleton,
@@ -17,9 +27,19 @@ import {
   MasterListSkeleton,
   DashboardSkeleton,
 } from '@/components/common/loading/skeleton-variants';
-import { ErrorBoundary, ErrorBoundaryWrapper } from '@/components/common/error/error-boundary';
-import { useNotification, usePromiseToast } from '@/components/common/notifications/toast-provider';
-import { ConfirmationDialog, useConfirmation, usePresetDialogs } from '@/components/common/dialog/confirmation-dialog';
+import {
+  ErrorBoundary,
+  ErrorBoundaryWrapper,
+} from '@/components/common/error/error-boundary';
+import {
+  useNotification,
+  usePromiseToast,
+} from '@/components/common/notifications/toast-provider';
+import {
+  ConfirmationDialog,
+  useConfirmation,
+  usePresetDialogs,
+} from '@/components/common/dialog/confirmation-dialog';
 
 // Component that throws an error for testing
 function ErrorComponent(): never {
@@ -45,7 +65,7 @@ export default function UIDemo() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
-  
+
   const notification = useNotification();
   const { promise } = usePromiseToast();
   const { confirm } = useConfirmation();
@@ -101,7 +121,9 @@ export default function UIDemo() {
           <Card>
             <CardHeader>
               <CardTitle>Spinner Components</CardTitle>
-              <CardDescription>Various spinner and loading states</CardDescription>
+              <CardDescription>
+                Various spinner and loading states
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-4 gap-4">
@@ -119,7 +141,9 @@ export default function UIDemo() {
                 </div>
                 <div className="flex flex-col items-center space-y-2">
                   <Spinner size="xl" />
-                  <span className="text-sm text-muted-foreground">Extra Large</span>
+                  <span className="text-sm text-muted-foreground">
+                    Extra Large
+                  </span>
                 </div>
               </div>
 
@@ -128,7 +152,10 @@ export default function UIDemo() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Progress Spinner</h3>
                 <div className="flex flex-col items-center space-y-4">
-                  <ProgressSpinner progress={progress} label="データを処理中..." />
+                  <ProgressSpinner
+                    progress={progress}
+                    label="データを処理中..."
+                  />
                   <Button onClick={simulateProgress}>Start Progress</Button>
                 </div>
               </div>
@@ -169,7 +196,9 @@ export default function UIDemo() {
           <Card>
             <CardHeader>
               <CardTitle>Skeleton Screens</CardTitle>
-              <CardDescription>Loading placeholders for different content types</CardDescription>
+              <CardDescription>
+                Loading placeholders for different content types
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
               <div>
@@ -207,7 +236,9 @@ export default function UIDemo() {
               <Separator />
 
               <div>
-                <h3 className="text-lg font-semibold mb-4">Daily Report Skeleton</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Daily Report Skeleton
+                </h3>
                 <DailyReportSkeleton />
               </div>
             </CardContent>
@@ -219,7 +250,9 @@ export default function UIDemo() {
           <Card>
             <CardHeader>
               <CardTitle>Error Handling</CardTitle>
-              <CardDescription>Error boundaries and error states</CardDescription>
+              <CardDescription>
+                Error boundaries and error states
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
@@ -238,10 +271,16 @@ export default function UIDemo() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Error Pages</h3>
                 <div className="flex gap-4">
-                  <Button variant="outline" onClick={() => window.open('/404', '_blank')}>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open('/404', '_blank')}
+                  >
                     View 404 Page
                   </Button>
-                  <Button variant="outline" onClick={() => window.open('/error-test', '_blank')}>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open('/error-test', '_blank')}
+                  >
                     View 500 Page
                   </Button>
                 </div>
@@ -255,31 +294,41 @@ export default function UIDemo() {
           <Card>
             <CardHeader>
               <CardTitle>Toast Notifications</CardTitle>
-              <CardDescription>Various notification types and styles</CardDescription>
+              <CardDescription>
+                Various notification types and styles
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   variant="outline"
-                  onClick={() => notification.success('成功', '操作が正常に完了しました。')}
+                  onClick={() =>
+                    notification.success('成功', '操作が正常に完了しました。')
+                  }
                 >
                   Success Toast
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => notification.error('エラー', '操作に失敗しました。')}
+                  onClick={() =>
+                    notification.error('エラー', '操作に失敗しました。')
+                  }
                 >
                   Error Toast
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => notification.warning('警告', '注意が必要です。')}
+                  onClick={() =>
+                    notification.warning('警告', '注意が必要です。')
+                  }
                 >
                   Warning Toast
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => notification.info('情報', 'お知らせがあります。')}
+                  onClick={() =>
+                    notification.info('情報', 'お知らせがあります。')
+                  }
                 >
                   Info Toast
                 </Button>
@@ -345,7 +394,9 @@ export default function UIDemo() {
           <Card>
             <CardHeader>
               <CardTitle>Confirmation Dialogs</CardTitle>
-              <CardDescription>Various confirmation dialog types</CardDescription>
+              <CardDescription>
+                Various confirmation dialog types
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -366,7 +417,8 @@ export default function UIDemo() {
                 <Button
                   variant="destructive"
                   onClick={async () => {
-                    const confirmed = await presetDialogs.confirmDelete('重要なデータ');
+                    const confirmed =
+                      await presetDialogs.confirmDelete('重要なデータ');
                     if (confirmed) {
                       notification.success('削除されました');
                     }
@@ -375,18 +427,24 @@ export default function UIDemo() {
                   Delete Confirmation
                 </Button>
                 <Button
-                  onClick={() => presetDialogs.showInfo('これは情報メッセージです。')}
+                  onClick={() =>
+                    presetDialogs.showInfo('これは情報メッセージです。')
+                  }
                 >
                   Info Dialog
                 </Button>
                 <Button
-                  onClick={() => presetDialogs.showSuccess('操作が正常に完了しました！')}
+                  onClick={() =>
+                    presetDialogs.showSuccess('操作が正常に完了しました！')
+                  }
                 >
                   Success Dialog
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={() => presetDialogs.showError('エラーが発生しました。')}
+                  onClick={() =>
+                    presetDialogs.showError('エラーが発生しました。')
+                  }
                 >
                   Error Dialog
                 </Button>
@@ -406,7 +464,9 @@ export default function UIDemo() {
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Standalone Dialog</h3>
-                <Button onClick={() => setDialogOpen(true)}>Open Standalone Dialog</Button>
+                <Button onClick={() => setDialogOpen(true)}>
+                  Open Standalone Dialog
+                </Button>
                 <ConfirmationDialog
                   open={dialogOpen}
                   onOpenChange={setDialogOpen}

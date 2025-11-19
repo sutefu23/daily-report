@@ -17,18 +17,16 @@ const sizeClasses = {
   xl: 'h-12 w-12',
 };
 
-export function Spinner({ 
-  size = 'md', 
-  className, 
+export function Spinner({
+  size = 'md',
+  className,
   label = '読み込み中...',
-  fullScreen = false 
+  fullScreen = false,
 }: SpinnerProps) {
   const spinnerContent = (
     <div className={cn('flex flex-col items-center gap-2', className)}>
       <Loader2 className={cn(sizeClasses[size], 'animate-spin text-primary')} />
-      {label && (
-        <span className="text-sm text-muted-foreground">{label}</span>
-      )}
+      {label && <span className="text-sm text-muted-foreground">{label}</span>}
     </div>
   );
 
@@ -59,16 +57,18 @@ export function ProgressSpinner({
   const progressContent = (
     <div className={cn('flex flex-col items-center gap-3', className)}>
       <div className="relative">
-        <Loader2 className={cn(sizeClasses[size], 'animate-spin text-primary')} />
+        <Loader2
+          className={cn(sizeClasses[size], 'animate-spin text-primary')}
+        />
         {showPercentage && progress > 0 && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs font-semibold">{Math.round(progress)}%</span>
+            <span className="text-xs font-semibold">
+              {Math.round(progress)}%
+            </span>
           </div>
         )}
       </div>
-      {label && (
-        <span className="text-sm text-muted-foreground">{label}</span>
-      )}
+      {label && <span className="text-sm text-muted-foreground">{label}</span>}
       {progress > 0 && (
         <div className="w-48 bg-secondary rounded-full h-2">
           <div
@@ -92,7 +92,8 @@ export function ProgressSpinner({
 }
 
 // Button with loading state
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface LoadingButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   loadingText?: string;
   children: React.ReactNode;

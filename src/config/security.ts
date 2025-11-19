@@ -14,7 +14,7 @@ export const securityConfig = {
     sameSite: 'strict' as const,
     path: '/',
   },
-  
+
   // JWT Configuration
   jwt: {
     secret: process.env.JWT_SECRET || 'change-this-jwt-secret-in-production',
@@ -23,7 +23,7 @@ export const securityConfig = {
     issuer: 'daily-report-system',
     audience: 'daily-report-users',
   },
-  
+
   // CSRF Configuration
   csrf: {
     enabled: true,
@@ -32,7 +32,7 @@ export const securityConfig = {
     headerName: 'x-csrf-token',
     maxAge: 60 * 60 * 1000, // 1 hour
   },
-  
+
   // Rate Limiting Configuration
   rateLimiting: {
     enabled: true,
@@ -75,7 +75,7 @@ export const securityConfig = {
       },
     },
   },
-  
+
   // Password Policy
   password: {
     minLength: 8,
@@ -97,12 +97,17 @@ export const securityConfig = {
     ],
     bcryptRounds: 10,
   },
-  
+
   // Content Security Policy
   csp: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-eval'",
+        "'unsafe-inline'",
+        'https://cdn.jsdelivr.net',
+      ],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
       fontSrc: ["'self'", 'data:'],
@@ -113,31 +118,34 @@ export const securityConfig = {
       upgradeInsecureRequests: [],
     },
   },
-  
+
   // CORS Configuration
   cors: {
     enabled: true,
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+      'http://localhost:3000',
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     exposedHeaders: ['X-Request-Id'],
     maxAge: 86400, // 24 hours
   },
-  
+
   // Security Headers
   headers: {
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    'Permissions-Policy':
+      'camera=(), microphone=(), geolocation=(), interest-cohort=()',
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-DNS-Prefetch-Control': 'off',
     'X-Download-Options': 'noopen',
     'X-Permitted-Cross-Domain-Policies': 'none',
   },
-  
+
   // File Upload Security
   fileUpload: {
     enabled: false, // Enable when needed
@@ -153,7 +161,7 @@ export const securityConfig = {
     uploadDir: '/tmp/uploads',
     scanForViruses: true, // Requires additional setup
   },
-  
+
   // Logging Configuration
   logging: {
     enabled: true,
@@ -164,7 +172,7 @@ export const securityConfig = {
     excludePaths: ['/health', '/metrics'],
     sanitizeFields: ['password', 'token', 'secret', 'apiKey'],
   },
-  
+
   // Brute Force Protection
   bruteForce: {
     enabled: true,
@@ -174,7 +182,7 @@ export const securityConfig = {
     lifetime: 24 * 60 * 60, // 24 hours
     storeType: 'memory', // Use 'redis' in production
   },
-  
+
   // API Security
   api: {
     requireApiKey: false, // Enable for public API
@@ -185,7 +193,7 @@ export const securityConfig = {
     maxRequestSize: '10mb',
     timeout: 30000, // 30 seconds
   },
-  
+
   // Database Security
   database: {
     enableSSL: process.env.NODE_ENV === 'production',
@@ -194,7 +202,7 @@ export const securityConfig = {
     enableQueryLogging: process.env.NODE_ENV !== 'production',
     sanitizeErrors: true,
   },
-  
+
   // Email Security
   email: {
     verifyRecipients: true,
@@ -203,7 +211,7 @@ export const securityConfig = {
     requireTLS: true,
     blockDisposableEmails: true,
   },
-  
+
   // Two-Factor Authentication
   twoFactor: {
     enabled: false, // Enable when implementing 2FA
@@ -212,7 +220,7 @@ export const securityConfig = {
     tokenLength: 6,
     backupCodesCount: 10,
   },
-  
+
   // Environment-specific settings
   isDevelopment: process.env.NODE_ENV === 'development',
   isProduction: process.env.NODE_ENV === 'production',
@@ -221,6 +229,7 @@ export const securityConfig = {
 
 // Type exports for TypeScript
 export type SecurityConfig = typeof securityConfig;
-export type RateLimitConfig = typeof securityConfig.rateLimiting.endpoints.default;
+export type RateLimitConfig =
+  typeof securityConfig.rateLimiting.endpoints.default;
 export type PasswordPolicy = typeof securityConfig.password;
 export type CSPDirectives = typeof securityConfig.csp.directives;

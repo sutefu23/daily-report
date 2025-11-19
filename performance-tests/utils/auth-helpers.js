@@ -41,14 +41,14 @@ export function getAuthToken(email, password) {
  */
 export function getMultipleAuthTokens(users) {
   const tokens = [];
-  
-  users.forEach(user => {
+
+  users.forEach((user) => {
     const auth = getAuthToken(user.email, user.password);
     if (auth) {
       tokens.push(auth);
     }
   });
-  
+
   return tokens;
 }
 
@@ -59,7 +59,7 @@ export function getMultipleAuthTokens(users) {
  */
 export function getAuthHeaders(token) {
   return {
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 }
@@ -72,18 +72,18 @@ export function getAuthHeaders(token) {
  */
 export function createTestUser(adminToken, userData) {
   const headers = getAuthHeaders(adminToken);
-  
+
   const createRes = http.post(
     `${BASE_URL}/api/sales-persons`,
     JSON.stringify(userData),
     { headers }
   );
-  
+
   if (createRes.status !== 201 && createRes.status !== 200) {
     console.error(`Failed to create user: ${createRes.status}`);
     return null;
   }
-  
+
   try {
     return JSON.parse(createRes.body);
   } catch (error) {
@@ -100,13 +100,11 @@ export function createTestUser(adminToken, userData) {
  */
 export function deleteTestUser(adminToken, userId) {
   const headers = getAuthHeaders(adminToken);
-  
-  const deleteRes = http.del(
-    `${BASE_URL}/api/sales-persons/${userId}`,
-    null,
-    { headers }
-  );
-  
+
+  const deleteRes = http.del(`${BASE_URL}/api/sales-persons/${userId}`, null, {
+    headers,
+  });
+
   return deleteRes.status === 204 || deleteRes.status === 200;
 }
 
@@ -119,7 +117,7 @@ export function deleteTestUser(adminToken, userId) {
  */
 export function createTestUsersBatch(adminToken, count, prefix = 'test') {
   const users = [];
-  
+
   for (let i = 1; i <= count; i++) {
     const userData = {
       name: `${prefix} User ${i}`,
@@ -128,7 +126,7 @@ export function createTestUsersBatch(adminToken, count, prefix = 'test') {
       department: '性能テスト部',
       is_manager: false,
     };
-    
+
     const user = createTestUser(adminToken, userData);
     if (user) {
       users.push({
@@ -137,7 +135,7 @@ export function createTestUsersBatch(adminToken, count, prefix = 'test') {
       });
     }
   }
-  
+
   return users;
 }
 
@@ -149,18 +147,18 @@ export function createTestUsersBatch(adminToken, count, prefix = 'test') {
  */
 export function createTestCustomer(adminToken, customerData) {
   const headers = getAuthHeaders(adminToken);
-  
+
   const createRes = http.post(
     `${BASE_URL}/api/customers`,
     JSON.stringify(customerData),
     { headers }
   );
-  
+
   if (createRes.status !== 201 && createRes.status !== 200) {
     console.error(`Failed to create customer: ${createRes.status}`);
     return null;
   }
-  
+
   try {
     return JSON.parse(createRes.body);
   } catch (error) {
@@ -179,11 +177,11 @@ export function createTestCustomersBatch(adminToken, count) {
   const customers = [];
   const companies = ['株式会社', '有限会社', '合同会社'];
   const industries = ['製造', '商社', 'IT', 'サービス', '小売'];
-  
+
   for (let i = 1; i <= count; i++) {
     const companyType = companies[Math.floor(Math.random() * companies.length)];
     const industry = industries[Math.floor(Math.random() * industries.length)];
-    
+
     const customerData = {
       company_name: `${companyType}テスト${industry}${i}`,
       contact_person: `担当者${i}`,
@@ -191,13 +189,13 @@ export function createTestCustomersBatch(adminToken, count) {
       email: `contact${i}@test-company.com`,
       address: `東京都テスト区テスト町${i}-${Math.floor(Math.random() * 10) + 1}-${Math.floor(Math.random() * 20) + 1}`,
     };
-    
+
     const customer = createTestCustomer(adminToken, customerData);
     if (customer) {
       customers.push(customer);
     }
   }
-  
+
   return customers;
 }
 
@@ -208,12 +206,9 @@ export function createTestCustomersBatch(adminToken, count) {
  */
 export function validateToken(token) {
   const headers = getAuthHeaders(token);
-  
-  const res = http.get(
-    `${BASE_URL}/api/auth/me`,
-    { headers }
-  );
-  
+
+  const res = http.get(`${BASE_URL}/api/auth/me`, { headers });
+
   return res.status === 200;
 }
 
@@ -224,12 +219,8 @@ export function validateToken(token) {
  */
 export function logout(token) {
   const headers = getAuthHeaders(token);
-  
-  const res = http.post(
-    `${BASE_URL}/api/auth/logout`,
-    null,
-    { headers }
-  );
-  
+
+  const res = http.post(`${BASE_URL}/api/auth/logout`, null, { headers });
+
   return res.status === 204 || res.status === 200;
 }

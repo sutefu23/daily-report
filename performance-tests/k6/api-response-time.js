@@ -10,15 +10,15 @@ const apiResponseTime = new Trend('api_response_time');
 // テスト設定
 export const options = {
   stages: [
-    { duration: '30s', target: 10 },  // ウォームアップ
-    { duration: '2m', target: 50 },   // 負荷を徐々に上げる
-    { duration: '3m', target: 50 },   // 定常状態
-    { duration: '30s', target: 0 },   // クールダウン
+    { duration: '30s', target: 10 }, // ウォームアップ
+    { duration: '2m', target: 50 }, // 負荷を徐々に上げる
+    { duration: '3m', target: 50 }, // 定常状態
+    { duration: '30s', target: 0 }, // クールダウン
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<1000'], // 95%のリクエストが1秒以内
-    'http_req_duration': ['p(99)<2000'], // 99%のリクエストが2秒以内
-    'errors': ['rate<0.01'],             // エラー率1%未満
+    http_req_duration: ['p(95)<1000'], // 95%のリクエストが1秒以内
+    http_req_duration: ['p(99)<2000'], // 99%のリクエストが2秒以内
+    errors: ['rate<0.01'], // エラー率1%未満
   },
 };
 
@@ -43,7 +43,7 @@ export function setup() {
 
 export default function (data) {
   const headers = {
-    'Authorization': `Bearer ${data.token}`,
+    Authorization: `Bearer ${data.token}`,
     'Content-Type': 'application/json',
   };
 
@@ -56,7 +56,7 @@ export default function (data) {
     { method: 'GET', path: '/api/auth/me', name: 'Get Current User' },
   ];
 
-  endpoints.forEach(endpoint => {
+  endpoints.forEach((endpoint) => {
     const res = http[endpoint.method.toLowerCase()](
       `${BASE_URL}${endpoint.path}`,
       null,
@@ -85,9 +85,9 @@ export function handleSummary(data) {
 
 function textSummary(data, options) {
   const { indent = '', enableColors = false } = options;
-  
+
   let summary = `\n${indent}=== API Response Time Test Results ===\n\n`;
-  
+
   // HTTP duration metrics
   const httpDuration = data.metrics['http_req_duration'];
   if (httpDuration) {
@@ -96,19 +96,19 @@ function textSummary(data, options) {
     summary += `${indent}  95th percentile: ${httpDuration.values['p(95)'].toFixed(2)}ms\n`;
     summary += `${indent}  99th percentile: ${httpDuration.values['p(99)'].toFixed(2)}ms\n\n`;
   }
-  
+
   // Error rate
   const errors = data.metrics['errors'];
   if (errors) {
     summary += `${indent}Error Rate: ${(errors.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // Thresholds
   summary += `\n${indent}Thresholds:\n`;
   for (const [key, value] of Object.entries(data.thresholds || {})) {
     const status = value.ok ? '✓' : '✗';
     summary += `${indent}  ${status} ${key}\n`;
   }
-  
+
   return summary;
 }

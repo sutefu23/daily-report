@@ -46,28 +46,38 @@ export class DashboardPage {
   }
 
   async navigateToReports(): Promise<void> {
-    const reportsLink = this.page.locator('a[href="/reports"], button:has-text("日報")');
+    const reportsLink = this.page.locator(
+      'a[href="/reports"], button:has-text("日報")'
+    );
     await reportsLink.click();
     await expect(this.page).toHaveURL('/reports');
   }
 
   async navigateToCustomers(): Promise<void> {
-    const customersLink = this.page.locator('a[href="/customers"], button:has-text("顧客")');
+    const customersLink = this.page.locator(
+      'a[href="/customers"], button:has-text("顧客")'
+    );
     await customersLink.click();
     await expect(this.page).toHaveURL('/customers');
   }
 
   async navigateToSalesPersons(): Promise<void> {
-    const salesPersonsLink = this.page.locator('a[href="/sales-persons"], button:has-text("営業担当")');
+    const salesPersonsLink = this.page.locator(
+      'a[href="/sales-persons"], button:has-text("営業担当")'
+    );
     await salesPersonsLink.click();
     await expect(this.page).toHaveURL('/sales-persons');
   }
 
   async expectManagerMenuVisible(): Promise<void> {
-    await expect(this.page.locator('text=営業担当者管理, text=顧客管理')).toBeVisible();
+    await expect(
+      this.page.locator('text=営業担当者管理, text=顧客管理')
+    ).toBeVisible();
   }
 
   async expectManagerMenuNotVisible(): Promise<void> {
-    await expect(this.page.locator('text=営業担当者管理, text=顧客管理')).toBeHidden();
+    await expect(
+      this.page.locator('text=営業担当者管理, text=顧客管理')
+    ).toBeHidden();
   }
 }

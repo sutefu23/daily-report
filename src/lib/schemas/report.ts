@@ -187,7 +187,9 @@ export type VisitRecordInput = z.infer<typeof VisitRecordInputSchema>;
 export type ManagerComment = z.infer<typeof ManagerCommentSchema>;
 export type Pagination = z.infer<typeof PaginationSchema>;
 export type DailyReportListItem = z.infer<typeof DailyReportListItemSchema>;
-export type DailyReportListResponse = z.infer<typeof DailyReportListResponseSchema>;
+export type DailyReportListResponse = z.infer<
+  typeof DailyReportListResponseSchema
+>;
 export type DailyReportDetail = z.infer<typeof DailyReportDetailSchema>;
 export type CreateReportRequest = z.infer<typeof CreateReportRequestSchema>;
 export type UpdateReportRequest = z.infer<typeof UpdateReportRequestSchema>;

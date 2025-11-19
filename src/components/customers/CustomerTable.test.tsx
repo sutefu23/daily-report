@@ -79,7 +79,9 @@ describe('CustomerTable', () => {
     );
 
     expect(screen.getByText('顧客データが見つかりません')).toBeInTheDocument();
-    expect(screen.getByText('新規登録ボタンから顧客を追加してください')).toBeInTheDocument();
+    expect(
+      screen.getByText('新規登録ボタンから顧客を追加してください')
+    ).toBeInTheDocument();
   });
 
   it('calls onEdit when edit button is clicked', () => {
@@ -154,7 +156,7 @@ describe('CustomerTable', () => {
       />
     );
 
-    let prevButton = screen.getByRole('button', { name: /前へ/i });
+    const prevButton = screen.getByRole('button', { name: /前へ/i });
     expect(prevButton).toBeDisabled();
 
     // Test last page

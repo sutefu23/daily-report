@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
@@ -7,11 +7,11 @@ import { ConfirmationProvider } from '@/components/common/dialog/confirmation-di
 import { GlobalToastInitializer } from '@/components/common/notifications/toast-provider';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
+// const inter = Inter({
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-inter',
+// });
 
 export const metadata: Metadata = {
   title: '営業日報システム',
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja" suppressHydrationWarning className={`${inter.variable} antialiased`}>
+    <html lang="ja" suppressHydrationWarning className="antialiased">
       <body className="font-sans min-h-screen bg-background">
         <ThemeProvider
           attribute="class"

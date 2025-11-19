@@ -49,7 +49,9 @@ describe('/api/sales-persons', () => {
     it('認証されていない場合は401を返す', async () => {
       vi.mocked(verifyToken).mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons');
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons'
+      );
       const response = await GET(request);
 
       expect(response.status).toBe(401);
@@ -81,7 +83,9 @@ describe('/api/sales-persons', () => {
       mockPrismaClient.salesPerson.count.mockResolvedValue(1);
       mockPrismaClient.salesPerson.findMany.mockResolvedValue(mockSalesPersons);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons');
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons'
+      );
 
       // Act
       const response = await GET(request);
@@ -129,9 +133,15 @@ describe('/api/sales-persons', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             OR: expect.arrayContaining([
-              expect.objectContaining({ name: expect.objectContaining({ contains: '田中' }) }),
-              expect.objectContaining({ email: expect.objectContaining({ contains: '田中' }) }),
-              expect.objectContaining({ department: expect.objectContaining({ contains: '田中' }) }),
+              expect.objectContaining({
+                name: expect.objectContaining({ contains: '田中' }),
+              }),
+              expect.objectContaining({
+                email: expect.objectContaining({ contains: '田中' }),
+              }),
+              expect.objectContaining({
+                department: expect.objectContaining({ contains: '田中' }),
+              }),
             ]),
             department: expect.objectContaining({ contains: '営業2課' }),
             isManager: true,
@@ -180,10 +190,13 @@ describe('/api/sales-persons', () => {
     it('認証されていない場合は401を返す', async () => {
       vi.mocked(verifyToken).mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
-        method: 'POST',
-        body: JSON.stringify({}),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons',
+        {
+          method: 'POST',
+          body: JSON.stringify({}),
+        }
+      );
       const response = await POST(request);
 
       expect(response.status).toBe(401);
@@ -198,10 +211,13 @@ describe('/api/sales-persons', () => {
         is_manager: false,
       });
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
-        method: 'POST',
-        body: JSON.stringify({}),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons',
+        {
+          method: 'POST',
+          body: JSON.stringify({}),
+        }
+      );
       const response = await POST(request);
 
       expect(response.status).toBe(403);
@@ -241,10 +257,13 @@ describe('/api/sales-persons', () => {
       mockBcryptHash.mockResolvedValue('hashed_password');
       mockPrismaClient.salesPerson.create.mockResolvedValue(mockCreatedPerson);
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
-        method: 'POST',
-        body: JSON.stringify(requestData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons',
+        {
+          method: 'POST',
+          body: JSON.stringify(requestData),
+        }
+      );
 
       // Act
       const response = await POST(request);
@@ -284,10 +303,13 @@ describe('/api/sales-persons', () => {
         salesPersonId: 1,
       }); // 既存ユーザー
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
-        method: 'POST',
-        body: JSON.stringify(requestData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons',
+        {
+          method: 'POST',
+          body: JSON.stringify(requestData),
+        }
+      );
 
       // Act
       const response = await POST(request);
@@ -315,10 +337,13 @@ describe('/api/sales-persons', () => {
         is_manager: false,
       };
 
-      const request = new NextRequest('http://localhost:3000/api/sales-persons', {
-        method: 'POST',
-        body: JSON.stringify(requestData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/sales-persons',
+        {
+          method: 'POST',
+          body: JSON.stringify(requestData),
+        }
+      );
 
       // Act
       const response = await POST(request);

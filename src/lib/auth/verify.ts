@@ -11,7 +11,9 @@ export interface AuthUser {
 /**
  * リクエストからトークンを検証してユーザー情報を取得
  */
-export async function verifyToken(request: NextRequest): Promise<AuthUser | null> {
+export async function verifyToken(
+  request: NextRequest
+): Promise<AuthUser | null> {
   try {
     // Cookieからトークンを取得
     const cookieStore = await cookies();

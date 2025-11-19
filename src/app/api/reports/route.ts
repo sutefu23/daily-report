@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth, AuthenticatedRequest } from '@/lib/auth/middleware';
-import { ReportQuerySchema, CreateReportRequestSchema } from '@/lib/schemas/report';
+import {
+  ReportQuerySchema,
+  CreateReportRequestSchema,
+} from '@/lib/schemas/report';
 import { z } from 'zod';
 
 // GET /api/reports - 日報一覧取得
@@ -154,109 +157,111 @@ export async function POST(request: NextRequest) {
   try {
     return await requireAuth(request, async (req: AuthenticatedRequest) => {
       try {
-      const body = await req.json();
-      
-      // バリデーション
-      const validatedData = CreateReportRequestSchema.parse(body);
+        const body = await req.json();
 
-      // 日付をDateオブジェクトに変換
-      const reportDate = new Date(`${validatedData.report_date}T00:00:00.000Z`);
+        // バリデーション
+        const validatedData = CreateReportRequestSchema.parse(body);
 
-      // 既存の日報チェック（同日の日報が存在しないか）
-      const existingReport = await prisma.dailyReport.findUnique({
-        where: {
-          salesPersonId_reportDate: {
-            salesPersonId: req.user.userId,
-            reportDate: reportDate,
-          },
-        },
-      });
-
-      if (existingReport) {
-        return NextResponse.json(
-          {
-            error: {
-              code: 'DUPLICATE_REPORT',
-              message: '同じ日付の日報が既に存在します',
-            },
-          },
-          { status: 409 }
+        // 日付をDateオブジェクトに変換
+        const reportDate = new Date(
+          `${validatedData.report_date}T00:00:00.000Z`
         );
-      }
 
-      // トランザクション処理で日報と訪問記録を一括作成
-      const report = await prisma.$transaction(async (tx) => {
-        // 日報作成
-        const newReport = await tx.dailyReport.create({
-          data: {
-            salesPersonId: req.user.userId,
-            reportDate: reportDate,
-            problem: validatedData.problem,
-            plan: validatedData.plan,
+        // 既存の日報チェック（同日の日報が存在しないか）
+        const existingReport = await prisma.dailyReport.findUnique({
+          where: {
+            salesPersonId_reportDate: {
+              salesPersonId: req.user.userId,
+              reportDate: reportDate,
+            },
           },
         });
 
-        // 訪問記録作成
-        if (validatedData.visits && validatedData.visits.length > 0) {
-          const visitData = validatedData.visits.map((visit) => ({
-            reportId: newReport.reportId,
-            customerId: visit.customer_id,
-            visitContent: visit.visit_content,
-            visitTime: visit.visit_time || null,
-          }));
-
-          await tx.visitRecord.createMany({
-            data: visitData,
-          });
+        if (existingReport) {
+          return NextResponse.json(
+            {
+              error: {
+                code: 'DUPLICATE_REPORT',
+                message: '同じ日付の日報が既に存在します',
+              },
+            },
+            { status: 409 }
+          );
         }
 
-        return newReport;
-      });
+        // トランザクション処理で日報と訪問記録を一括作成
+        const report = await prisma.$transaction(async (tx) => {
+          // 日報作成
+          const newReport = await tx.dailyReport.create({
+            data: {
+              salesPersonId: req.user.userId,
+              reportDate: reportDate,
+              problem: validatedData.problem,
+              plan: validatedData.plan,
+            },
+          });
 
-      // レスポンス
-      return NextResponse.json(
-        {
-          id: report.reportId,
-          report_date: report.reportDate.toISOString().split('T')[0],
-          sales_person_id: report.salesPersonId,
-          problem: report.problem,
-          plan: report.plan,
-          created_at: report.createdAt.toISOString(),
-        },
-        { status: 201 }
-      );
-    } catch (error: any) {
-      console.error('日報作成エラー:', error);
+          // 訪問記録作成
+          if (validatedData.visits && validatedData.visits.length > 0) {
+            const visitData = validatedData.visits.map((visit) => ({
+              reportId: newReport.reportId,
+              customerId: visit.customer_id,
+              visitContent: visit.visit_content,
+              visitTime: visit.visit_time || null,
+            }));
 
-      if (error instanceof z.ZodError) {
+            await tx.visitRecord.createMany({
+              data: visitData,
+            });
+          }
+
+          return newReport;
+        });
+
+        // レスポンス
+        return NextResponse.json(
+          {
+            id: report.reportId,
+            report_date: report.reportDate.toISOString().split('T')[0],
+            sales_person_id: report.salesPersonId,
+            problem: report.problem,
+            plan: report.plan,
+            created_at: report.createdAt.toISOString(),
+          },
+          { status: 201 }
+        );
+      } catch (error: any) {
+        console.error('日報作成エラー:', error);
+
+        if (error instanceof z.ZodError) {
+          return NextResponse.json(
+            {
+              error: {
+                code: 'VALIDATION_ERROR',
+                message: '入力値が不正です',
+                details: error.issues,
+              },
+            },
+            { status: 400 }
+          );
+        }
+
         return NextResponse.json(
           {
             error: {
-              code: 'VALIDATION_ERROR',
-              message: '入力値が不正です',
-              details: error.issues,
+              code: 'INTERNAL_ERROR',
+              message: 'サーバーエラーが発生しました',
             },
           },
-          { status: 400 }
+          { status: 500 }
         );
-      }
-
-      return NextResponse.json(
-        {
-          error: {
-            code: 'INTERNAL_ERROR',
-            message: 'サーバーエラーが発生しました',
-          },
-        },
-        { status: 500 }
-      );
       } finally {
         // await prisma.$disconnect(); // Not needed with singleton
       }
     });
   } catch (outerError: any) {
     console.error('Outer error in POST /api/reports:', outerError);
-    
+
     // Handle ZodError at the outer level
     if (outerError instanceof z.ZodError) {
       return NextResponse.json(
@@ -270,7 +275,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       {
         error: {

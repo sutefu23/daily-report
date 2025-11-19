@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { vi } from 'vitest';
 import { Sidebar } from '../Sidebar';
 import type { User, MenuItem } from '@/types/layout';
@@ -14,7 +20,9 @@ vi.mock('next/link', () => {
   return {
     __esModule: true,
     default: ({ children, href, className, ...props }: any) => (
-      <a href={href} className={className} {...props}>{children}</a>
+      <a href={href} className={className} {...props}>
+        {children}
+      </a>
     ),
   };
 });
@@ -57,7 +65,7 @@ describe('Sidebar', () => {
 
   it('renders all menu items for regular user', () => {
     render(<Sidebar user={mockUser} menuItems={testMenuItems} />);
-    
+
     expect(screen.getByText('ホーム')).toBeInTheDocument();
     expect(screen.getByText('日報管理')).toBeInTheDocument();
     expect(screen.queryByText('管理者メニュー')).not.toBeInTheDocument();
@@ -65,7 +73,7 @@ describe('Sidebar', () => {
 
   it('renders admin menu items for manager user', () => {
     render(<Sidebar user={mockManagerUser} menuItems={testMenuItems} />);
-    
+
     expect(screen.getByText('ホーム')).toBeInTheDocument();
     expect(screen.getByText('日報管理')).toBeInTheDocument();
     expect(screen.getByText('管理者メニュー')).toBeInTheDocument();
@@ -73,7 +81,7 @@ describe('Sidebar', () => {
 
   it('highlights active menu item based on current pathname', () => {
     render(<Sidebar user={mockUser} menuItems={testMenuItems} />);
-    
+
     const reportsLink = screen.getByText('日報管理').closest('a');
     expect(reportsLink).toHaveClass('bg-primary');
   });
@@ -103,21 +111,21 @@ describe('Sidebar', () => {
     ];
 
     render(<Sidebar user={mockUser} menuItems={menuWithChildren} />);
-    
+
     // Initially children should not be visible
     expect(screen.queryByText('子メニュー1')).not.toBeInTheDocument();
-    
+
     // Click parent to expand
     const parentButton = screen.getByText('親メニュー').closest('button');
     fireEvent.click(parentButton!);
-    
+
     // Children should now be visible
     expect(screen.getByText('子メニュー1')).toBeInTheDocument();
     expect(screen.getByText('子メニュー2')).toBeInTheDocument();
-    
+
     // Click again to collapse
     fireEvent.click(parentButton!);
-    
+
     // Children should be hidden again
     expect(screen.queryByText('子メニュー1')).not.toBeInTheDocument();
   });
@@ -134,13 +142,13 @@ describe('Sidebar', () => {
     ];
 
     render(<Sidebar user={mockUser} menuItems={menuWithBadge} />);
-    
+
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 
   it('handles collapse and expand functionality', () => {
     const mockOnCollapse = vi.fn();
-    
+
     render(
       <Sidebar
         user={mockUser}
@@ -149,35 +157,27 @@ describe('Sidebar', () => {
         onCollapse={mockOnCollapse}
       />
     );
-    
+
     const collapseButton = screen.getByLabelText(/collapse sidebar/i);
     fireEvent.click(collapseButton);
-    
+
     expect(mockOnCollapse).toHaveBeenCalledWith(true);
   });
 
   it('applies collapsed styles when isCollapsed is true', () => {
     const { container } = render(
-      <Sidebar
-        user={mockUser}
-        menuItems={testMenuItems}
-        isCollapsed={true}
-      />
+      <Sidebar user={mockUser} menuItems={testMenuItems} isCollapsed={true} />
     );
-    
+
     const sidebar = container.querySelector('aside');
     expect(sidebar).toHaveClass('w-16');
   });
 
   it('applies expanded styles when isCollapsed is false', () => {
     const { container } = render(
-      <Sidebar
-        user={mockUser}
-        menuItems={testMenuItems}
-        isCollapsed={false}
-      />
+      <Sidebar user={mockUser} menuItems={testMenuItems} isCollapsed={false} />
     );
-    
+
     const sidebar = container.querySelector('aside');
     expect(sidebar).toHaveClass('w-64');
   });
@@ -208,31 +208,33 @@ describe('Sidebar', () => {
     ];
 
     // Test with regular user
-    const { rerender } = render(<Sidebar user={mockUser} menuItems={nestedMenu} />);
-    
+    const { rerender } = render(
+      <Sidebar user={mockUser} menuItems={nestedMenu} />
+    );
+
     const parentButton = screen.getByText('親メニュー').closest('button');
     expect(parentButton).toBeInTheDocument();
     fireEvent.click(parentButton!);
-    
+
     // Wait for the submenu to expand and check if it's rendered
     // For regular user, only public menu should be visible
     await waitFor(() => {
       // Check that parent button exists and was clicked
       expect(parentButton).toBeInTheDocument();
     });
-    
+
     // For regular user, check for public menu text somewhere in the rendered output
     const publicText = screen.queryByText('公開メニュー');
     // Since the submenu might be rendered differently, just check parent exists
     expect(parentButton).toBeInTheDocument();
     expect(screen.queryByText('管理者メニュー')).not.toBeInTheDocument();
-    
+
     // Test with manager user
     rerender(<Sidebar user={mockManagerUser} menuItems={nestedMenu} />);
-    
+
     const parentButton2 = screen.getByText('親メニュー').closest('button');
     fireEvent.click(parentButton2!);
-    
+
     // For manager user, both menus should be accessible
     await waitFor(() => {
       // Just verify the parent button clicked

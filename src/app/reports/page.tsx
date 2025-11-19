@@ -38,7 +38,7 @@ export default function ReportsPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   // Search parameters
   const [searchParams, setSearchParams] = useState<{
     startDate?: string;
@@ -49,7 +49,7 @@ export default function ReportsPage() {
   // Fetch sales persons for the filter (managers only)
   const fetchSalesPersons = useCallback(async () => {
     if (!isManager) return;
-    
+
     try {
       const response = await api.salesPersons.getAll();
       setSalesPersons(response.data || []);
@@ -64,43 +64,48 @@ export default function ReportsPage() {
   }, [isManager, toast]);
 
   // Fetch reports
-  const fetchReports = useCallback(async (page = 1) => {
-    setIsLoading(true);
-    try {
-      const params = {
-        ...searchParams,
-        page,
-        per_page: 20,
-      };
-      
-      const response = await api.reports.getAll(params);
-      
-      // Sort reports based on sortOrder
-      const sortedReports = [...(response.data || [])].sort((a, b) => {
-        const dateA = new Date(a.report_date).getTime();
-        const dateB = new Date(b.report_date).getTime();
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      });
-      
-      setReports(sortedReports);
-      setPagination(response.pagination || {
-        total: 0,
-        page: 1,
-        per_page: 20,
-        total_pages: 0,
-      });
-    } catch (error) {
-      console.error('Failed to fetch reports:', error);
-      toast({
-        title: 'エラー',
-        description: '日報の取得に失敗しました',
-        variant: 'destructive',
-      });
-      setReports([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchParams, sortOrder, toast]);
+  const fetchReports = useCallback(
+    async (page = 1) => {
+      setIsLoading(true);
+      try {
+        const params = {
+          ...searchParams,
+          page,
+          per_page: 20,
+        };
+
+        const response = await api.reports.getAll(params);
+
+        // Sort reports based on sortOrder
+        const sortedReports = [...(response.data || [])].sort((a, b) => {
+          const dateA = new Date(a.report_date).getTime();
+          const dateB = new Date(b.report_date).getTime();
+          return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        });
+
+        setReports(sortedReports);
+        setPagination(
+          response.pagination || {
+            total: 0,
+            page: 1,
+            per_page: 20,
+            total_pages: 0,
+          }
+        );
+      } catch (error) {
+        console.error('Failed to fetch reports:', error);
+        toast({
+          title: 'エラー',
+          description: '日報の取得に失敗しました',
+          variant: 'destructive',
+        });
+        setReports([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [searchParams, sortOrder, toast]
+  );
 
   // Initial data load
   useEffect(() => {
@@ -117,7 +122,7 @@ export default function ReportsPage() {
     salesPersonId?: number;
   }) => {
     setSearchParams(params);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   // Handle pagination

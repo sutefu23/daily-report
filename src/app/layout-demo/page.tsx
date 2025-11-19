@@ -3,7 +3,13 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -88,7 +94,11 @@ export default function LayoutDemoPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={loginAsUser}
-                    variant={currentUser && !currentUser.isManager ? 'default' : 'outline'}
+                    variant={
+                      currentUser && !currentUser.isManager
+                        ? 'default'
+                        : 'outline'
+                    }
                     size="sm"
                   >
                     一般ユーザー
@@ -143,7 +153,8 @@ export default function LayoutDemoPage() {
                   <div>メール: {currentUser.email}</div>
                   <div>部署: {currentUser.department}</div>
                   <div className="flex items-center gap-2">
-                    権限: {currentUser.isManager ? (
+                    権限:{' '}
+                    {currentUser.isManager ? (
                       <Badge>管理者</Badge>
                     ) : (
                       <Badge variant="secondary">一般ユーザー</Badge>
@@ -172,7 +183,9 @@ export default function LayoutDemoPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    <span>ヘッダーコンポーネント（ロゴ、ユーザー情報、ログアウト）</span>
+                    <span>
+                      ヘッダーコンポーネント（ロゴ、ユーザー情報、ログアウト）
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-green-600" />

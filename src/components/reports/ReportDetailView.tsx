@@ -14,14 +14,14 @@ import { CommentHistory } from './CommentHistory';
 import { CommentForm } from './CommentForm';
 import { api, ApiError } from '@/lib/api/simple-client';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Calendar, 
-  User, 
-  Edit, 
+import {
+  Calendar,
+  User,
+  Edit,
   ArrowLeft,
   FileText,
   Target,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 interface ReportDetailViewProps {

@@ -56,14 +56,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
         {/* Main content */}
         <main
-          className={cn(
-            'flex-1 transition-all duration-300',
-            'bg-background'
-          )}
+          className={cn('flex-1 transition-all duration-300', 'bg-background')}
         >
-          <div className="container mx-auto px-4 py-6 lg:px-8">
-            {children}
-          </div>
+          <div className="container mx-auto px-4 py-6 lg:px-8">{children}</div>
         </main>
       </div>
 

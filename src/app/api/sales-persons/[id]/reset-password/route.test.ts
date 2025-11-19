@@ -55,7 +55,9 @@ describe('/api/sales-persons/[id]/reset-password', () => {
         isActive: true,
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
       mockBcrypt.hash.mockResolvedValue('hashed_new_password');
       mockPrismaClient.salesPerson.update.mockResolvedValue({
         ...existingSalesPerson,
@@ -132,7 +134,9 @@ describe('/api/sales-persons/[id]/reset-password', () => {
         isActive: false, // 無効なアカウント
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(inactiveSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        inactiveSalesPerson
+      );
 
       const request = new NextRequest(
         'http://localhost:3000/api/sales-persons/1/reset-password',
@@ -149,7 +153,9 @@ describe('/api/sales-persons/[id]/reset-password', () => {
       // Assert
       expect(response.status).toBe(403);
       expect(data.error.code).toBe('ACCOUNT_INACTIVE');
-      expect(data.error.message).toBe('無効なアカウントのパスワードはリセットできません');
+      expect(data.error.message).toBe(
+        '無効なアカウントのパスワードはリセットできません'
+      );
     });
 
     it('不正なID形式で400エラーが返る', async () => {
@@ -193,7 +199,9 @@ describe('/api/sales-persons/[id]/reset-password', () => {
         isActive: true,
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
 
       for (const invalidData of invalidPasswords) {
         const request = new NextRequest(
@@ -228,7 +236,9 @@ describe('/api/sales-persons/[id]/reset-password', () => {
         isActive: true,
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
 
       const request = new NextRequest(
         'http://localhost:3000/api/sales-persons/1/reset-password',
@@ -261,14 +271,18 @@ describe('/api/sales-persons/[id]/reset-password', () => {
         isActive: true,
       };
 
-      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.findUnique.mockResolvedValue(
+        existingSalesPerson
+      );
       mockBcrypt.hash.mockResolvedValue('hashed_password');
-      mockPrismaClient.salesPerson.update.mockResolvedValue(existingSalesPerson);
+      mockPrismaClient.salesPerson.update.mockResolvedValue(
+        existingSalesPerson
+      );
 
       for (const password of validPasswords) {
-        const requestData = { 
+        const requestData = {
           password,
-          confirmPassword: password 
+          confirmPassword: password,
         };
 
         const request = new NextRequest(

@@ -3,39 +3,91 @@ import { z } from 'zod';
 
 // 日報バリデーションスキーマを定義
 export const ReportCreateSchema = z.object({
-  report_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日付はYYYY-MM-DD形式で入力してください'),
-  problem: z.string().min(1, '課題・相談事項は必須項目です').max(1000, '課題・相談事項は1000文字以内で入力してください'),
-  plan: z.string().min(1, '明日の計画は必須項目です').max(1000, '明日の計画は1000文字以内で入力してください'),
-  visits: z.array(
-    z.object({
-      customer_id: z.number().int().positive('顧客IDは正の整数である必要があります'),
-      visit_content: z.string().min(1, '訪問内容は必須項目です').max(500, '訪問内容は500文字以内で入力してください'),
-      visit_time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, '訪問時刻は HH:MM 形式で入力してください').optional().or(z.literal('')),
-    })
-  ).min(1, '最低1件の訪問記録が必要です'),
+  report_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '日付はYYYY-MM-DD形式で入力してください'),
+  problem: z
+    .string()
+    .min(1, '課題・相談事項は必須項目です')
+    .max(1000, '課題・相談事項は1000文字以内で入力してください'),
+  plan: z
+    .string()
+    .min(1, '明日の計画は必須項目です')
+    .max(1000, '明日の計画は1000文字以内で入力してください'),
+  visits: z
+    .array(
+      z.object({
+        customer_id: z
+          .number()
+          .int()
+          .positive('顧客IDは正の整数である必要があります'),
+        visit_content: z
+          .string()
+          .min(1, '訪問内容は必須項目です')
+          .max(500, '訪問内容は500文字以内で入力してください'),
+        visit_time: z
+          .string()
+          .regex(
+            /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/,
+            '訪問時刻は HH:MM 形式で入力してください'
+          )
+          .optional()
+          .or(z.literal('')),
+      })
+    )
+    .min(1, '最低1件の訪問記録が必要です'),
 });
 
 export const ReportUpdateSchema = z.object({
-  problem: z.string().min(1, '課題・相談事項は必須項目です').max(1000, '課題・相談事項は1000文字以内で入力してください').optional(),
-  plan: z.string().min(1, '明日の計画は必須項目です').max(1000, '明日の計画は1000文字以内で入力してください').optional(),
-  visits: z.array(
-    z.object({
-      id: z.number().int().positive().optional(),
-      customer_id: z.number().int().positive('顧客IDは正の整数である必要があります'),
-      visit_content: z.string().min(1, '訪問内容は必須項目です').max(500, '訪問内容は500文字以内で入力してください'),
-      visit_time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, '訪問時刻は HH:MM 形式で入力してください').optional().or(z.literal('')),
-    })
-  ).optional(),
+  problem: z
+    .string()
+    .min(1, '課題・相談事項は必須項目です')
+    .max(1000, '課題・相談事項は1000文字以内で入力してください')
+    .optional(),
+  plan: z
+    .string()
+    .min(1, '明日の計画は必須項目です')
+    .max(1000, '明日の計画は1000文字以内で入力してください')
+    .optional(),
+  visits: z
+    .array(
+      z.object({
+        id: z.number().int().positive().optional(),
+        customer_id: z
+          .number()
+          .int()
+          .positive('顧客IDは正の整数である必要があります'),
+        visit_content: z
+          .string()
+          .min(1, '訪問内容は必須項目です')
+          .max(500, '訪問内容は500文字以内で入力してください'),
+        visit_time: z
+          .string()
+          .regex(
+            /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/,
+            '訪問時刻は HH:MM 形式で入力してください'
+          )
+          .optional()
+          .or(z.literal('')),
+      })
+    )
+    .optional(),
 });
 
 export const CommentCreateSchema = z.object({
-  comment: z.string().min(1, 'コメントは必須項目です').max(500, 'コメントは500文字以内で入力してください'),
+  comment: z
+    .string()
+    .min(1, 'コメントは必須項目です')
+    .max(500, 'コメントは500文字以内で入力してください'),
 });
 
 // 日付バリデーション関数
-export function validateReportDate(dateString: string): { isValid: boolean; errors: string[] } {
+export function validateReportDate(dateString: string): {
+  isValid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
+
   // 基本フォーマットチェック
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
     errors.push('日付はYYYY-MM-DD形式で入力してください');
@@ -44,7 +96,7 @@ export function validateReportDate(dateString: string): { isValid: boolean; erro
 
   const date = new Date(dateString);
   const today = new Date();
-  
+
   // 有効な日付かチェック
   if (isNaN(date.getTime())) {
     errors.push('有効な日付を入力してください');
@@ -66,9 +118,12 @@ export function validateReportDate(dateString: string): { isValid: boolean; erro
 }
 
 // 訪問時刻バリデーション関数
-export function validateVisitTime(timeString: string): { isValid: boolean; errors: string[] } {
+export function validateVisitTime(timeString: string): {
+  isValid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
+
   if (!timeString || timeString === '') {
     return { isValid: true, errors }; // 任意項目のため、空文字は有効
   }
@@ -80,7 +135,7 @@ export function validateVisitTime(timeString: string): { isValid: boolean; error
   }
 
   const [hours, minutes] = timeString.split(':').map(Number);
-  
+
   // 営業時間チェック（8:00-20:00）
   if (hours < 8 || (hours === 20 && minutes > 0) || hours > 20) {
     errors.push('訪問時刻は営業時間内（08:00-20:00）で入力してください');
@@ -119,9 +174,9 @@ describe('Report Validations', () => {
 
       const result = ReportCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('課題・相談事項は必須項目です');
         expect(errors).toContain('最低1件の訪問記録が必要です');
       }
@@ -143,10 +198,12 @@ describe('Report Validations', () => {
 
       const result = ReportCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
-        expect(errors).toContain('課題・相談事項は1000文字以内で入力してください');
+        const errors = result.error.issues.map((issue) => issue.message);
+        expect(errors).toContain(
+          '課題・相談事項は1000文字以内で入力してください'
+        );
         expect(errors).toContain('訪問内容は500文字以内で入力してください');
       }
     });
@@ -166,9 +223,9 @@ describe('Report Validations', () => {
 
       const result = ReportCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('日付はYYYY-MM-DD形式で入力してください');
       }
     });
@@ -189,9 +246,9 @@ describe('Report Validations', () => {
 
       const result = ReportCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('訪問時刻は HH:MM 形式で入力してください');
       }
     });
@@ -211,9 +268,9 @@ describe('Report Validations', () => {
 
       const result = ReportCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('顧客IDは正の整数である必要があります');
       }
     });
@@ -289,9 +346,9 @@ describe('Report Validations', () => {
 
       const result = CommentCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('コメントは必須項目です');
       }
     });
@@ -303,9 +360,9 @@ describe('Report Validations', () => {
 
       const result = CommentCreateSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errors = result.error.issues.map(issue => issue.message);
+        const errors = result.error.issues.map((issue) => issue.message);
         expect(errors).toContain('コメントは500文字以内で入力してください');
       }
     });
@@ -315,21 +372,21 @@ describe('Report Validations', () => {
     it('有効な今日の日付で成功する', () => {
       const today = new Date().toISOString().split('T')[0];
       const result = validateReportDate(today);
-      
+
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
     it('不正なフォーマットでエラーを返す', () => {
       const result = validateReportDate('2025/01/15');
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('日付はYYYY-MM-DD形式で入力してください');
     });
 
     it('無効な日付でエラーを返す', () => {
       const result = validateReportDate('2025-13-32');
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('有効な日付を入力してください');
     });
@@ -338,9 +395,9 @@ describe('Report Validations', () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       const tomorrowString = tomorrow.toISOString().split('T')[0];
-      
+
       const result = validateReportDate(tomorrowString);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('未来の日付は入力できません');
     });
@@ -349,9 +406,9 @@ describe('Report Validations', () => {
       const oldDate = new Date();
       oldDate.setDate(oldDate.getDate() - 91);
       const oldDateString = oldDate.toISOString().split('T')[0];
-      
+
       const result = validateReportDate(oldDateString);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('90日以前の日報は作成できません');
     });
@@ -360,8 +417,8 @@ describe('Report Validations', () => {
   describe('validateVisitTime', () => {
     it('有効な時刻で成功する', () => {
       const validTimes = ['09:30', '14:15', '08:00', '20:00', '12:00'];
-      
-      validTimes.forEach(time => {
+
+      validTimes.forEach((time) => {
         const result = validateVisitTime(time);
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -370,35 +427,39 @@ describe('Report Validations', () => {
 
     it('空文字で成功する（任意項目）', () => {
       const result = validateVisitTime('');
-      
+
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
     it('不正な時刻フォーマットでエラーを返す', () => {
       const invalidTimes = ['9:30', '14:5', '25:00', '12:60', 'abc', '1400'];
-      
-      invalidTimes.forEach(time => {
+
+      invalidTimes.forEach((time) => {
         const result = validateVisitTime(time);
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('時刻はHH:MM形式で入力してください（例: 09:30）');
+        expect(result.errors).toContain(
+          '時刻はHH:MM形式で入力してください（例: 09:30）'
+        );
       });
     });
 
     it('営業時間外でエラーを返す', () => {
       const outsideHours = ['07:59', '20:01', '06:00', '22:00'];
-      
-      outsideHours.forEach(time => {
+
+      outsideHours.forEach((time) => {
         const result = validateVisitTime(time);
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('訪問時刻は営業時間内（08:00-20:00）で入力してください');
+        expect(result.errors).toContain(
+          '訪問時刻は営業時間内（08:00-20:00）で入力してください'
+        );
       });
     });
 
     it('営業時間境界値で成功する', () => {
       const boundaryTimes = ['08:00', '20:00'];
-      
-      boundaryTimes.forEach(time => {
+
+      boundaryTimes.forEach((time) => {
         const result = validateVisitTime(time);
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -407,9 +468,11 @@ describe('Report Validations', () => {
 
     it('複数のエラーを正しく報告する', () => {
       const result = validateVisitTime('25:70');
-      
+
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('時刻はHH:MM形式で入力してください（例: 09:30）');
+      expect(result.errors).toContain(
+        '時刻はHH:MM形式で入力してください（例: 09:30）'
+      );
     });
   });
 
@@ -417,16 +480,19 @@ describe('Report Validations', () => {
     it('文字数制限の境界値をテストする', () => {
       // 1000文字ちょうど（課題・計画）
       const exactly1000 = 'a'.repeat(1000);
-      const problem1000 = ReportCreateSchema.shape.problem.safeParse(exactly1000);
+      const problem1000 =
+        ReportCreateSchema.shape.problem.safeParse(exactly1000);
       expect(problem1000.success).toBe(true);
 
       const over1000 = 'a'.repeat(1001);
-      const problemOver1000 = ReportCreateSchema.shape.problem.safeParse(over1000);
+      const problemOver1000 =
+        ReportCreateSchema.shape.problem.safeParse(over1000);
       expect(problemOver1000.success).toBe(false);
 
       // 500文字ちょうど（訪問内容）
       const exactly500 = 'b'.repeat(500);
-      const visitContentSchema = ReportCreateSchema.shape.visits.element.shape.visit_content;
+      const visitContentSchema =
+        ReportCreateSchema.shape.visits.element.shape.visit_content;
       const visitContent500 = visitContentSchema.safeParse(exactly500);
       expect(visitContent500.success).toBe(true);
 
@@ -436,12 +502,13 @@ describe('Report Validations', () => {
     });
 
     it('顧客IDの境界値をテストする', () => {
-      const customerIdSchema = ReportCreateSchema.shape.visits.element.shape.customer_id;
-      
+      const customerIdSchema =
+        ReportCreateSchema.shape.visits.element.shape.customer_id;
+
       // 正の整数
       expect(customerIdSchema.safeParse(1).success).toBe(true);
       expect(customerIdSchema.safeParse(999999).success).toBe(true);
-      
+
       // 不正な値
       expect(customerIdSchema.safeParse(0).success).toBe(false);
       expect(customerIdSchema.safeParse(-1).success).toBe(false);
@@ -449,13 +516,14 @@ describe('Report Validations', () => {
     });
 
     it('時刻の境界値をテストする', () => {
-      const timeSchema = ReportCreateSchema.shape.visits.element.shape.visit_time;
-      
+      const timeSchema =
+        ReportCreateSchema.shape.visits.element.shape.visit_time;
+
       // 有効な境界値
       expect(timeSchema.safeParse('00:00').success).toBe(true);
       expect(timeSchema.safeParse('23:59').success).toBe(true);
       expect(timeSchema.safeParse('').success).toBe(true);
-      
+
       // 無効な境界値
       expect(timeSchema.safeParse('24:00').success).toBe(false);
       expect(timeSchema.safeParse('23:60').success).toBe(false);
@@ -471,7 +539,8 @@ describe('Report Validations', () => {
         visits: [
           {
             customer_id: 1,
-            visit_content: 'お客様との打ち合わせ内容について。資料の説明を行いました。',
+            visit_content:
+              'お客様との打ち合わせ内容について。資料の説明を行いました。',
             visit_time: '10:30',
           },
         ],
@@ -488,7 +557,8 @@ describe('Report Validations', () => {
       expect(result.success).toBe(true);
 
       const tooManyJapaneseChars = 'あ'.repeat(1001);
-      const tooManyResult = ReportCreateSchema.shape.problem.safeParse(tooManyJapaneseChars);
+      const tooManyResult =
+        ReportCreateSchema.shape.problem.safeParse(tooManyJapaneseChars);
       expect(tooManyResult.success).toBe(false);
     });
   });

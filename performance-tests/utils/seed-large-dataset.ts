@@ -30,10 +30,10 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
       // 1. 営業担当者の作成
       console.log(`Creating ${config.salesPersonCount} sales persons...`);
       const salesPersons = [];
-      
+
       for (let i = 1; i <= config.salesPersonCount; i++) {
         const isManager = i <= Math.ceil(config.salesPersonCount * 0.1); // 10%を管理者に
-        
+
         const salesPerson = await tx.salesPerson.create({
           data: {
             name: faker.person.fullName(),
@@ -43,61 +43,65 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
             isManager: isManager,
           },
         });
-        
+
         salesPersons.push(salesPerson);
-        
+
         if (i % 10 === 0) {
           console.log(`  Created ${i} sales persons...`);
         }
       }
-      
+
       console.log(`✅ Created ${salesPersons.length} sales persons`);
 
       // 2. 顧客の作成
       console.log(`Creating ${config.customerCount} customers...`);
       const customers = [];
-      
+
       for (let i = 1; i <= config.customerCount; i++) {
         const customer = await tx.customer.create({
           data: {
-            companyName: faker.company.name() + (['株式会社', '有限会社', '合同会社'][Math.floor(Math.random() * 3)]),
+            companyName:
+              faker.company.name() +
+              ['株式会社', '有限会社', '合同会社'][
+                Math.floor(Math.random() * 3)
+              ],
             contactPerson: faker.person.fullName(),
             phone: faker.phone.number('03-####-####'),
             email: faker.internet.email(),
             address: faker.location.streetAddress(true),
           },
         });
-        
+
         customers.push(customer);
-        
+
         if (i % 50 === 0) {
           console.log(`  Created ${i} customers...`);
         }
       }
-      
+
       console.log(`✅ Created ${customers.length} customers`);
 
       // 3. 日報とその関連データの作成
       console.log(`Creating reports for the last ${config.reportDays} days...`);
-      
-      const managers = salesPersons.filter(sp => sp.isManager);
-      const nonManagers = salesPersons.filter(sp => !sp.isManager);
-      
+
+      const managers = salesPersons.filter((sp) => sp.isManager);
+      const nonManagers = salesPersons.filter((sp) => !sp.isManager);
+
       let totalReports = 0;
       let totalVisits = 0;
       let totalComments = 0;
-      
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       for (let dayOffset = 0; dayOffset < config.reportDays; dayOffset++) {
         const reportDate = new Date(today);
         reportDate.setDate(reportDate.getDate() - dayOffset);
-        
+
         // 各営業担当者が70%の確率で日報を作成
         for (const salesPerson of nonManagers) {
           if (Math.random() > 0.7) continue;
-          
+
           try {
             // 日報作成
             const report = await tx.dailyReport.create({
@@ -108,20 +112,22 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
                 plan: generatePlanText(),
               },
             });
-            
+
             totalReports++;
-            
+
             // 訪問記録の作成
             const visitCount = Math.floor(
-              Math.random() * (config.visitsPerReport.max - config.visitsPerReport.min + 1) 
-              + config.visitsPerReport.min
+              Math.random() *
+                (config.visitsPerReport.max - config.visitsPerReport.min + 1) +
+                config.visitsPerReport.min
             );
-            
+
             for (let v = 0; v < visitCount; v++) {
-              const customer = customers[Math.floor(Math.random() * customers.length)];
+              const customer =
+                customers[Math.floor(Math.random() * customers.length)];
               const hour = 9 + Math.floor(Math.random() * 9); // 9-17時
               const minute = Math.floor(Math.random() * 60);
-              
+
               await tx.visitRecord.create({
                 data: {
                   reportId: report.id,
@@ -130,19 +136,23 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
                   visitContent: generateVisitContent(),
                 },
               });
-              
+
               totalVisits++;
             }
-            
+
             // 管理者コメントの作成
             const commentCount = Math.floor(
-              Math.random() * (config.commentsPerReport.max - config.commentsPerReport.min + 1)
-              + config.commentsPerReport.min
+              Math.random() *
+                (config.commentsPerReport.max -
+                  config.commentsPerReport.min +
+                  1) +
+                config.commentsPerReport.min
             );
-            
+
             for (let c = 0; c < commentCount; c++) {
-              const manager = managers[Math.floor(Math.random() * managers.length)];
-              
+              const manager =
+                managers[Math.floor(Math.random() * managers.length)];
+
               await tx.managerComment.create({
                 data: {
                   reportId: report.id,
@@ -150,37 +160,45 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
                   comment: generateComment(),
                 },
               });
-              
+
               totalComments++;
             }
           } catch (error) {
             // 重複エラーなどは無視
             if (!error.message.includes('Unique constraint')) {
-              console.error(`Error creating report for ${salesPerson.name} on ${reportDate.toISOString().split('T')[0]}:`, error.message);
+              console.error(
+                `Error creating report for ${salesPerson.name} on ${reportDate.toISOString().split('T')[0]}:`,
+                error.message
+              );
             }
           }
         }
-        
+
         if ((dayOffset + 1) % 10 === 0) {
           console.log(`  Processed ${dayOffset + 1} days...`);
-          console.log(`    Reports: ${totalReports}, Visits: ${totalVisits}, Comments: ${totalComments}`);
+          console.log(
+            `    Reports: ${totalReports}, Visits: ${totalVisits}, Comments: ${totalComments}`
+          );
         }
       }
-      
-      console.log(`✅ Created ${totalReports} reports with ${totalVisits} visits and ${totalComments} comments`);
+
+      console.log(
+        `✅ Created ${totalReports} reports with ${totalVisits} visits and ${totalComments} comments`
+      );
     });
 
     // 統計情報の表示
     const stats = await getStatistics();
     console.log('\n📊 Database Statistics:');
-    console.log(`  Sales Persons: ${stats.salesPersons} (Managers: ${stats.managers})`);
+    console.log(
+      `  Sales Persons: ${stats.salesPersons} (Managers: ${stats.managers})`
+    );
     console.log(`  Customers: ${stats.customers}`);
     console.log(`  Reports: ${stats.reports}`);
     console.log(`  Visit Records: ${stats.visitRecords}`);
     console.log(`  Manager Comments: ${stats.managerComments}`);
-    
+
     console.log('\n✨ Large dataset seeding completed successfully!');
-    
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     throw error;
@@ -190,7 +208,14 @@ async function seedLargeDataset(config: SeedConfig = defaultConfig) {
 }
 
 async function getStatistics() {
-  const [salesPersons, managers, customers, reports, visitRecords, managerComments] = await Promise.all([
+  const [
+    salesPersons,
+    managers,
+    customers,
+    reports,
+    visitRecords,
+    managerComments,
+  ] = await Promise.all([
     prisma.salesPerson.count(),
     prisma.salesPerson.count({ where: { isManager: true } }),
     prisma.customer.count(),
@@ -198,7 +223,7 @@ async function getStatistics() {
     prisma.visitRecord.count(),
     prisma.managerComment.count(),
   ]);
-  
+
   return {
     salesPersons,
     managers,
@@ -222,10 +247,12 @@ function generateProblemText(): string {
     'アフターフォローの体制を強化する必要があります。',
     '営業資料の更新が追いついていません。最新情報の反映が必要です。',
   ];
-  
-  return problems[Math.floor(Math.random() * problems.length)] + 
-    '\n' + 
-    faker.lorem.sentence();
+
+  return (
+    problems[Math.floor(Math.random() * problems.length)] +
+    '\n' +
+    faker.lorem.sentence()
+  );
 }
 
 function generatePlanText(): string {
@@ -241,10 +268,12 @@ function generatePlanText(): string {
     '新規開拓リストの精査と優先順位付けを行います。',
     '競合分析レポートを作成し、差別化ポイントを明確にします。',
   ];
-  
-  return plans[Math.floor(Math.random() * plans.length)] + 
-    '\n' + 
-    faker.lorem.sentence();
+
+  return (
+    plans[Math.floor(Math.random() * plans.length)] +
+    '\n' +
+    faker.lorem.sentence()
+  );
 }
 
 function generateVisitContent(): string {
@@ -260,13 +289,13 @@ function generateVisitContent(): string {
     'アフターフォロー訪問。満足度は高い。',
     '新規案件の相談。要件定義から参画予定。',
   ];
-  
+
   const content = contents[Math.floor(Math.random() * contents.length)];
-  
+
   if (Math.random() > 0.5) {
     return content + ' ' + faker.lorem.sentence();
   }
-  
+
   return content;
 }
 
@@ -283,14 +312,14 @@ function generateComment(): string {
     '課題への対応策を一緒に考えましょう。',
     'チーム内での情報共有をお願いします。',
   ];
-  
+
   return comments[Math.floor(Math.random() * comments.length)];
 }
 
 // CLIから実行する場合
 if (require.main === module) {
   const args = process.argv.slice(2);
-  
+
   const config: SeedConfig = {
     salesPersonCount: parseInt(args[0]) || defaultConfig.salesPersonCount,
     customerCount: parseInt(args[1]) || defaultConfig.customerCount,
@@ -298,12 +327,11 @@ if (require.main === module) {
     visitsPerReport: defaultConfig.visitsPerReport,
     commentsPerReport: defaultConfig.commentsPerReport,
   };
-  
-  seedLargeDataset(config)
-    .catch((error) => {
-      console.error('Fatal error:', error);
-      process.exit(1);
-    });
+
+  seedLargeDataset(config).catch((error) => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+  });
 }
 
 export { seedLargeDataset, getStatistics, SeedConfig };

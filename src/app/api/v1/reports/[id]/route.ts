@@ -13,7 +13,8 @@ const mockReport: Report = {
     department: '営業1課',
     is_manager: false,
   },
-  problem: '新規開拓の進捗が遅れている。\n競合他社の動向について情報収集が必要。\n既存顧客からの要望対応に時間がかかっている。',
+  problem:
+    '新規開拓の進捗が遅れている。\n競合他社の動向について情報収集が必要。\n既存顧客からの要望対応に時間がかかっている。',
   plan: 'ABC商事への見積もり作成を完了させる。\n新規リスト50件に電話アプローチを実施。\nXYZ工業への提案資料を準備。',
   visits: [
     {
@@ -29,7 +30,8 @@ const mockReport: Report = {
         created_at: '2025-01-01T09:00:00Z',
         updated_at: '2025-01-01T09:00:00Z',
       },
-      visit_content: '新商品の提案を実施。先方の反応は良好で、次回見積もり提出予定。',
+      visit_content:
+        '新商品の提案を実施。先方の反応は良好で、次回見積もり提出予定。',
       visit_time: '10:00',
       created_at: '2025-09-04T10:00:00Z',
     },
@@ -46,7 +48,8 @@ const mockReport: Report = {
         created_at: '2025-01-01T09:00:00Z',
         updated_at: '2025-01-01T09:00:00Z',
       },
-      visit_content: '既存システムの保守相談。来月の更新契約について前向きな回答を得た。',
+      visit_content:
+        '既存システムの保守相談。来月の更新契約について前向きな回答を得た。',
       visit_time: '14:00',
       created_at: '2025-09-04T14:00:00Z',
     },
@@ -78,7 +81,8 @@ const mockReport: Report = {
         department: '営業1課',
         is_manager: true,
       },
-      comment: '新規開拓については明日相談しましょう。競合情報は営業会議で共有お願いします。',
+      comment:
+        '新規開拓については明日相談しましょう。競合情報は営業会議で共有お願いします。',
       created_at: '2025-09-04T18:00:00Z',
     },
     {
@@ -92,7 +96,8 @@ const mockReport: Report = {
         department: '営業1課',
         is_manager: true,
       },
-      comment: 'ABC商事の見積もりは優先度高めでお願いします。必要があればサポートします。',
+      comment:
+        'ABC商事の見積もりは優先度高めでお願いします。必要があればサポートします。',
       created_at: '2025-09-04T18:30:00Z',
     },
   ],
@@ -106,14 +111,14 @@ export async function GET(
 ) {
   const { id: idStr } = await params;
   const id = parseInt(idStr, 10);
-  
+
   // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   if (id === 1) {
     return NextResponse.json(mockReport);
   }
-  
+
   return NextResponse.json(
     { error: { code: 'NOT_FOUND', message: '日報が見つかりません' } },
     { status: 404 }
@@ -127,10 +132,10 @@ export async function PUT(
   const { id: idStr } = await params;
   const id = parseInt(idStr, 10);
   const body = await request.json();
-  
+
   // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   if (id === 1) {
     return NextResponse.json({
       ...mockReport,
@@ -138,7 +143,7 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     });
   }
-  
+
   return NextResponse.json(
     { error: { code: 'NOT_FOUND', message: '日報が見つかりません' } },
     { status: 404 }
@@ -151,14 +156,14 @@ export async function DELETE(
 ) {
   const { id: idStr } = await params;
   const id = parseInt(idStr, 10);
-  
+
   // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   if (id === 1) {
     return new NextResponse(null, { status: 204 });
   }
-  
+
   return NextResponse.json(
     { error: { code: 'NOT_FOUND', message: '日報が見つかりません' } },
     { status: 404 }

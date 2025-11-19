@@ -10,16 +10,16 @@ const complexSearchTime = new Trend('complex_search_time');
 // テスト設定
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },   // ウォームアップ
-    { duration: '2m', target: 80 },    // 負荷を徐々に上げる
-    { duration: '3m', target: 100 },   // 100同時ユーザーで維持
-    { duration: '30s', target: 0 },    // クールダウン
+    { duration: '30s', target: 20 }, // ウォームアップ
+    { duration: '2m', target: 80 }, // 負荷を徐々に上げる
+    { duration: '3m', target: 100 }, // 100同時ユーザーで維持
+    { duration: '30s', target: 0 }, // クールダウン
   ],
   thresholds: {
-    'search_response_time': ['p(95)<2000'],     // 95%が2秒以内
-    'complex_search_time': ['p(95)<3000'],      // 複雑な検索も3秒以内
-    'errors': ['rate<0.01'],                    // エラー率1%未満
-    'http_req_failed': ['rate<0.01'],           // HTTPエラー率1%未満
+    search_response_time: ['p(95)<2000'], // 95%が2秒以内
+    complex_search_time: ['p(95)<3000'], // 複雑な検索も3秒以内
+    errors: ['rate<0.01'], // エラー率1%未満
+    http_req_failed: ['rate<0.01'], // HTTPエラー率1%未満
   },
 };
 
@@ -39,29 +39,38 @@ export function setup() {
   );
 
   const authData = JSON.parse(loginRes.body);
-  
+
   // 検索用のテストデータを準備
   const salesPersons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const dateRanges = generateDateRanges();
-  const searchKeywords = ['新規', '提案', '見積', '契約', '訪問', '相談', '課題', '計画'];
-  
-  return { 
+  const searchKeywords = [
+    '新規',
+    '提案',
+    '見積',
+    '契約',
+    '訪問',
+    '相談',
+    '課題',
+    '計画',
+  ];
+
+  return {
     token: authData.token,
     salesPersons,
     dateRanges,
-    searchKeywords
+    searchKeywords,
   };
 }
 
 export default function (data) {
   const headers = {
-    'Authorization': `Bearer ${data.token}`,
+    Authorization: `Bearer ${data.token}`,
     'Content-Type': 'application/json',
   };
 
   // ランダムに検索タイプを選択
   const searchType = Math.random();
-  
+
   if (searchType < 0.3) {
     // 単純な日付範囲検索
     performDateRangeSearch(headers, data);
@@ -81,14 +90,15 @@ export default function (data) {
 }
 
 function performDateRangeSearch(headers, data) {
-  const dateRange = data.dateRanges[Math.floor(Math.random() * data.dateRanges.length)];
-  
+  const dateRange =
+    data.dateRanges[Math.floor(Math.random() * data.dateRanges.length)];
+
   const startTime = Date.now();
   const res = http.get(
     `${BASE_URL}/api/reports?start_date=${dateRange.start}&end_date=${dateRange.end}`,
-    { 
+    {
       headers,
-      tags: { search_type: 'date_range' }
+      tags: { search_type: 'date_range' },
     }
   );
   const responseTime = Date.now() - startTime;
@@ -111,14 +121,15 @@ function performDateRangeSearch(headers, data) {
 }
 
 function performSalesPersonSearch(headers, data) {
-  const salesPersonId = data.salesPersons[Math.floor(Math.random() * data.salesPersons.length)];
-  
+  const salesPersonId =
+    data.salesPersons[Math.floor(Math.random() * data.salesPersons.length)];
+
   const startTime = Date.now();
   const res = http.get(
     `${BASE_URL}/api/reports?sales_person_id=${salesPersonId}&per_page=50`,
-    { 
+    {
       headers,
-      tags: { search_type: 'sales_person' }
+      tags: { search_type: 'sales_person' },
     }
   );
   const responseTime = Date.now() - startTime;
@@ -141,10 +152,12 @@ function performSalesPersonSearch(headers, data) {
 }
 
 function performComplexSearch(headers, data) {
-  const dateRange = data.dateRanges[Math.floor(Math.random() * data.dateRanges.length)];
-  const salesPersonId = data.salesPersons[Math.floor(Math.random() * data.salesPersons.length)];
+  const dateRange =
+    data.dateRanges[Math.floor(Math.random() * data.dateRanges.length)];
+  const salesPersonId =
+    data.salesPersons[Math.floor(Math.random() * data.salesPersons.length)];
   const page = Math.floor(Math.random() * 5) + 1;
-  
+
   const params = new URLSearchParams({
     start_date: dateRange.start,
     end_date: dateRange.end,
@@ -152,15 +165,12 @@ function performComplexSearch(headers, data) {
     page: page,
     per_page: 20,
   });
-  
+
   const startTime = Date.now();
-  const res = http.get(
-    `${BASE_URL}/api/reports?${params.toString()}`,
-    { 
-      headers,
-      tags: { search_type: 'complex' }
-    }
-  );
+  const res = http.get(`${BASE_URL}/api/reports?${params.toString()}`, {
+    headers,
+    tags: { search_type: 'complex' },
+  });
   const responseTime = Date.now() - startTime;
 
   const result = check(res, {
@@ -181,22 +191,23 @@ function performComplexSearch(headers, data) {
 }
 
 function performFullTextSearch(headers, data) {
-  const keyword = data.searchKeywords[Math.floor(Math.random() * data.searchKeywords.length)];
-  
+  const keyword =
+    data.searchKeywords[Math.floor(Math.random() * data.searchKeywords.length)];
+
   // キーワード検索エンドポイント（実装されている場合）
   const startTime = Date.now();
   const res = http.get(
     `${BASE_URL}/api/reports?search=${encodeURIComponent(keyword)}`,
-    { 
+    {
       headers,
-      tags: { search_type: 'full_text' }
+      tags: { search_type: 'full_text' },
     }
   );
   const responseTime = Date.now() - startTime;
 
   // 全文検索が実装されていない場合も考慮
   const isNotImplemented = res.status === 400 || res.status === 404;
-  
+
   if (!isNotImplemented) {
     const result = check(res, {
       'status is 200': (r) => r.status === 200,
@@ -219,7 +230,7 @@ function performFullTextSearch(headers, data) {
 function generateDateRanges() {
   const ranges = [];
   const now = new Date();
-  
+
   // 様々な期間の日付範囲を生成
   const periods = [
     { days: 7, name: 'week' },
@@ -228,14 +239,14 @@ function generateDateRanges() {
     { days: 180, name: 'half_year' },
     { days: 365, name: 'year' },
   ];
-  
-  periods.forEach(period => {
+
+  periods.forEach((period) => {
     for (let i = 0; i < 3; i++) {
       const end = new Date(now);
-      end.setDate(end.getDate() - (i * period.days));
+      end.setDate(end.getDate() - i * period.days);
       const start = new Date(end);
       start.setDate(start.getDate() - period.days);
-      
+
       ranges.push({
         start: start.toISOString().split('T')[0],
         end: end.toISOString().split('T')[0],
@@ -243,7 +254,7 @@ function generateDateRanges() {
       });
     }
   });
-  
+
   return ranges;
 }
 
@@ -256,7 +267,7 @@ export function handleSummary(data) {
 
 function textSummary(data) {
   let summary = '\n=== Search Performance Test Results ===\n\n';
-  
+
   // Search time metrics
   const searchTimeMetric = data.metrics['search_response_time'];
   if (searchTimeMetric) {
@@ -265,7 +276,7 @@ function textSummary(data) {
     summary += `  95th percentile: ${searchTimeMetric.values['p(95)'].toFixed(2)}ms\n`;
     summary += `  99th percentile: ${searchTimeMetric.values['p(99)'].toFixed(2)}ms\n\n`;
   }
-  
+
   // Complex search metrics
   const complexSearchMetric = data.metrics['complex_search_time'];
   if (complexSearchMetric && complexSearchMetric.values.count > 0) {
@@ -273,32 +284,32 @@ function textSummary(data) {
     summary += `  Median: ${complexSearchMetric.values.med.toFixed(2)}ms\n`;
     summary += `  95th percentile: ${complexSearchMetric.values['p(95)'].toFixed(2)}ms\n\n`;
   }
-  
+
   // Error rate
   const errors = data.metrics['errors'];
   if (errors) {
     summary += `Error Rate: ${(errors.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // HTTP metrics
   const httpFailed = data.metrics['http_req_failed'];
   if (httpFailed) {
     summary += `HTTP Failure Rate: ${(httpFailed.values.rate * 100).toFixed(2)}%\n`;
   }
-  
+
   // Total requests
   const reqCount = data.metrics['http_reqs'];
   if (reqCount) {
     summary += `Total Requests: ${reqCount.values.count}\n`;
     summary += `Request Rate: ${reqCount.values.rate.toFixed(2)} req/s\n`;
   }
-  
+
   // Thresholds
   summary += '\nThresholds:\n';
   for (const [key, value] of Object.entries(data.thresholds || {})) {
     const status = value.ok ? '✓' : '✗';
     summary += `  ${status} ${key}\n`;
   }
-  
+
   return summary;
 }

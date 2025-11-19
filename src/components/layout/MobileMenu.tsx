@@ -139,8 +139,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   const renderMenuItem = (item: MenuItem, depth = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
-    const isActive = pathname === item.href || 
-      (hasChildren && item.children?.some(child => pathname === child.href));
+    const isActive =
+      pathname === item.href ||
+      (hasChildren && item.children?.some((child) => pathname === child.href));
 
     if (hasChildren) {
       return (
@@ -213,7 +214,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>営業日報システム</span>
           </SheetTitle>
         </SheetHeader>
-        
+
         {user && (
           <div className="border-b px-6 py-4">
             <div className="flex items-center space-x-3">
@@ -232,9 +233,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                     {user.department}
                   </Badge>
                 )}
-                {user.isManager && (
-                  <Badge className="text-xs">管理者</Badge>
-                )}
+                {user.isManager && <Badge className="text-xs">管理者</Badge>}
               </div>
             )}
           </div>

@@ -21,7 +21,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Customer, CustomerFormData, customerSchema } from '@/lib/types/customer';
+import {
+  Customer,
+  CustomerFormData,
+  customerSchema,
+} from '@/lib/types/customer';
 import { Textarea } from '@/components/ui/textarea';
 
 interface CustomerFormDialogProps {
@@ -103,14 +107,17 @@ export function CustomerFormDialog({
             {mode === 'create' ? '顧客新規登録' : '顧客情報編集'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'create' 
+            {mode === 'create'
               ? '新しい顧客情報を登録します。必須項目を入力してください。'
               : '顧客情報を編集します。必要な項目を修正してください。'}
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="company_name"
@@ -160,7 +167,11 @@ export function CustomerFormDialog({
                 <FormItem>
                   <FormLabel>メールアドレス *</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="example@company.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="example@company.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,7 +185,7 @@ export function CustomerFormDialog({
                 <FormItem>
                   <FormLabel>住所</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="東京都千代田区..."
                       className="resize-none"
                       rows={3}
@@ -196,7 +207,11 @@ export function CustomerFormDialog({
                 キャンセル
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? '処理中...' : (mode === 'create' ? '登録' : '更新')}
+                {isSubmitting
+                  ? '処理中...'
+                  : mode === 'create'
+                    ? '登録'
+                    : '更新'}
               </Button>
             </DialogFooter>
           </form>
